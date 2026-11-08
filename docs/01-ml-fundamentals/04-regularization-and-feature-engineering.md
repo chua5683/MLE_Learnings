@@ -23,7 +23,7 @@ $$
 $$
 
 - **L2 (Ridge)**: $\Omega(w)=\frac12\|w\|_2^2$; the gradient gains an extra $\lambda w$, so parameters shrink proportionally. Linear regression has the closed-form solution $w^*=(X^\top X+\lambda I)^{-1}X^\top y$.
-- **L1 (Lasso)**: $\Omega(w)=\|w\|_1$; it is non-differentiable at 0, so subgradients are used. It is equivalent to applying a soft-threshold to each coordinate, $S_\lambda(z)=\operatorname{sign}(z)\max(|z|-\lambda,0)$, which can push some weights to **exactly 0**.
+- **L1 (Lasso)**: $\Omega(w)=\|w\|_1$; it is non-differentiable at 0, so subgradients are used. It is equivalent to applying a soft-threshold to each coordinate, $S_\lambda(z)=\mathrm{sign}(z)\max(|z|-\lambda,0)$, which can push some weights to **exactly 0**.
 - **ElasticNet**: $\Omega=\lambda_1\|w\|_1+\lambda_2\|w\|_2^2$, balancing sparsity and grouping of correlated features; it is more stable than pure Lasso when there are many features and few samples.
 
 **Why is L1 sparse?** Three perspectives:

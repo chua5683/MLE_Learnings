@@ -14,7 +14,7 @@
 | k-fold CV | k=5/10; stratified keeps class proportions; split time series by time |
 | Nested CV | Inner loop tunes, outer loop evaluates, avoiding tuning bias |
 | VC intuition | Generalization gap $O(\sqrt{d/m})$, with $m\gg d$ |
-| L1 | Sparse, Laplace prior, soft threshold $\operatorname{sign}(z)\max(\vert z\vert -\lambda,0)$ |
+| L1 | Sparse, Laplace prior, soft threshold $\mathrm{sign}(z)\max(\vert z\vert -\lambda,0)$ |
 | L2 | Smooth, Gaussian prior, $w^*=(X^\top X+\lambda I)^{-1}X^\top y$ |
 | Prerequisites for regularization | Standardize features; usually do not penalize the bias; choose $\lambda$ by CV |
 

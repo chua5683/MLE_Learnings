@@ -65,7 +65,7 @@ $$\frac{\partial J}{\partial z_i} = p_i - y_i \quad\Longrightarrow\quad \nabla_w
 
 In vector form: $\frac{\partial J}{\partial w} = \frac{1}{m}\sum_i (p_i-y_i)x_i$. The second derivative (Hessian) is
 
-$$H = \frac{1}{m}X^\top \operatorname{diag}(p_i(1-p_i)) X \succeq 0$$
+$$H = \frac{1}{m}X^\top \mathrm{diag}(p_i(1-p_i)) X \succeq 0$$
 
 Therefore the cross-entropy loss is convex in $w$ and has a unique global optimum (unless the data are degenerate). There is no closed form, so we use gradient descent, L-BFGS, or Newton's method/IRLS.
 

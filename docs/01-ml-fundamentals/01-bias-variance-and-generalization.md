@@ -21,7 +21,7 @@ An intuitive framework: **learning = balancing model capacity against data size*
 
 Assume the data-generating process is
 
-$$y = f(x) + \varepsilon, \qquad \mathbb{E}[\varepsilon]=0, \qquad \operatorname{Var}(\varepsilon)=\sigma^2$$
+$$y = f(x) + \varepsilon, \qquad \mathbb{E}[\varepsilon]=0, \qquad \mathrm{Var}(\varepsilon)=\sigma^2$$
 
 The training set $D$ is sampled independently from the data distribution, and the learner outputs $f_D(x)$. At a fixed test point $x$, take the expectation over the randomness of the training set and the noise:
 
@@ -146,7 +146,7 @@ Rule of thumb: **training error reflects bias, while the train-validation gap re
 ## 4. Interview Q&A
 
 ### Q1. Derive the bias-variance decomposition.
-**Answer**: Let $y=f(x)+\varepsilon$ with $\mathbb{E}\varepsilon=0$ and $\operatorname{Var}(\varepsilon)=\sigma^2$. Write the test error as $\mathbb{E}[(f+\varepsilon-f_D)^2]$; after expansion the noise cross term is zero, leaving $\mathbb{E}_D[(f-f_D)^2]+\sigma^2$. Add and subtract the mean $\bar f$ of $f_D$: $f-f_D=(f-\bar f)-(f_D-\bar f)$; the cross-term expectation is zero, so we get $(f-\bar f)^2+\mathbb{E}_D[(f_D-\bar f)^2]+\sigma^2$, i.e., bias² + variance + noise.
+**Answer**: Let $y=f(x)+\varepsilon$ with $\mathbb{E}\varepsilon=0$ and $\mathrm{Var}(\varepsilon)=\sigma^2$. Write the test error as $\mathbb{E}[(f+\varepsilon-f_D)^2]$; after expansion the noise cross term is zero, leaving $\mathbb{E}_D[(f-f_D)^2]+\sigma^2$. Add and subtract the mean $\bar f$ of $f_D$: $f-f_D=(f-\bar f)-(f_D-\bar f)$; the cross-term expectation is zero, so we get $(f-\bar f)^2+\mathbb{E}_D[(f_D-\bar f)^2]+\sigma^2$, i.e., bias² + variance + noise.
 **Follow-up**: Why decompose squared loss specifically? Other losses (e.g., 0-1 loss or absolute loss) generally do not admit such a clean additive decomposition.
 
 ### Q2. How do you tell whether a model has high bias or high variance, and how do you fix each?
