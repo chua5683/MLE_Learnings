@@ -1,4 +1,11 @@
 $schema: https://api.gitbook.com/gitbook-docs.yaml
 site:
-  title: MLE_Learnings
-  structure: []
+  title: MLE Learning Notes
+  structure:
+    - type: space
+      key: space-mle-notes
+      title: MLE Learning Notes
+      path: /
+      default: true
+      content:
+        directory: ./
