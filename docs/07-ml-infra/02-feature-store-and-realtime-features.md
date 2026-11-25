@@ -124,7 +124,7 @@ stateDiagram-v2
     Deprecate --> [*]
 ```
 
-In practice teams use **two-stage backfill** (Pinterest's approach): first backfill a small sample over a short window to validate the gain, then backfill the full history for real training; meanwhile use **training-time join** (compute features on the fly during training) to reduce dependence on materialized tables. Scheduling, versioning, and quality checks for backfills belong to the data platform — see [05 Data and experiment platform](05-data-and-experiment-platform.md).
+In practice teams use **two-stage backfill** (Pinterest's approach): first backfill a small sample over a short window to validate the gain, then backfill the full history for real training; meanwhile use **training-time join** (compute features on the fly during training) to reduce dependence on materialized tables. Scheduling, versioning, and quality checks for backfills belong to the data platform — see [06 Data and experiment platform](06-data-and-experiment-platform.md).
 
 ## 3. Implementation notes
 

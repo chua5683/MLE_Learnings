@@ -38,7 +38,7 @@ All chapters are **rewritten and condensed notes** (not copied verbatim) for per
 1. **Build the frame first**: read the [knowledge map](00-roadmap/03-knowledge-map.md) and each chapter README to see what problem every block of knowledge solves.
 2. **Read a chapter, then answer its Q&A without looking**: if you cannot, go back to the derivation.
 3. **Write your own one-liner**: the "Cheat sheet" at the end of each note is the smallest unit you should be able to say out loud in an interview; rewrite it in your own words.
-4. **Three days before an interview**: review only the [cheat sheets](08-interview-bank/README.md) and the [top 100 questions](08-interview-bank/04-top-100-questions.md).
+4. **Three days before an interview**: review only the [cheat sheets](08-interview-bank/README.md) and the [top 120 questions](08-interview-bank/07-top-120-questions.md).
 5. **After an interview**: add every question you fumbled to the relevant chapter, with the date and company type.
 
 ## Conventions

@@ -1,6 +1,6 @@
 # Chapter 7 · ML Infra
 
-> **Chapter intro**: An ML Infra interview does not test "which model would you pick"; it tests "how does this system actually run on real machines, fast and cheap". The chapter follows five stages — **data → features → training → serving → platform** — and closes with two full case studies that turn the pieces into a story you can tell in 45 minutes. The split with [Chapter 6 · ML System Design](../06-ml-system-design/README.md) is: Chapter 6 covers "the model and business design", this chapter covers "the pipelines, clusters, scheduling, and serving engineering that support it".
+> **Chapter intro**: An ML Infra interview does not test "which model would you pick"; it tests "how does this system actually run on real machines, fast and cheap". The chapter follows six core pillars — **overview → features → training → serving → RL post-training → data & experiment platform** — and closes with full interview case studies that turn the pieces into a story you can tell in 45 minutes. The split with [Chapter 6 · ML System Design](../06-ml-system-design/README.md) is: Chapter 6 covers "the model and business design", this chapter covers "the pipelines, clusters, scheduling, and serving engineering that support it".
 
 ## 1. ML infra vs. ML system design
 
@@ -24,10 +24,13 @@ flowchart LR
     F --> T["03 Distributed training<br/>cluster / scheduling / comms"]
     F --> R["Samples and training data<br/>point-in-time join"]
     R --> T
+    T --> RL["05 RL post-training infra<br/>rollouts · weight sync · verifiers"]
     T --> M["Model registry / release"]
+    RL --> M
     M --> V["04 Inference serving<br/>GPU optimization / autoscaling"]
+    V -.-> RL
     V --> L["Logs and monitoring<br/>(back to E)"]
-    P["05 Data and experiment platform<br/>versioning, A/B, CI-CD, drift"] -.-> F
+    P["06 Data and experiment platform<br/>versioning, A/B, CI-CD, drift"] -.-> F
     P -.-> T
     P -.-> V
     O["01 Overview: end-to-end component map"] -.-> F
@@ -41,9 +44,9 @@ flowchart LR
 - [02 · Feature platform and real-time features](02-feature-store-and-realtime-features.md) — the dual-store model of a feature store; point-in-time join and data leakage; forward logging vs. backfill; Kafka/Flink basics (partitions, event time, windows, watermarks, state); incremental computation and pre-aggregated blocks for real-time aggregation; ordering guarantees for real-time sequence features; feature monitoring and the backfill flow.
 - [03 · Distributed training infrastructure](03-distributed-training-infrastructure.md) — clusters and scheduling (K8s, gang scheduling, topology awareness); parameter servers vs. all-reduce (including the communication-volume derivation); NCCL/RDMA/NVLink topology; checkpointing, elastic training, and failure recovery; training-platform abstractions and cost estimation.
 - [04 · Inference serving and GPU optimization](04-inference-serving-and-gpu-optimization.md) — the layered online-inference architecture; dynamic batching and autoscaling; GPU utilization and MFU; profiling with nsys/ncu; eliminating small kernels (fused embedding lookup, one-shot H2D copy, CUDA graphs); custom Triton kernels; multi-model sharing; SLA and capacity-planning formulas.
-- [05 · Data and experiment platform](05-data-and-experiment-platform.md) — batch/stream data pipelines and idempotent reruns; data versioning and table formats (Iceberg/Hudi/Delta); data-quality checks; the experiment platform (assignment, layers, sample size, SRM, CUPED); model registry and CI/CD, canary and rollback; drift monitoring and alerting.
-- [06 · Infra interview cases](06-infra-case-studies.md) — a full pipeline walk-through (short-video recommendation); four component-design templates (feature store / real-time features / distributed training / GPU serving); capacity-estimation exercises with solutions; time allocation and common ways to lose points.
-- [07 · RL post-training infrastructure and GPU orchestration](07-rl-posttraining-infrastructure.md) — colocated (verl) vs. disaggregated async RL clusters, fast in-memory weight sync, long-tail CoT straggler mitigation, sandboxed verifiers, and Slurm vs. Kubernetes (+ Kueue/Volcano) vs. Ray.
+- [05 · RL post-training infrastructure and GPU orchestration](05-rl-posttraining-infrastructure.md) — colocated (verl) vs. disaggregated async RL clusters, fast in-memory weight sync, long-tail CoT straggler mitigation, sandboxed verifiers, and Slurm vs. Kubernetes (+ Kueue/Volcano) vs. Ray.
+- [06 · Data and experiment platform](06-data-and-experiment-platform.md) — batch/stream data pipelines and idempotent reruns; data versioning and table formats (Iceberg/Hudi/Delta); data-quality checks; the experiment platform (assignment, layers, sample size, SRM, CUPED); model registry and CI/CD, canary and rollback; drift monitoring and alerting.
+- [07 · Infra interview cases](07-infra-case-studies.md) — a full pipeline walk-through (short-video recommendation); four component-design templates (feature store / real-time features / distributed training / GPU serving); capacity-estimation exercises with solutions; time allocation and common ways to lose points.
 
 ## 4. The two question types and answer skeletons
 
@@ -71,8 +74,8 @@ The interviewer says "design a feature store / real-time feature system / distri
 
 ## 5. Study plan
 
-- **Suggested order**: 01 → 02 → 04 → 03 → 05 → 06. First get "one request" and "one feature" working end to end (01/02), then move to GPUs and training (04/03), then fill in the platform and the cases (05/06).
-- **Time budget**: 3 days. 02 and 04 get one day each (most frequently asked, most detail); 01/03/05/06 share one day.
+- **Suggested order**: 01 → 02 → 04 → 03 → 05 → 06 → 07. First get "one request" and "one feature" working end to end (01/02), then move to GPUs, training, and RL post-training (04/03/05), then fill in the platform and the cases (06/07).
+- **Time budget**: 3 days. 02 and 04 get one day each (most frequently asked, most detail); 01/03/05/06/07 share one day (prioritize 05 for LLM post-training infra roles).
 - **Do the math by hand**: all-reduce communication volume, checkpoint size, GPU count, A/B sample size — these four are the "calculation questions" of an infra interview.
 - **Review method**: close the notes and spend 5 minutes walking a colleague through "the online and offline paths of the Xiaohongshu Explore Feed"; whatever you cannot explain is what you have not learned.
 - **Speaking habit**: give the conclusion first ("I would use the existing feature platform rather than build one"), then 2-3 reasons, then "here is what I would change if the scale were different".
@@ -81,8 +84,9 @@ The interviewer says "design a feature store / real-time feature system / distri
 
 - [Chapter 4 · Distributed training](../04-llm/07-distributed-training.md): the **algorithm and memory derivations** for DP/TP/PP/ZeRO live there; [03](03-distributed-training-infrastructure.md) here only covers **clusters, scheduling, communication libraries, fault tolerance, and cost**, without repeating the derivations.
 - [Chapter 4 · Inference optimization and deployment](../04-llm/08-inference-optimization-and-serving.md): LLM-side KV cache/PagedAttention/continuous batching live there; [04](04-inference-serving-and-gpu-optimization.md) here covers **general GPU serving engineering and capacity planning**, and only bridges to the LLM side.
-- [Chapter 6 · Answer framework](../06-ml-system-design/01-framework-and-methodology.md): the general part on clarifying questions, metrics, and capacity templates; [06](06-infra-case-studies.md) here is that framework applied from an infra angle.
-- [Chapter 1 · Evaluation metrics](../01-ml-fundamentals/05-evaluation-metrics.md): definitions of AUC/GAUC/NDCG; [05](05-data-and-experiment-platform.md) here covers how those metrics are computed and compared on the experiment platform.
+- [Chapter 3 · GRPO and Reasoning RL](../03-reinforcement-learning/07-grpo-and-reasoning-rl.md): alignment algorithms live there; [05](05-rl-posttraining-infrastructure.md) here covers the cluster orchestration, weight sync, and straggler engineering behind them.
+- [Chapter 6 · Answer framework](../06-ml-system-design/01-framework-and-methodology.md): the general part on clarifying questions, metrics, and capacity templates; [07](07-infra-case-studies.md) here is that framework applied from an infra angle.
+- [Chapter 1 · Evaluation metrics](../01-ml-fundamentals/05-evaluation-metrics.md): definitions of AUC/GAUC/NDCG; [06](06-data-and-experiment-platform.md) here covers how those metrics are computed and compared on the experiment platform.
 - [Chapter 8 · System design and infra cheat sheet](../08-interview-bank/05-system-design-and-infra-cheatsheet.md): the compressed version for the day before an interview.
 
 ## 7. One-page cheat sheet
@@ -99,5 +103,6 @@ The interviewer says "design a feature store / real-time feature system / distri
 | Communication time | $t \approx 2S/B$; a 7B bf16 gradient is about 14 GB → about 28 GB per GPU per step | [03](03-distributed-training-infrastructure.md) |
 | GPU serving | Profile first to find the bottleneck; small kernels, H2D copies, and launch overhead are the three killers | [04](04-inference-serving-and-gpu-optimization.md) |
 | Capacity estimation | GPUs = QPS × per-request GPU time / target utilization | [04](04-inference-serving-and-gpu-optimization.md) |
-| Experiments | Stratified randomization, sample size $n\approx16\sigma^2/\Delta^2$, check SRM and confidence intervals | [05](05-data-and-experiment-platform.md) |
-| Interview output | Online then offline, go deep on 1-2 components, give numbers and failure modes | [06](06-infra-case-studies.md) |
+| RL post-training infra | Rollouts dominate (60–80%); sync weights in RAM, pass raw token IDs, kill long-tail stragglers, sandbox verifiers | [05](05-rl-posttraining-infrastructure.md) |
+| Experiments | Stratified randomization, sample size $n\approx16\sigma^2/\Delta^2$, check SRM and confidence intervals | [06](06-data-and-experiment-platform.md) |
+| Interview output | Online then offline, go deep on 1-2 components, give numbers and failure modes | [07](07-infra-case-studies.md) |

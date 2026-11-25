@@ -1,6 +1,6 @@
 # Chapter 4 · Large Language Models (LLM)
 
-> **Chapter intro**: This chapter answers four questions: **how text becomes tokens** (01), **what the model looks like** (02, 03), **how the model gets trained** (04, 05, 07), and **how a trained model becomes a product** (06). These 12 notes are the backbone of LLM interviews: architecture details, memory estimates, and scaling laws come up in almost every round. The last five notes (inference, quantization, evaluation, RAG, prompting) lean toward applied engineering and sit in the second half of the chapter.
+> **Chapter intro**: This chapter answers four questions: **how text becomes tokens** (01), **what the model looks like** (02, 03), **how the model gets trained** (04, 05, 06, 07), and **how a trained model is served, evaluated, and applied across modalities** (08–13). These 13 notes are the backbone of LLM interviews: architecture details, memory estimates, and scaling laws come up in almost every round, while the second half covers inference, quantization, evaluation, RAG, prompting, and multimodal VLMs.
 
 ## Chapter map
 
@@ -17,12 +17,15 @@ flowchart TB
         A6["06 Fine-tuning and PEFT"]
         A7["07 Distributed training"]
     end
-    subgraph S3["3) Applications and evaluation 08-12"]
+    subgraph S3["3) Inference, compression, and evaluation 08-10"]
         A8["08 Inference optimization and deployment"]
         A9["09 Quantization and compression"]
         A10["10 Evaluation and hallucination"]
+    end
+    subgraph S4["4) Applications and multimodal 11-13"]
         A11["11 RAG"]
         A12["12 Prompt engineering"]
+        A13["13 Multimodal LLMs"]
     end
     A1 --> A2 --> A3
     A3 --> A4 --> A5 --> A7
@@ -31,6 +34,7 @@ flowchart TB
     A6 --> A10
     A8 --> A11
     A8 --> A12
+    A3 --> A13
 ```
 
 ## What this chapter covers
@@ -48,20 +52,23 @@ flowchart TB
 - [06 Fine-tuning and PEFT](06-fine-tuning-and-peft.md) - SFT data and loss masking; full fine-tuning memory; LoRA/QLoRA/DoRA; adapter/prefix/prompt tuning; catastrophic forgetting and evaluation.
 - [07 Distributed training](07-distributed-training.md) - DP/DDP, ZeRO 1/2/3, FSDP, TP, PP (1F1B), SP/CP, MoE expert parallelism; communication primitives and memory estimates; MFU; checkpoint recovery.
 
-### Part 3: Applications and evaluation (08-12)
+### Part 3: Inference, compression, and evaluation (08-10)
 
 - [08 Inference optimization and deployment](08-inference-optimization-and-serving.md) - prefill/decode, KV cache, PagedAttention, continuous batching, speculative decoding, PD disaggregation, TTFT/TPOT.
 - [09 Quantization and compression](09-quantization-and-compression.md) - INT8/INT4/FP8, PTQ/QAT, GPTQ/AWQ/SmoothQuant/GGUF, KV cache quantization, distillation and pruning.
 - [10 Evaluation and hallucination](10-evaluation-and-hallucination.md) - benchmarks, data contamination, LLM-as-judge, hallucination sources and mitigation, safety evaluation.
+
+### Part 4: Applications and multimodal (11-13)
+
 - [11 RAG](11-rag.md) - chunking, embeddings, ANN indexes, hybrid retrieval and reranking, GraphRAG, RAG evaluation.
 - [12 Prompt engineering](12-prompt-engineering.md) - zero/few-shot, CoT, ReAct, structured output, prompt-injection defenses, context engineering.
 - [13 Multimodal LLMs (VLMs & Omni)](13-multimodal-llms.md) - modular ViT+projector vs. native early-fusion, dynamic high-res tiling (AnyRes / NaViT), video token compression, audio tokenization, and multimodal hallucination.
 
 ## Study plan
 
-- **Recommended order**: 01 -> 02 -> 03 -> 04 -> 05 -> 07 -> 06 -> 08 -> 09 -> 10 -> 11 -> 12. You can swap 02 and 03: seeing the architecture panorama first makes the attention details easier to follow.
+- **Recommended order**: 01 -> 02 -> 03 -> 04 -> 05 -> 07 -> 06 -> 08 -> 09 -> 10 -> 11 -> 12 -> 13. You can swap 02 and 03: seeing the architecture panorama first makes the attention details easier to follow.
 - **Time budget**: 3-4 days. 01/03/05/07 are worth doing by hand (KV cache, memory, scaling-law budgets); for the rest, aim to explain the trade-offs clearly.
-- **Interview weight**: architecture evolution (02), KV cache and GQA/MLA (03), Chinchilla (05), LoRA and memory (06/07) are asked in nearly every LLM role; 08-12 matter more for application roles.
+- **Interview weight**: architecture evolution (02), KV cache and GQA/MLA (03), Chinchilla (05), LoRA and memory (06/07) are asked in nearly every LLM role; 08-13 matter more for application and multimodal roles.
 - **Review method**: cover the Q&A first and answer from memory, then reproduce the one-page version from the cheat sheet; cross-cutting questions (such as "why is everyone overtraining now") should connect 05 + 07 + 08.
 
 ## One-page summary
@@ -84,6 +91,6 @@ flowchart TB
 - [02 · Optimizers and training tricks](../02-dl-fundamentals/06-optimizers-and-training-tips.md): AdamW, warmup, gradient clipping, mixed precision.
 - [03 · The full RLHF pipeline](../03-reinforcement-learning/05-rlhf-pipeline.md) and [03 · DPO](../03-reinforcement-learning/06-dpo-and-preference-optimization.md): preference alignment after SFT; note 06 in this chapter stops at SFT/PEFT.
 - [07 · Distributed training infrastructure](../07-ml-infra/03-distributed-training-infrastructure.md): the same problem seen from clusters, NCCL, and scheduling; note 07 here focuses on algorithms and memory.
-- [08 · LLM cheat sheet](../08-interview-bank/02-llm-cheatsheet.md): the compressed version of this chapter's conclusions, for the day before an interview.
+- [08 · LLM cheat sheet](../08-interview-bank/03-llm-cheatsheet.md): the compressed version of this chapter's conclusions, for the day before an interview.
 
-> Note: notes 08-12 are maintained by the application track; this README only indexes them and does not duplicate their content.
+> Note: notes 08-13 focus on inference, compression, evaluation, RAG, prompting, and multimodal systems; this README only indexes them and does not duplicate their content.

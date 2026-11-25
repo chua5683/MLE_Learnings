@@ -19,19 +19,20 @@
 
 ```mermaid
 flowchart TD
-    A[Machine Learning Fundamentals] --> B[Generalization theory]
-    A --> C[Supervised models]
-    A --> D[Evaluation and data]
-    A --> E[Probabilistic view]
-    B --> B1[Bias-variance decomposition]
-    B --> B2[Cross-validation / learning curves]
-    B --> B3[PAC/VC intuition]
-    C --> C1[Linear models LR/SVM]
-    C --> C2[Trees and ensembles XGBoost/LightGBM]
-    D --> D1[Metrics ROC-AUC/PR/NDCG]
-    D --> D2[Imbalance and calibration]
-    E --> E1[Naive Bayes/MLE/MAP]
-    E --> E2[EM/GMM/HMM]
+    A["Machine Learning Fundamentals"] --> B["Generalization theory"]
+    A --> C["Supervised models"]
+    A --> D["Evaluation and data"]
+    A --> E["Probabilistic and decision view"]
+    B --> B1["Bias-variance decomposition"]
+    B --> B2["Cross-validation / learning curves"]
+    B --> B3["PAC/VC intuition"]
+    C --> C1["Linear models LR/SVM"]
+    C --> C2["Trees and ensembles XGBoost/LightGBM"]
+    D --> D1["Metrics ROC-AUC/PR/NDCG"]
+    D --> D2["Imbalance and calibration"]
+    E --> E1["Naive Bayes/MLE/MAP"]
+    E --> E2["EM/GMM/HMM"]
+    E --> E3["Causal inference, uplift, and bandits"]
     C2 --> F["Interview thread: why it works + how to tune"]
     D1 --> F
 ```
@@ -40,7 +41,7 @@ flowchart TD
 
 1. **Read 01 and 05 first** (about half a day): build the frameworks for "generalization" and "evaluation"; every later model can then be measured with the same two rulers.
 2. **Then read 02 and 03** (about one day): practice derivations on linear models and engineering details on tree models; you must be able to write the XGBoost objective expansion on a whiteboard.
-3. **Finally read 04, 06, and 07** (about one day): these three notes patch the first two parts and often show up as interview follow-ups.
+3. **Finally read 04, 06, 07, and 08** (about one day): 04, 06, and 07 patch the first two parts and often show up as interview follow-ups; 08 covers causal/uplift modeling and bandits for experimentation, ads, and marketing roles.
 4. For each note, cover the answers and retell the Q&A out loud; if you get stuck, go back to the formulas. The cheat sheet is for the day before an interview.
 
 Expected total time: **2.5-3 days**. If time is tight, prioritize: bias-variance → evaluation metrics → XGBoost → logistic regression/SVM.

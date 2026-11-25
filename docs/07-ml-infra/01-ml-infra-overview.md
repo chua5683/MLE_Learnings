@@ -30,7 +30,7 @@ I remember it as five layers, which makes it easy to walk through in an intervie
 | Training platform | Submit, queue, tolerate failures, produce checkpoints | Gang scheduling + elasticity + resume from checkpoint (see [03](03-distributed-training-infrastructure.md)) |
 | Model registry | Versions, lineage, stages (staging/prod) | Model + feature version + code commit as one triple |
 | Inference service | Score with low latency and high throughput | Layered architecture + batching + autoscaling (see [04](04-inference-serving-and-gpu-optimization.md)) |
-| Monitoring / alerting | Catch data, feature, model, and system problems | Four families of metrics, none optional (see [05](05-data-and-experiment-platform.md)) |
+| Monitoring / alerting | Catch data, feature, model, and system problems | Four families of metrics, none optional (see [06](06-data-and-experiment-platform.md)) |
 | Workflow orchestration | Run all of the above in dependency order | DAG + idempotency + retries + backfill |
 
 ## 2. Principles and derivations: two paths and one hub

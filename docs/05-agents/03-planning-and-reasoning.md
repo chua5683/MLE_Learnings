@@ -153,7 +153,7 @@ def plan_execute(task, tools, llm, max_rounds=3):
     return done
 ```
 
-Key engineering details: **record a span per step** (see [production evaluation](07-evaluation-and-safety.md)), **truncate subtask output before it enters the context**, **cap the number of replans**, and **prefer external signals over model self-evaluation**.
+Key engineering details: **record a span per step** (see [production evaluation](09-evaluation-and-safety.md)), **truncate subtask output before it enters the context**, **cap the number of replans**, and **prefer external signals over model self-evaluation**.
 
 ## 4. Interview Q&A
 

@@ -58,4 +58,4 @@
 
 ## 6. Related chapters
 
-- [04 PPO and TRPO](../03-reinforcement-learning/04-ppo-and-trpo.md) · [05 RLHF pipeline](../03-reinforcement-learning/05-rlhf-pipeline.md) · [06 DPO](../03-reinforcement-learning/06-dpo-and-preference-optimization.md) · [07 GRPO & Reasoning RL](../03-reinforcement-learning/07-grpo-and-reasoning-rl.md) · [08 Alignment compared](../03-reinforcement-learning/08-alignment-algorithms-compared.md) · [07-07 RL Post-Training Infra](../07-ml-infra/07-rl-posttraining-infrastructure.md)
+- [04 PPO and TRPO](../03-reinforcement-learning/04-ppo-and-trpo.md) · [05 RLHF pipeline](../03-reinforcement-learning/05-rlhf-pipeline.md) · [06 DPO](../03-reinforcement-learning/06-dpo-and-preference-optimization.md) · [07 GRPO & Reasoning RL](../03-reinforcement-learning/07-grpo-and-reasoning-rl.md) · [08 Alignment compared](../03-reinforcement-learning/08-alignment-algorithms-compared.md) · [07-05 RL Post-Training Infra](../07-ml-infra/05-rl-posttraining-infrastructure.md)

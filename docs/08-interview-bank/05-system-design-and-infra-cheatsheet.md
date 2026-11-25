@@ -123,5 +123,5 @@
 - Risk and finance: [Risk and finance design](../06-ml-system-design/04-risk-and-finance-design.md)
 - LLM applications: [LLM application system design](../06-ml-system-design/05-llm-application-design.md)
 - Cases: [Case library](../06-ml-system-design/06-case-studies.md)
-- Infra details: [ML Infra overview](../07-ml-infra/01-ml-infra-overview.md), [Feature platform](../07-ml-infra/02-feature-store-and-realtime-features.md), [Inference serving](../07-ml-infra/04-inference-serving-and-gpu-optimization.md)
+- Infra details: [ML Infra overview](../07-ml-infra/01-ml-infra-overview.md), [Feature platform](../07-ml-infra/02-feature-store-and-realtime-features.md), [Distributed training](../07-ml-infra/03-distributed-training-infrastructure.md), [Inference serving](../07-ml-infra/04-inference-serving-and-gpu-optimization.md), [RL post-training infra](../07-ml-infra/05-rl-posttraining-infrastructure.md), [Data and experiment platform](../07-ml-infra/06-data-and-experiment-platform.md)
 - Evaluation metrics: [Evaluation metrics](../01-ml-fundamentals/05-evaluation-metrics.md)

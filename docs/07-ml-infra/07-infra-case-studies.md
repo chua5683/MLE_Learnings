@@ -145,7 +145,7 @@ Peak 100k QPS, 2 KB per log entry (with a feature snapshot it is larger; we use 
 
 ### Exercise 4: how long must an A/B test run?
 
-Baseline CTR 5%, targeting a +2% relative lift ($\Delta=0.001$); each group needs about 750k impressions (see [05](05-data-and-experiment-platform.md)). At a peak of 100k QPS with 1% of traffic in the experiment → 1000 impressions/s, 1.5M across both groups → about 25 minutes. With only 0.1% of traffic → 4 hours; to detect a +1% relative lift the sample size is 4x → 100 minutes. Conclusion: **MDE and traffic together determine the experiment duration**; small traffic cannot detect small gains.
+Baseline CTR 5%, targeting a +2% relative lift ($\Delta=0.001$); each group needs about 750k impressions (see [06](06-data-and-experiment-platform.md)). At a peak of 100k QPS with 1% of traffic in the experiment → 1000 impressions/s, 1.5M across both groups → about 25 minutes. With only 0.1% of traffic → 4 hours; to detect a +1% relative lift the sample size is 4x → 100 minutes. Conclusion: **MDE and traffic together determine the experiment duration**; small traffic cannot detect small gains.
 
 ## 5. Interview Q&A
 

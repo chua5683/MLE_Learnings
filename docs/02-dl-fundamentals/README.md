@@ -39,7 +39,7 @@ flowchart LR
 
 ## Study plan
 
-- **Order**: 01 → 02 → 03 → 05 → 04 → 06. For LLM roles, master the Transformer first and then go back to CNN/RNN; for classical CV or recommendation roles, move 04 earlier.
+- **Order**: 01 → 02 → 03 → 05 → 04 → 06 → 07. For LLM roles, master the Transformer first and then go back to CNN/RNN; for classical CV, multimodal, or graph roles, prioritize 04 and 07.
 - **Time**: 2–3 days. 01/03/05 carry the weight and deserve 60% of the time; 04 is mostly for intuition and a vocabulary index - come back to it when a specific role calls for it.
 - **Method**: derive each core formula at least once (the chain rule in backprop, the forward/backward pass of BN, self-attention complexity, Adam's bias correction). One follow-up question exposes whether you only memorized the conclusion.
 - **Practice**: implement a two-layer MLP in PyTorch and check gradients against `autograd`; implement single-head self-attention and verify the output shape and the effect of the mask.

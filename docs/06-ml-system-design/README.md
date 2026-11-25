@@ -67,7 +67,7 @@ Every trade-off in system design comes from one of these tensions. When you get 
 
 1. **Memorize the framework before reading cases**: the 9 steps and capacity formulas from 01 must be reproducible without notes (~2 hours).
 2. **Do one full design per track**: pick one from 02–05, present it on a whiteboard in 45 minutes, record it, and listen back (~1–2 hours each).
-3. **Use the case library to fill gaps**: for each of the 14 cases in 06, remember only "clarifying questions + skeleton + one pitfall" (~2 hours).
+3. **Use the case library to fill gaps**: for each of the 18 cases in 06, remember only "clarifying questions + skeleton + one pitfall" (~2 hours).
 4. **One hour before the interview**: read only the [system design and infra cheat sheet](../08-interview-bank/05-system-design-and-infra-cheatsheet.md).
 
 Estimated total: **2–3 days**.

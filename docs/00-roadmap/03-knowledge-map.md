@@ -15,13 +15,13 @@ flowchart TB
 
     subgraph M["Models"]
         RL["03 Reinforcement learning<br/>MDP · PG · PPO · RLHF · DPO · GRPO"]
-        LLM["04 Large language models<br/>architecture · pretraining · scaling · fine-tuning · distributed · inference · quantization · evaluation · RAG · prompting"]
-        AG["05 AI agents<br/>agent loop · tools · planning · memory · multi-agent · engineering"]
+        LLM["04 Large language models<br/>architecture · pretraining · scaling · fine-tuning · distributed · inference · quantization · evaluation · RAG · prompting · multimodal"]
+        AG["05 AI agents<br/>agent loop · tools · planning · memory · RAG · multi-agent · proactive · harness · eval · governance"]
     end
 
     subgraph S["Systems"]
         SD["06 ML system design<br/>recsys · search · ads · risk · LLM apps"]
-        INF["07 ML infra<br/>feature store · real-time features · training/serving infrastructure"]
+        INF["07 ML infra<br/>feature store · real-time features · training · serving · RL post-training · platform"]
     end
 
     ML --> DL
@@ -50,11 +50,11 @@ flowchart TB
 | DPO | Preference modeling, KL regularization | 03-06 |
 | RAG | Retrieval, embeddings, generation | 04-11 |
 | Agents | LLMs, tool calling, planning | 05-01 |
-| Harness, Governance & Proactive Agents | Agent loop, MCP, event streams, auth/RBAC | 05-09 / 05-10 / 05-11 |
+| Proactive, Harness & Governance Agents | Agent loop, MCP, event streams, auth/RBAC | 05-07 / 05-08 / 05-10 |
 | Feature store | Offline/online consistency | 07-02 |
 | Causal / Uplift & Bandits | Potential outcomes, propensities | 01-08 |
 | VLMs / Diffusion / GNNs | ViT, contrastive loss, message passing | 02-07 / 04-13 |
-| RL Post-Training Infra | Distributed training + vLLM/SGLang serving | 07-07 |
+| RL Post-Training Infra | Distributed training + vLLM/SGLang serving | 07-05 |
 
 ## 3. One-page index
 

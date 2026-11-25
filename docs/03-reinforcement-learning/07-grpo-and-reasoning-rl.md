@@ -82,7 +82,7 @@ The fix: drop std normalization (use only $r_i-\mathrm{mean}$) and change length
 
 #### Off-policy staleness and Multi-turn / Agentic RL
 
-- **Async / off-policy staleness**: when rollout engines (vLLM/SGLang) run asynchronously behind the trainer (see [07-07 RL Post-Training Infra](../07-ml-infra/07-rl-posttraining-infrastructure.md)), the behavior policy $\pi_{\mathrm{rollout}}$ lags $\pi_\theta$; bound staleness (e.g., $\le 2\text{–}4$ steps) and compute importance ratios against the **actual rollout logprobs**.
+- **Async / off-policy staleness**: when rollout engines (vLLM/SGLang) run asynchronously behind the trainer (see [07-05 RL Post-Training Infra](../07-ml-infra/05-rl-posttraining-infrastructure.md)), the behavior policy $\pi_{\mathrm{rollout}}$ lags $\pi_\theta$; bound staleness (e.g., $\le 2\text{–}4$ steps) and compute importance ratios against the **actual rollout logprobs**.
 - **Multi-turn tool / agentic RL**: when rollouts interleave assistant tokens with environment/tool observations (Python stdout, search results, compiler errors), **strictly mask non-assistant tokens out of the policy-gradient loss and KL term** so the model learns *which actions to take* rather than imitating tool outputs.
 
 ### 2.6 RLVR: verifiable rewards

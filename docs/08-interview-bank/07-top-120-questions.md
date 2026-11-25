@@ -1,4 +1,4 @@
-# Top 100 Interview Questions
+# Top 120 Interview Questions
 
 > **How to use**: cover the answer and self-quiz; follow the link for any question you miss. Answers are 2–4 lines of key points: conclusion + reason + likely follow-up direction.
 >
@@ -396,11 +396,11 @@
 
 ### Q96. When should you not use multi-agent systems?
 **Answer**: When a single agent can do the task, when latency or cost is tight, or when strong consistency and debuggability are required. Multi-agent adds communication overhead, error propagation, and evaluation difficulty. Start with one agent plus tools; split only when justified.
-→ See [Multi agent systems](../05-agents/05-multi-agent-systems.md)
+→ See [Multi agent systems](../05-agents/06-multi-agent-systems.md)
 
 ### Q97. How do you evaluate an agent?
 **Answer**: Task success rate, trajectory quality (steps/tool accuracy), cost (tokens/latency), robustness (perturbation/failure recovery), and safety. You need reproducible environments, fixed tool sets, LLM-as-a-judge plus human spot checks, and regression tests.
-→ See [Evaluation and safety](../05-agents/07-evaluation-and-safety.md)
+→ See [Evaluation and safety](../05-agents/09-evaluation-and-safety.md)
 
 ### Q98. What are the principles of good tool design?
 **Answer**: Single responsibility, clear descriptions (when to use, inputs/outputs, limits), few stable parameters, idempotency and retryability, readable error messages, structured and truncated outputs, least privilege, and confirmation for destructive operations.
@@ -408,11 +408,11 @@
 
 ### Q99. How do you optimize agent cost?
 **Answer**: Model routing (small models for easy steps), context compression/caching, step limits, parallel tool calls, truncating tool results, prompt caching, fast failure, and offline batch processing.
-→ See [Evaluation and safety](../05-agents/07-evaluation-and-safety.md)
+→ See [Evaluation and safety](../05-agents/09-evaluation-and-safety.md)
 
 ### Q100. What are the security risks of agents?
 **Answer**: Prompt injection (especially from web pages or documents), tool abuse or privilege escalation, data exfiltration, sandbox escapes in code execution, supply-chain risks (MCP servers), and irreversible actions. Defenses: least privilege, sandboxing, human confirmation, audit logs, and output filtering.
-→ See [Evaluation and safety](../05-agents/07-evaluation-and-safety.md)
+→ See [Evaluation and safety](../05-agents/09-evaluation-and-safety.md)
 
 ## F. System Design, ML Infra, and Frontier Topics (Q101–Q120)
 
@@ -450,15 +450,15 @@
 
 ### Q109. Why is RL post-training infrastructure (verl / OpenRLHF) harder than standard SFT training?
 **Answer**: RL loops alternate between autoregressive **rollouts** (decode-heavy, variable-length, straggler-prone, served by vLLM/SGLang) and **policy updates** (compute-heavy FSDP/Megatron), plus external verifiers/sandboxes. Key bottlenecks are weight-sync latency between trainer and rollout engines, GPU idle bubbles from long-tail CoT lengths, and off-policy staleness under async rollouts.
-→ See [RL post-training infrastructure](../07-ml-infra/07-rl-posttraining-infrastructure.md)
+→ See [RL post-training infrastructure](../07-ml-infra/05-rl-posttraining-infrastructure.md)
 
 ### Q110. What is SRM in A/B testing, and how do you handle peeking and network interference?
 **Answer**: Sample Ratio Mismatch (chi-square $p < 0.001$) flags broken randomization, logging drops, or asymmetric timeouts and invalidates the test immediately. Prevent peeking inflation with fixed horizons or always-valid sequential tests (mSPRT); handle marketplace/social spillover with cluster randomization or time-based switchbacks.
-→ See [Data and experiment platform](../07-ml-infra/05-data-and-experiment-platform.md)
+→ See [Data and experiment platform](../07-ml-infra/06-data-and-experiment-platform.md)
 
 ### Q111. How does Interleaving compare to standard A/B testing for search and recommendation?
 **Answer**: Interleaving merges top-$K$ results from rankers A and B into one list (Team Draft / Probabilistic Interleaving) and attributes clicks within the same impression, removing user-level variance. It detects ranking gains with 10–100× less traffic than user-split A/B tests, so teams use it as a fast filter before full A/B confirmation of business and guardrail metrics.
-→ See [Data and experiment platform](../07-ml-infra/05-data-and-experiment-platform.md)
+→ See [Data and experiment platform](../07-ml-infra/06-data-and-experiment-platform.md)
 
 ### Q112. How do Vision-Language Models (VLMs) feed images into an LLM, and why does dynamic tiling matter?
 **Answer**: Modular VLMs encode an image with a vision encoder (e.g., SigLIP/ViT) and project patch tokens via an MLP or Q-Former into the LLM embedding space; native multimodal models tokenize image patches directly. Fixed low-resolution resizing blurs small text and charts, so dynamic tiling (AnyRes) splits high-res images into aspect-ratio-preserving crops plus a global thumbnail.
@@ -482,11 +482,11 @@
 
 ### Q117. What is the difference between `pass@k` and `pass^k` in agent evaluation?
 **Answer**: `pass@k` measures the probability that *at least one* of $k$ independent runs succeeds (capability ceiling, rises with $k$). `pass^k` measures the probability that *all $k$* independent runs succeed (production consistency, decays as $\hat{p}^k$). An agent with 80% single-run accuracy has `pass@4` ≈ 99.8% but `pass^4` ≈ 41%.
-→ See [Evaluation and safety](../05-agents/07-evaluation-and-safety.md)
+→ See [Evaluation and safety](../05-agents/09-evaluation-and-safety.md)
 
 ### Q118. What is context engineering for long-horizon agents?
 **Answer**: Managing the finite attention and cost budget across dozens of turns: keep system prompts and tool definitions static at the prefix for KV/prompt-cache hits, disclose tools/skills progressively instead of dumping 100 schemas, offload large tool outputs to external files/scratchpads, and compact stale trajectory steps into structured state summaries.
-→ See [Agent fundamentals and architecture](../05-agents/01-agent-fundamentals-and-architecture.md)
+→ See [Agent fundamentals and architecture](../05-agents/01-agent-fundamentals-and-architecture.md) and [Harness engineering](../05-agents/08-harness-engineering.md)
 
 ### Q119. How do Semantic IDs (RQ-VAE / TIGER) change recommender retrieval?
 **Answer**: Instead of maintaining an ANN index over millions of flat item embeddings, RQ-VAE quantizes each item's content/collaborative embedding into a short hierarchical tuple of discrete codebook tokens (e.g., 4 tokens). A sequence Transformer then autoregressively generates target Semantic IDs via beam search, unifying retrieval and cold-start generalization.

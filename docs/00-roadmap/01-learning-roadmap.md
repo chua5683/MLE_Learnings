@@ -11,7 +11,7 @@ The same body of knowledge carries very different weight across roles. Below are
 | Role | Typical work | High-weight chapters | Lower-weight chapters |
 | --- | --- | --- | --- |
 | **Traditional MLE** (recsys / ads / search / risk) | Features, model iteration, A/B tests, offline-online consistency | 01, 02, 06, the pipeline part of 07 | 03; inference details in 04 |
-| **LLM application engineer** | RAG, agents, prompting, evaluation, serving | 04 (08–12), 05, 06-05 | Tree-model derivations in 01; 07 |
+| **LLM application engineer** | RAG, agents, prompting, evaluation, serving | 04 (08–13), 05, 06-05 | Tree-model derivations in 01; 07 |
 | **LLM training / inference engineer** | Pretraining, fine-tuning, distributed training, inference optimization | 02, 03, 04 (01–09), 07 | Business design in 06 |
 | **Agent / application architect** | Tool use, multi-agent systems, engineering | 04, 05, 06-05 | Formula-heavy parts of 01 and 02 |
 
@@ -26,7 +26,7 @@ The same body of knowledge carries very different weight across roles. Below are
 | 3 | LLM architecture and pretraining | 04-01 to 04-05 | Draw Llama; compute KV cache; explain Chinchilla |
 | 4 | Fine-tuning and distributed training | 04-06, 04-07 | Explain LoRA/QLoRA; compute ZeRO memory; explain TP/PP |
 | 5 | Inference and evaluation | 04-08 to 04-10 | Explain PagedAttention and speculative decoding; design an eval plan |
-| 6 | RAG, prompting, agents | 04-11, 04-12, all of 05 | Design a RAG system; write a tool schema |
+| 6 | RAG, prompting, agents | 04-11 to 04-13, all of 05 | Design a RAG system; write a tool schema |
 | 7 | System design | All of 06 plus 07-01/02/04 | Two 45-minute designs; draw a feature store |
 | 8 | Final sprint | 03 (role-dependent), chapter 08 | Three mock interviews; finalize project stories; review mistakes |
 
@@ -37,7 +37,7 @@ The same body of knowledge carries very different weight across roles. Below are
 1. **Read (40%)**: go in chapter order and mark anything you cannot follow or derive.
 2. **Write (30%)**: close the Q&A and answer in your own words; if you cannot, go back.
 3. **Explain (20%)**: 15 minutes at a whiteboard or recorded, focusing on derivations and trade-offs.
-4. **Test (10%)**: self-quiz with the [top 100 questions](../08-interview-bank/04-top-100-questions.md); log missed questions in the relevant chapter.
+4. **Test (10%)**: self-quiz with the [top 120 questions](../08-interview-bank/07-top-120-questions.md); log missed questions in the relevant chapter.
 
 ## 4. Minimum reading list (when time is short)
 
@@ -48,14 +48,14 @@ The same body of knowledge carries very different weight across roles. Below are
 
 ### LLM applications
 - 04-01 tokenization, 04-02 architecture, 04-05 scaling laws, 04-06 fine-tuning
-- 04-08 inference, 04-10 evaluation, 04-11 RAG, 04-12 prompting
-- 05-01 agent fundamentals, 05-02 tool use, 05-04 memory, 05-07 engineering
+- 04-08 inference, 04-10 evaluation, 04-11 RAG, 04-12 prompting, 04-13 multimodal
+- 05-01 agent fundamentals, 05-02 tool use, 05-04 memory, 05-08 harness engineering, 05-09 evaluation & safety
 - 06-05 LLM application system design
 
 ### LLM training / inference
 - 02-05 Transformer, 04-02 architecture, 04-03 attention, 04-04 pretraining
 - 04-05 scaling laws, 04-06 fine-tuning, 04-07 distributed training
-- 04-08 inference, 04-09 quantization, 07-03 training infrastructure, 07-04 GPU serving
+- 04-08 inference, 04-09 quantization, 07-03 training infrastructure, 07-04 GPU serving, 07-05 RL post-training infra
 
 ## 5. Common pitfalls
 

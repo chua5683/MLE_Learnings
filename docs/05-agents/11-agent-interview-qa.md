@@ -129,100 +129,104 @@
 ### Q39. How do you design a forgetting policy?
 **Answer**: Time decay lowers weight, access reinforcement raises it, conflicts merge (latest wins for preferences), hot and cold tiers archive, and compliance requires hard deletion with export and audit. Decay must be slowed for important memories so they are not deleted by mistake.
 
-## E. Multi-agent systems ([05](05-multi-agent-systems.md))
+## E. Agentic RAG ([05](05-agentic-rag.md))
 
-### Q40. Are multi-agent systems always better than a single agent?
-**Answer**: No. The gains hold only when the task can be split with few information dependencies, needs different tools and roles, or needs independent verification; costs grow roughly quadratically (Anthropic reports about 15x tokens for its multi-agent research system) and debugging gets harder.
-
-### Q41. How do you estimate multi-agent communication cost?
-**Answer**: With full connectivity the message count is $O(n^2)$ and each message carries context. Savings: star or hierarchical topologies ($O(n)$), structured summaries, capped rounds and length, and early stopping when there is no progress.
-
-### Q42. How do you prevent multi-agent loops?
-**Answer**: Max rounds plus budget cap plus convergence criteria (stable judge, consistent votes, no new information) plus loop detection (repeated delegation), and appoint an explicit final owner.
-
-### Q43. When does debate help?
-**Answer**: When errors can be exposed by argument and participants have different information sources (different models or evidence). Debating with the same model, prompt, and retrieval source only fails together.
-
-### Q44. Single agent with many tools, or multiple agents?
-**Answer**: Three tests: does context contaminate itself, do you need parallelism, do you need independent verification. If none applies, stay single-agent; the middle ground is "one controller plus a few dedicated sub-agents (retrieval, code execution)".
-
-### Q45. What is the difference between A2A and MCP?
-**Answer**: MCP is the vertical access protocol for "agent to tools and data"; A2A is the horizontal protocol for "agent to agent" discovery, delegation, and state synchronization. The former is mature, the latter early, and they are complementary.
-
-## F. Agentic RAG ([06](06-agentic-rag.md))
-
-### Q46. How is Agentic RAG different from Advanced RAG?
+### Q40. How is Agentic RAG different from Advanced RAG?
 **Answer**: Advanced RAG is a fixed pipeline (rewrite → retrieve → rerank → generate); Agentic RAG makes retrieval a tool and lets the model decide what to look up, how many times, whether the evidence suffices, and whether to switch tools. Control flow moves to the model, and cost and latency rise with it.
 
-### Q47. When is agentic retrieval worth it?
+### Q41. When is agentic retrieval worth it?
 **Answer**: Multi-hop, heterogeneous sources, open-ended questions, expensive mistakes, and unstable recall with room to improve. It is not worth it for single-hop FAQ, latency-sensitive paths, or already-solid retrieval. The test: can one retrieval probably collect all the evidence.
 
-### Q48. How do you handle multi-hop questions?
+### Q42. How do you handle multi-hop questions?
 **Answer**: Decompose the query → iterate serially (use the previous hop's result to build the next query) → ground every hop with citations → cap at 2-4 hops → if still short, give a partial answer and say what is missing. Independent sub-questions can run in parallel.
 
-### Q49. Self-RAG versus CRAG?
+### Q43. Self-RAG versus CRAG?
 **Answer**: Self-RAG trains the model to emit reflection tokens for whether to retrieve and whether passages are relevant or supporting (internalized, needs training); CRAG bolts on a retrieval evaluator that sorts results into correct / incorrect / ambiguous and triggers different actions (easy to ship, observable). Products start with the CRAG-style external layer.
 
-### Q50. Is GraphRAG worth it?
+### Q44. Is GraphRAG worth it?
 **Answer**: Only for global thematic questions or multi-hop relations over a stable structure. Graph construction plus community summaries is LLM-expensive and incremental updates are painful; most enterprise knowledge bases do fine with hybrid retrieval plus reranking plus agentic follow-up queries.
 
-### Q51. How do you guarantee citations and reduce hallucination?
+### Q45. How do you guarantee citations and reduce hallucination?
 **Answer**: Force citations during generation (sentences without a citation are not emitted) → verify entailment sentence by sentence after generation (delete or rewrite unsupported claims) → abstain explicitly when evidence is insufficient → make citations clickable back to the source.
 
-### Q52. Which layer should permission filtering live in?
+### Q46. Which layer should permission filtering live in?
 **Answer**: The **retrieval layer** (attach the ACL filter to the query), not post-generation trimming; otherwise the model has already seen unauthorized content and may leak it. The cache key must include permissions and version too.
 
-## G. Production, evaluation, and safety ([07](07-evaluation-and-safety.md))
+## F. Multi-agent systems ([06](06-multi-agent-systems.md))
 
-### Q53. How do you evaluate an agent?
-**Answer**: Three layers: end to end (task success rate, pass@1 / pass^k, cost, P95 latency), trajectory (steps, wasted steps, repeat rate, tool accuracy), component (retrieval hit rate, judge agreement), plus an online A/B.
+### Q47. Are multi-agent systems always better than a single agent?
+**Answer**: No. The gains hold only when the task can be split with few information dependencies, needs different tools and roles, or needs independent verification; costs grow roughly quadratically (Anthropic reports about 15x tokens for its multi-agent research system) and debugging gets harder.
 
-### Q54. What are the biases of LLM-as-judge and how do you use it?
-**Answer**: Position, length, self-preference, and sycophancy bias. Mitigate with a rubric split into dimensions, pairwise comparison with swapped order, reference answers, and calibration against human labels with reported agreement; before calibration use it only as a soft gate.
+### Q48. How do you estimate multi-agent communication cost?
+**Answer**: With full connectivity the message count is $O(n^2)$ and each message carries context. Savings: star or hierarchical topologies ($O(n)$), structured summaries, capped rounds and length, and early stopping when there is no progress.
 
-### Q55. How do you localize an online failure?
-**Answer**: Walk the span tree of the trace, find the **first anomalous span**, check that step's input (missing information?), tool arguments (schema), and return (truncated or timed out), then reproduce offline with fixed model, prompt, and tool versions, and add it to the regression set.
+### Q49. How do you prevent multi-agent loops?
+**Answer**: Max rounds plus budget cap plus convergence criteria (stable judge, consistent votes, no new information) plus loop detection (repeated delegation), and appoint an explicit final owner.
 
-### Q56. How do you optimize cost?
-**Answer**: Fewer steps > compress context > cache > model routing > parallelism (saves time, not money) > early stopping; account cost per **successful task** and amortize failed retries.
+### Q50. When does debate help?
+**Answer**: When errors can be exposed by argument and participants have different information sources (different models or evidence). Debating with the same model, prompt, and retrieval source only fails together.
 
-### Q57. Why is prompt injection more dangerous for agents?
-**Answer**: Agents actively read untrusted content and hold execution permissions, so injection can directly cause exfiltration or writes. Assume "some injection will succeed" and bound the blast radius with least privilege, sandboxes, HITL, and audit.
+### Q51. Single agent with many tools, or multiple agents?
+**Answer**: Three tests: does context contaminate itself, do you need parallelism, do you need independent verification. If none applies, stay single-agent; the middle ground is "one controller plus a few dedicated sub-agents (retrieval, code execution)".
 
-### Q58. How do you roll out safely?
-**Answer**: Split by session or user (not per request, so one session never spans versions), monitor success rate, cost, latency, human takeover rate, and security events, set automatic rollback thresholds, ramp 1% → 5% → 25% → full traffic, and use shadow mode first for risky changes.
+### Q52. What is the difference between A2A and MCP?
+**Answer**: MCP is the vertical access protocol for "agent to tools and data"; A2A is the horizontal protocol for "agent to agent" discovery, delegation, and state synchronization. The former is mature, the latter early, and they are complementary.
 
-## H. Harness engineering, governance, and proactive agents ([09](09-harness-engineering.md) · [10](10-governance-and-guardrails.md) · [11](11-proactive-and-ambient-agents.md))
+## G. Proactive and ambient agents ([07](07-proactive-and-ambient-agents.md))
 
-### Q59. What is harness engineering, and why does it move success rate by 15–30% on the same model?
-**Answer**: The harness is everything around the LLM: execution loop, context compiler, Agent-Computer Interface (ACI), sandbox, deterministic verifiers, and durable checkpoints. Clean tool interfaces, cached prompt prefixes, spill-to-disk truncation, and fast deterministic backpressure eliminate retries and context rot without changing model weights.
-
-### Q60. What are the core rules of Agent-Computer Interface (ACI) design?
-**Answer**: Prefer unique search-and-replace or patch edits over fragile line-number edits; bound and paginate all tool outputs with spill-to-disk file paths; return recovery-oriented error messages; disclose large tool libraries progressively; and support `dry_run` + `idempotency_key` on stateful tools.
-
-### Q61. How do you keep prompt-cache hit rates high (>80%) across a long agent loop?
-**Answer**: Keep the prompt prefix (`system prompt + static tool schemas + static workspace docs`) strictly byte-immutable and append-only; place volatile metadata (timestamps, step counters) in the latest user/tool message, and compact history only at coarse thresholds instead of rewriting earlier turns every step.
-
-### Q62. Why are system-prompt guardrails insufficient for enterprise agent governance?
-**Answer**: Prompts are probabilistic hints mixed into the same token stream as untrusted inputs. Hard security and business invariants (ACLs, refund caps, DLP, SQL write bans) must live in a deterministic **Policy-as-Code gateway** (OPA/Cedar) evaluated outside the LLM before tool execution.
-
-### Q63. How does On-Behalf-Of (OBO) delegation prevent the Confused Deputy problem?
-**Answer**: Instead of giving an agent a shared admin key, the gateway exchanges the invoking user's token (OAuth RFC 8693) for a short-lived scoped token representing $\mathrm{Perms}(\mathrm{Agent\_NHI}) \cap \mathrm{Perms}(\mathrm{User})$. The agent can never access data the invoking user cannot access.
-
-### Q64. How should enterprise runtime guardrails be layered?
-**Answer**: L1 deterministic (<5 ms, fail-closed: OPA/Cedar, JSON Schema, SQL AST, DLP regex, URL allowlists, spend caps) → L2 fast classifiers (10–50 ms: injection/toxicity) → L3 semantic LLM guard (100–500 ms on Tier 2/3 actions). Roll out L2/L3 in shadow mode first to calibrate false-positive rates before blocking.
-
-### Q65. How do you tier agent actions by blast radius?
-**Answer**: Tier 0 public reads (auto-allow) → Tier 1 scoped reads/drafts (OBO ACL + audit) → Tier 2 reversible internal writes (policy + undo token + budget cap) → Tier 3 irreversible/financial/external actions (mandatory HITL approval with exact diff preview and TTL expiry).
-
-### Q66. Why does precision matter more than recall for proactive (ambient) agents?
+### Q53. Why does precision matter more than recall for proactive (ambient) agents?
 **Answer**: Uninvited interruptions impose an attention and cleanup cost $C_{\mathrm{false}}$; act only when $p > C_{\mathrm{false}}/(V_{\mathrm{true}}+C_{\mathrm{false}})$. Two false alarms get a proactive agent muted faster than five missed nudges — track precision, accept/dismiss rate, mute rate, and make `no_action` / `snooze` first-class tools.
 
-### Q67. How do you prevent infinite causal loops and event storms in proactive agents?
+### Q54. How do you prevent infinite causal loops and event storms in proactive agents?
 **Answer**: Stamp every agent-authored mutation with `actor_id`, `correlation_id`, and `hop_depth` and drop self-triggered events at ingress; coalesce alert storms by entity inside a cooldown window; put a cheap deterministic + small-LLM triage funnel in front of the frontier model; and enforce per-tenant token buckets and spend circuit breakers.
 
-### Q68. What is the TOCTOU (stale-state) risk in human-approved proactive actions, and how do you fix it?
+### Q55. What is the TOCTOU (stale-state) risk in human-approved proactive actions, and how do you fix it?
 **Answer**: If an engineer approves a proactive proposal hours later, the underlying PR, ticket, or cluster state may have already changed. Bind every proposal to a TTL expiry, an idempotency key, and a state-version precondition (ETag / commit SHA), and re-verify live state immediately before execution.
+
+## H. Harness engineering ([08](08-harness-engineering.md))
+
+### Q56. What is harness engineering, and why does it move success rate by 15–30% on the same model?
+**Answer**: The harness is everything around the LLM: execution loop, context compiler, Agent-Computer Interface (ACI), sandbox, deterministic verifiers, and durable checkpoints. Clean tool interfaces, cached prompt prefixes, spill-to-disk truncation, and fast deterministic backpressure eliminate retries and context rot without changing model weights.
+
+### Q57. What are the core rules of Agent-Computer Interface (ACI) design?
+**Answer**: Prefer unique search-and-replace or patch edits over fragile line-number edits; bound and paginate all tool outputs with spill-to-disk file paths; return recovery-oriented error messages; disclose large tool libraries progressively; and support `dry_run` + `idempotency_key` on stateful tools.
+
+### Q58. How do you keep prompt-cache hit rates high (>80%) across a long agent loop?
+**Answer**: Keep the prompt prefix (`system prompt + static tool schemas + static workspace docs`) strictly byte-immutable and append-only; place volatile metadata (timestamps, step counters) in the latest user/tool message, and compact history only at coarse thresholds instead of rewriting earlier turns every step.
+
+## I. Production evaluation and safety ([09](09-evaluation-and-safety.md))
+
+### Q59. How do you evaluate an agent?
+**Answer**: Three layers: end to end (task success rate, pass@1 / pass^k, cost, P95 latency), trajectory (steps, wasted steps, repeat rate, tool accuracy), component (retrieval hit rate, judge agreement), plus an online A/B.
+
+### Q60. What are the biases of LLM-as-judge and how do you use it?
+**Answer**: Position, length, self-preference, and sycophancy bias. Mitigate with a rubric split into dimensions, pairwise comparison with swapped order, reference answers, and calibration against human labels with reported agreement; before calibration use it only as a soft gate.
+
+### Q61. How do you localize an online failure?
+**Answer**: Walk the span tree of the trace, find the **first anomalous span**, check that step's input (missing information?), tool arguments (schema), and return (truncated or timed out), then reproduce offline with fixed model, prompt, and tool versions, and add it to the regression set.
+
+### Q62. How do you optimize cost?
+**Answer**: Fewer steps > compress context > cache > model routing > parallelism (saves time, not money) > early stopping; account cost per **successful task** and amortize failed retries.
+
+### Q63. Why is prompt injection more dangerous for agents?
+**Answer**: Agents actively read untrusted content and hold execution permissions, so injection can directly cause exfiltration or writes. Assume "some injection will succeed" and bound the blast radius with least privilege, sandboxes, HITL, and audit.
+
+### Q64. How do you roll out safely?
+**Answer**: Split by session or user (not per request, so one session never spans versions), monitor success rate, cost, latency, human takeover rate, and security events, set automatic rollback thresholds, ramp 1% → 5% → 25% → full traffic, and use shadow mode first for risky changes.
+
+## J. Enterprise governance and guardrails ([10](10-governance-and-guardrails.md))
+
+### Q65. Why are system-prompt guardrails insufficient for enterprise agent governance?
+**Answer**: Prompts are probabilistic hints mixed into the same token stream as untrusted inputs. Hard security and business invariants (ACLs, refund caps, DLP, SQL write bans) must live in a deterministic **Policy-as-Code gateway** (OPA/Cedar) evaluated outside the LLM before tool execution.
+
+### Q66. How does On-Behalf-Of (OBO) delegation prevent the Confused Deputy problem?
+**Answer**: Instead of giving an agent a shared admin key, the gateway exchanges the invoking user's token (OAuth RFC 8693) for a short-lived scoped token representing $\mathrm{Perms}(\mathrm{Agent\_NHI}) \cap \mathrm{Perms}(\mathrm{User})$. The agent can never access data the invoking user cannot access.
+
+### Q67. How should enterprise runtime guardrails be layered?
+**Answer**: L1 deterministic (<5 ms, fail-closed: OPA/Cedar, JSON Schema, SQL AST, DLP regex, URL allowlists, spend caps) → L2 fast classifiers (10–50 ms: injection/toxicity) → L3 semantic LLM guard (100–500 ms on Tier 2/3 actions). Roll out L2/L3 in shadow mode first to calibrate false-positive rates before blocking.
+
+### Q68. How do you tier agent actions by blast radius?
+**Answer**: Tier 0 public reads (auto-allow) → Tier 1 scoped reads/drafts (OBO ACL + audit) → Tier 2 reversible internal writes (policy + undo token + budget cap) → Tier 3 irreversible/financial/external actions (mandatory HITL approval with exact diff preview and TTL expiry).
 
 ## Topic quick reference (memorize this table if 68 questions is too many)
 
@@ -234,12 +238,12 @@
 | MCP | Handles tool access and discovery, complements function calling | [02](02-tool-use-and-function-calling.md) |
 | Planning | Decompose, search, verify; trade test-time compute for accuracy | [03](03-planning-and-reasoning.md) |
 | Memory | Put the most useful information into the token budget; it is not "having a vector store" | [04](04-memory-systems.md) |
-| Multi-agent | A cost multiplier; first ask whether the task splits independently | [05](05-multi-agent-systems.md) |
-| Agentic RAG | The model owns the control flow: what to look up, how often, whether it suffices | [06](06-agentic-rag.md) |
-| Shipping | Observable, measurable, controllable; all three are required | [07](07-evaluation-and-safety.md) |
-| Harness engineering | Thin primitives + cached prefix + ACI + deterministic backpressure + replay CI | [09](09-harness-engineering.md) |
+| Agentic RAG | The model owns the control flow: what to look up, how often, whether it suffices | [05](05-agentic-rag.md) |
+| Multi-agent | A cost multiplier; first ask whether the task splits independently | [06](06-multi-agent-systems.md) |
+| Proactive agents | Loop/storm guards → cheap triage → autonomy ladder (L0→L3) → stale-state checks | [07](07-proactive-and-ambient-agents.md) |
+| Harness engineering | Thin primitives + cached prefix + ACI + deterministic backpressure + replay CI | [08](08-harness-engineering.md) |
+| Production eval & safety | Observable, measurable, controllable; all three are required | [09](09-evaluation-and-safety.md) |
 | Governance & guardrails | OBO identity $\cap$ NHI, Policy-as-Code (OPA/Cedar), 4-tier blast-radius gates, kill switches | [10](10-governance-and-guardrails.md) |
-| Proactive agents | Loop/storm guards → cheap triage → autonomy ladder (L0→L3) → stale-state checks | [11](11-proactive-and-ambient-agents.md) |
 
 ## Ten conclusions
 
@@ -254,4 +258,4 @@
 9. **The essence of Agentic RAG is that the model owns the control flow**; fix retrieval before orchestration.
 10. **No traces, no optimization**; no regression set, no iteration.
 
-> Full derivations, code, and follow-ups live in the other seven notes of this chapter; the cross-topic cheat sheet is [Agent cheat sheet](../08-interview-bank/03-agent-cheatsheet.md).
+> Full derivations, code, and follow-ups live in the other ten notes of this chapter; the cross-topic cheat sheet is [Agent cheat sheet](../08-interview-bank/04-agent-cheatsheet.md).
