@@ -30,7 +30,7 @@ flowchart LR
     R -->|not done| P
     R -->|done| A[Answer / final action]
     M --> P
-    subgraph support [Support]
+    subgraph support["Support"]
       E[Evaluation and observability]
       S[Security and permissions]
     end

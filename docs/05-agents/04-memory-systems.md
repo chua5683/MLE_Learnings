@@ -21,14 +21,14 @@ An agent without memory is a "stateless function": every request feels like the 
 
 ```mermaid
 flowchart TB
-    subgraph ctx [Context window (RAM)]
-        W[Working memory<br/>current task instruction + recent turns + tool results]
-        S[Session summary<br/>key points of compressed history]
+    subgraph ctx["Context window (RAM)"]
+        W["Working memory<br/>current task instruction + recent turns + tool results"]
+        S["Session summary<br/>key points of compressed history"]
     end
-    subgraph ext [External storage (disk)]
-        L1[(Long-term memory store<br/>vector / relational / graph)]
-        L2[(Documents and knowledge base<br/>RAG index)]
-        L3[(State and artifacts<br/>files / DB / checkpoint)]
+    subgraph ext["External storage (disk)"]
+        L1[("Long-term memory store<br/>vector / relational / graph")]
+        L2[("Documents and knowledge base<br/>RAG index")]
+        L3[("State and artifacts<br/>files / DB / checkpoint")]
     end
     W -->|compress when over budget| S
     S -->|write key points| L1

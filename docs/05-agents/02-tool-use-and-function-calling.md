@@ -97,12 +97,12 @@ MCP (Model Context Protocol, proposed by Anthropic in November 2024) standardize
 
 ```mermaid
 flowchart LR
-    subgraph Host[Host app / agent]
-        C1[MCP client]
+    subgraph Host["Host app / agent"]
+        C1["MCP client"]
     end
-    S1[MCP server: filesystem]
-    S2[MCP server: database]
-    S3[MCP server: internal API]
+    S1["MCP server: filesystem"]
+    S2["MCP server: database"]
+    S3["MCP server: internal API"]
     C1 <-->|stdio| S1
     C1 <-->|Streamable HTTP| S2
     C1 <-->|Streamable HTTP| S3

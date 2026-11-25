@@ -97,21 +97,21 @@ Do not rely on the model saying "I am done":
 
 ```mermaid
 flowchart TB
-    subgraph access [Access layer]
-        GW[API gateway / sessions / auth]
+    subgraph access["Access layer"]
+        GW["API gateway / sessions / auth"]
     end
-    subgraph control [Control layer]
-        RT[Agent runtime<br/>loop · termination · budget · retries]
-        PL[Planner / Router]
+    subgraph control["Control layer"]
+        RT["Agent runtime<br/>loop · termination · budget · retries"]
+        PL["Planner / Router"]
     end
-    subgraph capability [Capability layer]
-        TL[Tool layer<br/>retrieval · internal APIs · code execution · browser]
-        MEM[Memory layer<br/>context · summaries · vector store]
-        SB[Sandbox<br/>permissions · isolation · quotas]
+    subgraph capability["Capability layer"]
+        TL["Tool layer<br/>retrieval · internal APIs · code execution · browser"]
+        MEM["Memory layer<br/>context · summaries · vector store"]
+        SB["Sandbox<br/>permissions · isolation · quotas"]
     end
-    subgraph support [Support layer]
-        OBS[Observability<br/>trace/span · metrics · replay]
-        EV[Evaluation<br/>datasets · regression · A/B]
+    subgraph support["Support layer"]
+        OBS["Observability<br/>trace/span · metrics · replay"]
+        EV["Evaluation<br/>datasets · regression · A/B"]
     end
     GW --> RT --> PL
     PL --> TL

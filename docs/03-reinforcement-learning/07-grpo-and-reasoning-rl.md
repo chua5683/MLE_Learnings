@@ -106,12 +106,12 @@ Pros: **no labels, hard to cheat (relative to an RM), and easy to scale**. Cons:
 
 ```mermaid
 flowchart TB
-    B[Base model] --> Z[R1-Zero: direct GRPO + rule rewards]
-    Z -->|emergent long CoT / aha moment| R1[R1]
-    B --> C[Cold-start SFT: a small set of long CoT data]
-    C --> RL1[GRPO reasoning RL]
-    RL1 --> RS[Rejection sampling + SFT data]
-    RS --> RL2[General alignment RL]
+    B["Base model"] --> Z["R1-Zero: direct GRPO + rule rewards"]
+    Z -->|"emergent long CoT / aha moment"| R1["R1"]
+    B --> C["Cold-start SFT: a small set of long CoT data"]
+    C --> RL1["GRPO reasoning RL"]
+    RL1 --> RS["Rejection sampling + SFT data"]
+    RS --> RL2["General alignment RL"]
     RL2 --> R1
 ```
 

@@ -20,8 +20,8 @@ flowchart LR
     P --> D["Decode: 1 token per step"]
     D -->|until EOS/length limit| D
     D --> E[Return response]
-    P -.write.-> KV[(KV cache memory pool)]
-    D -.read/write.-> KV
+    P -. "write" .-> KV[("KV cache memory pool")]
+    D -. "read/write" .-> KV
 ```
 
 Four metrics dominate production. Pin the definitions down first (stating them precisely already earns points):

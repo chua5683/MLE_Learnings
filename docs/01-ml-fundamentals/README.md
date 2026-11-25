@@ -32,7 +32,7 @@ flowchart TD
     D --> D2[Imbalance and calibration]
     E --> E1[Naive Bayes/MLE/MAP]
     E --> E2[EM/GMM/HMM]
-    C2 --> F[Interview thread: why it works + how to tune]
+    C2 --> F["Interview thread: why it works + how to tune"]
     D1 --> F
 ```
 

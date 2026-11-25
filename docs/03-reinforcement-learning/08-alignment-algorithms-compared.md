@@ -86,15 +86,15 @@ Common engineering savings: LoRA/QLoRA, sharing the actor-critic trunk, 4-bit qu
 
 ```mermaid
 flowchart TD
-    A[Alignment need] --> B{Can the reward be verified automatically?}
-    B -->|Yes: math/code/format| C{Enough compute for online RL?}
-    C -->|Yes| D[GRPO + RLVR]
-    C -->|No| E[Rejection-sampling SFT / distillation / best-of-N]
-    B -->|No| F{Do we have pairwise preference data?}
-    F -->|Yes| G{Need to reuse an RM / online exploration?}
-    G -->|No, budget limited| H[DPO / IPO / SimPO]
-    G -->|Yes| I[RLHF-PPO]
-    F -->|No, only single-item feedback| J[KTO / rule rewards / RLAIF]
+    A["Alignment need"] --> B{"Can the reward be verified automatically?"}
+    B -->|"Yes: math/code/format"| C{"Enough compute for online RL?"}
+    C -->|Yes| D["GRPO + RLVR"]
+    C -->|No| E["Rejection-sampling SFT / distillation / best-of-N"]
+    B -->|No| F{"Do we have pairwise preference data?"}
+    F -->|Yes| G{"Need to reuse an RM / online exploration?"}
+    G -->|"No, budget limited"| H["DPO / IPO / SimPO"]
+    G -->|Yes| I["RLHF-PPO"]
+    F -->|"No, only single-item feedback"| J["KTO / rule rewards / RLAIF"]
 ```
 
 ### 3.2 Combinations are more common

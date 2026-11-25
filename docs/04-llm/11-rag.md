@@ -11,7 +11,7 @@ RAG solves four classes of problems: **long-tail knowledge** (never learned), **
 ```mermaid
 flowchart LR
     subgraph IDX["(1) Offline indexing"]
-        A[Parse] --> B[Clean/normalize] --> C[Chunking] --> D[Embedding] --> E[(Vector DB + inverted index)]
+        A["Parse"] --> B["Clean/normalize"] --> C["Chunking"] --> D["Embedding"] --> E[("Vector DB + inverted index")]
     end
     subgraph RET["(2) Online retrieval"]
         Q[Query] --> QP[Rewrite/expand] --> H["Hybrid recall dense+BM25"] --> R[Rerank] --> F[Permission/metadata filter]

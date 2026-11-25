@@ -34,21 +34,21 @@ A one-line test: **"after splitting, can every subtask be completed independentl
 
 ```mermaid
 flowchart TB
-    subgraph S[Centralized supervisor]
+    subgraph S["Centralized supervisor"]
         SUP[Supervisor] --> W1[Worker A]
         SUP --> W2[Worker B]
         SUP --> W3[Worker C]
     end
-    subgraph P[Pipeline]
+    subgraph P["Pipeline"]
         P1[Retrieve] --> P2[Analyze] --> P3[Write] --> P4[Review]
     end
-    subgraph D[Debate]
+    subgraph D["Debate"]
         D1[Agent 1] <--> D2[Agent 2]
         D1 --> J[Judge]
         D2 --> J
     end
-    subgraph B[Blackboard]
-        B1[Agent A] --> BB[(Shared state)]
+    subgraph B["Blackboard"]
+        B1[Agent A] --> BB[("Shared state")]
         B2[Agent B] --> BB
         BB --> B3[Agent C]
     end

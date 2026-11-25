@@ -142,17 +142,17 @@ Layer the defenses in order, and **assume no single layer is sufficient**:
 
 ```mermaid
 flowchart LR
-    U[User] --> GW[API gateway<br/>auth · rate limits · quotas]
-    GW --> SM[Session and state store<br/>checkpoint / history]
-    GW --> RT[Agent runtime<br/>loop · budget · termination]
-    RT --> MR[Model router<br/>strong/weak models · cache]
-    RT --> SB[Sandbox workers<br/>code / browser]
-    RT --> TL[Tool layer<br/>retrieval · internal APIs · MCP]
-    RT --> Q[Async task queue<br/>long tasks / batch]
-    RT -.trace.-> OBS[(Observability<br/>LangSmith / Langfuse / OTel)]
-    TL -.trace.-> OBS
-    SB -.trace.-> OBS
-    OBS --> EV[Evaluation and regression<br/>offline sets · online metrics]
+    U["User"] --> GW["API gateway<br/>auth · rate limits · quotas"]
+    GW --> SM["Session and state store<br/>checkpoint / history"]
+    GW --> RT["Agent runtime<br/>loop · budget · termination"]
+    RT --> MR["Model router<br/>strong/weak models · cache"]
+    RT --> SB["Sandbox workers<br/>code / browser"]
+    RT --> TL["Tool layer<br/>retrieval · internal APIs · MCP"]
+    RT --> Q["Async task queue<br/>long tasks / batch"]
+    RT -. "trace" .-> OBS[("Observability<br/>LangSmith / Langfuse / OTel")]
+    TL -. "trace" .-> OBS
+    SB -. "trace" .-> OBS
+    OBS --> EV["Evaluation and regression<br/>offline sets · online metrics"]
 ```
 
 Key points: **stateless runtime** (state lives in the session store, so it scales horizontally), **durable execution & checkpointing** (persist step state after every tool call — e.g. Temporal or LangGraph checkpoints — so long-running jobs and HITL approval pauses survive crashes without re-executing non-idempotent side effects), **asynchronous long tasks** (queue plus callback), and **end-to-end tracing** (including sandboxes and tools).

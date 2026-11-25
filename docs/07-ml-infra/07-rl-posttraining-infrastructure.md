@@ -13,8 +13,8 @@ flowchart LR
     P["Prompt Buffer<br/>(curriculum / dynamic sampling)"] --> R["Rollout Engine<br/>(vLLM / SGLang, TP/DP)"]
     R -->|trajectories| V["Reward / Verifier Pool<br/>(RM GPUs + CPU code sandboxes)"]
     V -->|advantages| T["Trainer Engine<br/>(FSDP / Megatron-LM)"]
-    T -.fast weight sync<br/>(NCCL / CUDA IPC).-> R
-    R -.logprobs / ref.-> T
+    T -. "fast weight sync<br/>(NCCL / CUDA IPC)" .-> R
+    R -. "logprobs / ref" .-> T
 ```
 
 | Stage | Bottleneck | Optimal parallelism | Typical engine |
