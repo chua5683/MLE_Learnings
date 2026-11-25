@@ -192,7 +192,39 @@
 ### Q58. How do you roll out safely?
 **Answer**: Split by session or user (not per request, so one session never spans versions), monitor success rate, cost, latency, human takeover rate, and security events, set automatic rollback thresholds, ramp 1% → 5% → 25% → full traffic, and use shadow mode first for risky changes.
 
-## Topic quick reference (memorize this table if 58 questions is too many)
+## H. Harness engineering, governance, and proactive agents ([09](09-harness-engineering.md) · [10](10-governance-and-guardrails.md) · [11](11-proactive-and-ambient-agents.md))
+
+### Q59. What is harness engineering, and why does it move success rate by 15–30% on the same model?
+**Answer**: The harness is everything around the LLM: execution loop, context compiler, Agent-Computer Interface (ACI), sandbox, deterministic verifiers, and durable checkpoints. Clean tool interfaces, cached prompt prefixes, spill-to-disk truncation, and fast deterministic backpressure eliminate retries and context rot without changing model weights.
+
+### Q60. What are the core rules of Agent-Computer Interface (ACI) design?
+**Answer**: Prefer unique search-and-replace or patch edits over fragile line-number edits; bound and paginate all tool outputs with spill-to-disk file paths; return recovery-oriented error messages; disclose large tool libraries progressively; and support `dry_run` + `idempotency_key` on stateful tools.
+
+### Q61. How do you keep prompt-cache hit rates high (>80%) across a long agent loop?
+**Answer**: Keep the prompt prefix (`system prompt + static tool schemas + static workspace docs`) strictly byte-immutable and append-only; place volatile metadata (timestamps, step counters) in the latest user/tool message, and compact history only at coarse thresholds instead of rewriting earlier turns every step.
+
+### Q62. Why are system-prompt guardrails insufficient for enterprise agent governance?
+**Answer**: Prompts are probabilistic hints mixed into the same token stream as untrusted inputs. Hard security and business invariants (ACLs, refund caps, DLP, SQL write bans) must live in a deterministic **Policy-as-Code gateway** (OPA/Cedar) evaluated outside the LLM before tool execution.
+
+### Q63. How does On-Behalf-Of (OBO) delegation prevent the Confused Deputy problem?
+**Answer**: Instead of giving an agent a shared admin key, the gateway exchanges the invoking user's token (OAuth RFC 8693) for a short-lived scoped token representing $\mathrm{Perms}(\mathrm{Agent\_NHI}) \cap \mathrm{Perms}(\mathrm{User})$. The agent can never access data the invoking user cannot access.
+
+### Q64. How should enterprise runtime guardrails be layered?
+**Answer**: L1 deterministic (<5 ms, fail-closed: OPA/Cedar, JSON Schema, SQL AST, DLP regex, URL allowlists, spend caps) → L2 fast classifiers (10–50 ms: injection/toxicity) → L3 semantic LLM guard (100–500 ms on Tier 2/3 actions). Roll out L2/L3 in shadow mode first to calibrate false-positive rates before blocking.
+
+### Q65. How do you tier agent actions by blast radius?
+**Answer**: Tier 0 public reads (auto-allow) → Tier 1 scoped reads/drafts (OBO ACL + audit) → Tier 2 reversible internal writes (policy + undo token + budget cap) → Tier 3 irreversible/financial/external actions (mandatory HITL approval with exact diff preview and TTL expiry).
+
+### Q66. Why does precision matter more than recall for proactive (ambient) agents?
+**Answer**: Uninvited interruptions impose an attention and cleanup cost $C_{\mathrm{false}}$; act only when $p > C_{\mathrm{false}}/(V_{\mathrm{true}}+C_{\mathrm{false}})$. Two false alarms get a proactive agent muted faster than five missed nudges — track precision, accept/dismiss rate, mute rate, and make `no_action` / `snooze` first-class tools.
+
+### Q67. How do you prevent infinite causal loops and event storms in proactive agents?
+**Answer**: Stamp every agent-authored mutation with `actor_id`, `correlation_id`, and `hop_depth` and drop self-triggered events at ingress; coalesce alert storms by entity inside a cooldown window; put a cheap deterministic + small-LLM triage funnel in front of the frontier model; and enforce per-tenant token buckets and spend circuit breakers.
+
+### Q68. What is the TOCTOU (stale-state) risk in human-approved proactive actions, and how do you fix it?
+**Answer**: If an engineer approves a proactive proposal hours later, the underlying PR, ticket, or cluster state may have already changed. Bind every proposal to a TTL expiry, an idempotency key, and a state-version precondition (ETag / commit SHA), and re-verify live state immediately before execution.
+
+## Topic quick reference (memorize this table if 68 questions is too many)
 
 | Topic | One-line conclusion | Details |
 |---|---|---|
@@ -205,6 +237,9 @@
 | Multi-agent | A cost multiplier; first ask whether the task splits independently | [05](05-multi-agent-systems.md) |
 | Agentic RAG | The model owns the control flow: what to look up, how often, whether it suffices | [06](06-agentic-rag.md) |
 | Shipping | Observable, measurable, controllable; all three are required | [07](07-evaluation-and-safety.md) |
+| Harness engineering | Thin primitives + cached prefix + ACI + deterministic backpressure + replay CI | [09](09-harness-engineering.md) |
+| Governance & guardrails | OBO identity $\cap$ NHI, Policy-as-Code (OPA/Cedar), 4-tier blast-radius gates, kill switches | [10](10-governance-and-guardrails.md) |
+| Proactive agents | Loop/storm guards → cheap triage → autonomy ladder (L0→L3) → stale-state checks | [11](11-proactive-and-ambient-agents.md) |
 
 ## Ten conclusions
 

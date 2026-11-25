@@ -79,6 +79,19 @@ $$\text{Full corpus} \xrightarrow{\text{ANN}} \text{Top-}50 \xrightarrow{\text{c
 
 The price is latency: reranking 50 passages usually costs 20-200 ms and must fit the end-to-end budget; an LLM reranker (RankGPT-style) works better but is more expensive, so it is reserved for offline evaluation or high-value queries. Set a relevance threshold after rerank - better to drop low-scoring candidates than to let noise pull the LLM off course.
 
+#### Late interaction, multimodal retrieval, and ANN index trade-offs
+
+- **Late interaction (ColBERT / MaxSim)**: instead of compressing a passage into one vector, store per-token embeddings offline and score $\sum_{i}\max_{j} q_i^\top d_j$ at query time — bridges bi-encoder speed and cross-encoder accuracy, at the cost of larger index storage.
+- **Multimodal document retrieval (ColPali)**: encodes PDF page images directly with a VLM + MaxSim, bypassing brittle OCR/table-extraction pipelines for slide decks, charts, and complex layouts.
+- **Contextual retrieval**: prepend a short LLM-generated document summary ("this chunk is from Q3 2025 revenue footnotes of Company X") to each chunk before embedding and BM25 indexing, sharply reducing orphan-chunk recall misses.
+- **ANN index selection**:
+
+| Index | Memory footprint | Recall / Latency | Best fit |
+| --- | --- | --- | --- |
+| **HNSW** | High (~1.5–2× raw vectors + graph edges, RAM-resident) | Very high recall (>98%), <5 ms | <50M vectors, low-latency online serving |
+| **IVF-PQ** | Very low ($8\text{–}32\times$ compression via product quantization) | Lower recall unless oversampled + reranked | Tight RAM budget, 100M+ vectors |
+| **DiskANN (Vamana)** | Low RAM (PQ in RAM + full vectors/graph on NVMe SSD) | High recall (~95%), 5–15 ms SSD IO | Billion-scale corpora at low memory cost |
+
 ### 2.5 Query understanding, rewriting, and multi-hop retrieval
 
 | Method | How | What it fixes |

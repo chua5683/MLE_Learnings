@@ -52,15 +52,29 @@ One trace corresponds to one task and carries spans (model calls, tool calls, re
 
 ## 2. Principles and derivations
 
-### 2.1 Why report pass^k instead of "we ran it once and it worked"
+### 2.1 Why report pass@k and pass^k instead of "we ran it once and it worked"
 
-Model sampling is stochastic, so a single success does not show stability. Use the probability of at least one success in $k$ independent attempts:
+Model sampling is stochastic, so a single run hides reliability. Distinguish two complementary metrics from $n$ independent trials with $c$ successes:
 
 $$
-\mathrm{pass@}k = 1 - \frac{\binom{n-c}{k}}{\binom{n}{k}}
+\mathrm{pass@}k = 1 - \frac{\binom{n-c}{k}}{\binom{n}{k}}, \qquad
+\mathrm{pass}^k = \frac{\binom{c}{k}}{\binom{n}{k}} \approx \hat{p}^k \quad (\hat{p}=c/n)
 $$
 
-where $n$ is the number of samples and $c$ the number of successes. In engineering, what matters more is **the mean success rate of running the same task $k$ times** (stability) and **the success rate on the worst 10% of tasks** (long-tail quality). Reporting only the mean hides long-tail collapse.
+- **$\mathrm{pass@}k$** (capability ceiling): probability of **at least one** success in $k$ attempts — rises with $k$.
+- **$\mathrm{pass}^k$** (consistency / reliability, introduced in $\tau$-bench): probability that **all $k$** independent runs succeed — decays exponentially with $k$ (a 70% single-run agent has $\mathrm{pass}^4 \approx 24\%$).
+
+In production, pair $\mathrm{pass@}1$ with $\mathrm{pass}^k$ (reliability) and **worst-10% task success** (long-tail collapse).
+
+#### Common public agent benchmarks
+
+| Benchmark | Domain | Verification signal | What it stresses |
+|---|---|---|---|
+| SWE-bench Verified | Real GitHub issue fixing | Repo unit tests (PASS_TO_PASS / FAIL_TO_PASS) | Multi-file code navigation, edits, test debugging |
+| $\tau$-bench / $\tau^2$-bench | Customer support / policy-bound tasks | Final DB state + policy rules ($\mathrm{pass}^k$) | Tool reliability, user simulation, rule compliance |
+| GAIA | General web & file-backed QA | Exact short-answer match | Multi-hop browsing, document parsing, calculation |
+| OSWorld | Desktop GUI / computer use | OS state evaluation scripts | Visual grounding, long action horizons |
+| BFCL | Function calling | AST + live execution checks | Schema accuracy, parallel/multi-turn calls, abstention |
 
 ### 2.2 Trajectory-level evaluation and error attribution
 
@@ -141,7 +155,7 @@ flowchart LR
     OBS --> EV[Evaluation and regression<br/>offline sets · online metrics]
 ```
 
-Key points: **stateless runtime** (state lives in the session store, so it scales horizontally), **asynchronous long tasks** (queue plus callback), and **end-to-end tracing** (including sandboxes and tools).
+Key points: **stateless runtime** (state lives in the session store, so it scales horizontally), **durable execution & checkpointing** (persist step state after every tool call — e.g. Temporal or LangGraph checkpoints — so long-running jobs and HITL approval pauses survive crashes without re-executing non-idempotent side effects), **asynchronous long tasks** (queue plus callback), and **end-to-end tracing** (including sandboxes and tools).
 
 ### 2.8 The data flywheel
 

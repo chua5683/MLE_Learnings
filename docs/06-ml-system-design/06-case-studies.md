@@ -1,4 +1,4 @@
-# Case library: 14 interview problems at a glance
+# Case library: 18 interview problems at a glance
 
 > **One-line summary**: ML design prompts come from a finite set — **Feed (content/people/products), Search, Trust & Safety, decision problems, and LLM applications**. Do one prompt per type thoroughly; the rest transfer via "clarify + skeleton + one pitfall".
 >
@@ -25,7 +25,7 @@ flowchart TB
     L --> L1["Knowledge-base QA/support"]
 ```
 
-## 3. The fourteen cases
+## 3. The eighteen cases
 
 ### 1) News Feed (Facebook / Weibo)
 
@@ -125,6 +125,35 @@ flowchart TB
 - **Skeleton**: Distance/traffic/time of day/merchant prep time/rider features → GBDT or deep regression (optionally with **quantile loss** for P50/P90) → online real-time features → calibration by city/trade area.
 - **Pitfall**: **Merchant prep time is the largest uncertainty**; traffic freshness; long-tail merchants and bad weather; training with MAE underestimates the tail, while the business cares about the P90 late rate.
 
+### 15) Coding agent / IDE copilot
+
+- **Prompt**: Design an AI coding assistant supporting inline tab-completion and multi-file issue fixing.
+- **Clarify**: Latency SLA (<150 ms inline vs. multi-minute async agent)? Privacy/code-residency? Supported languages and repo scale?
+- **Skeleton**: Dual-tier stack — (a) **Inline FIM (Fill-in-the-Middle)**: small fast model (1B–7B) + prefix/suffix context from open tabs/LSP + speculative/KV caching; (b) **Repo agent**: hybrid AST/ripgrep/vector repo index → ReAct edit loop → sandboxed build/test verifier → diff review.
+- **Pitfall**: **Acceptance rate alone is misleading** (track 30-day retained lines + CI pass rate); context truncation breaks imports; untrusted repos can hide prompt injections in comments/issues; sandbox execution must block outbound network and secrets.
+- **Capacity feel**: 500k DAU × 200 inline requests/day ≈ 1.2k avg / 4k peak QPS; 500-token FIM prompt with 90% prefix-cache hit ≈ ~30–50 H100s.
+
+### 16) Visual search / image-to-product (Pinterest Lens / Google Lens)
+
+- **Prompt**: Given a user photo, retrieve visually identical or stylistically similar products.
+- **Clarify**: Exact SKU match or "shop the look" (style)? Multi-object photos? Catalog size ($10^8$–$10^9$)? Latency (<300 ms)?
+- **Skeleton**: Object detector / cropper (locate dress, shoes, bag separately) → multimodal vision encoder (fine-tuned SigLIP/CLIP with metric learning / ArcFace) → sharded HNSW/IVF-PQ ANN index (100M items × 512-dim FP16 ≈ 100 GB) → multimodal reranker (image + title + price/availability) → diversity & stock filtering.
+- **Pitfall**: **Domain gap** between messy user photos (lighting, occlusion, background clutter) and clean studio catalog shots; requires object detection + hard-negative mining from click logs + real-time out-of-stock filtering.
+
+### 17) Multimodal content moderation with VLMs
+
+- **Prompt**: Moderate user-uploaded videos/memes/posts combining image, OCR text, and audio under rapidly shifting policies.
+- **Clarify**: Policy categories (hate, violence, CSAM, scams)? Precision/recall SLA and human-review capacity? Upload QPS?
+- **Skeleton**: Cascaded funnel — perceptual hash/dedup (block known bad in <5 ms) → fast cheap multimodal classifier (CLIP/SigLIP + ASR/OCR MLP handles ~95% clear pass/block) → **VLM policy judge** (only on uncertain ~5% slice with explicit policy rubric) → human review queue + appeals loop.
+- **Pitfall**: **Running a VLM on 100% of uploads blows the GPU budget** (10k uploads/s × 500 visual tokens is prohibitive); memes hide toxicity in image+text irony (unimodal filters miss it); policy wording changes weekly, favoring rubric-prompted VLMs on the ambiguous tier.
+
+### 18) Dynamic pricing / two-sided marketplace matching (Uber / Airbnb)
+
+- **Prompt**: Set real-time surge pricing or match riders to drivers to maximize completed trips and marketplace health.
+- **Clarify**: Short-term GMV vs. long-term retention? Hard regulatory price caps? Supply/demand elasticity? Geo-temporal granularity (H3 hexes)?
+- **Skeleton**: Real-time supply/demand forecasting per H3 hex (spatial-temporal GBDT/GNN) → price-elasticity / conversion model (causal/uplift to avoid confounding) → constrained optimization (LP / bipartite matching / RL pacing under latency, ETA, and price-smoothness bounds) → switchback / cluster A/B testing.
+- **Pitfall**: **Standard user-level A/B testing fails due to network spillover** (treated riders steal drivers from control riders in the same city); use **geo-time switchback** or cluster randomization; watch driver churn and price shock guardrails.
+
 ## 4. One-page comparison
 
 | Case | Core difficulty | Must-have components | Common follow-up |
@@ -143,6 +172,10 @@ flowchart TB
 | Support Copilot | Human in the loop | Tool calls, ASR, review | How to prevent write mistakes? |
 | Suggestion | High QPS, low latency | Trie, caching, safety filtering | How to get latency under 50 ms? |
 | ETA | Uncertainty | Quantile regression, real-time features | How to guarantee P90? |
+| Coding Agent | Latency + verification | FIM small model, AST/LSP, sandboxed test loop | Acceptance vs. retained code? Injection risk? |
+| Visual Search | Studio-to-wild domain gap | Object detector, fine-tuned CLIP, sharded ANN | Multi-object crops? Out-of-stock filtering? |
+| VLM Moderation | Cost vs. subtle irony | Hash → fast classifier → VLM rubric tier → human | Why cascade? How to adapt to weekly policy edits? |
+| Marketplace Pricing | Network interference | H3 forecasting, elasticity, LP/matching, switchback | Why does user A/B fail? Driver-side guardrails? |
 
 ## 5. Interview Q&A
 

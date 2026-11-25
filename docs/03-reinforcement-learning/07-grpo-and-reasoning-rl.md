@@ -76,7 +76,14 @@ The fix: drop std normalization (use only $r_i-\mathrm{mean}$) and change length
 | Dynamic sampling | Filter out all-correct/all-wrong groups and resample until a group has signal | Wasted invalid samples |
 | Token-level loss | Sum over all tokens in the group first, then average, instead of averaging per answer | Length bias |
 | Overlong reward shaping | Soft penalty for overly long answers | Runaway length |
-| GSPO (Qwen) | Replace the token-level importance ratio with a sequence-level one | Reduces ratio variance on long sequences |
+| GSPO (Qwen) | Replace the token-level importance ratio with a sequence-level one | Reduces ratio variance on long sequences and MoE routing jitter |
+| **RLOO / REINFORCE++** | Leave-one-out group baseline $\hat{A}_i = r_i - \frac{1}{G-1}\sum_{j\neq i}r_j$ (RLOO) or global advantage norm without critic | Unbiased baseline without std distortion |
+| **CISPO** | Clip the importance-sampling weight inside the gradient while preserving gradient flow on all tokens | Prevents zero-gradient dead zones on rare reasoning tokens |
+
+#### Off-policy staleness and Multi-turn / Agentic RL
+
+- **Async / off-policy staleness**: when rollout engines (vLLM/SGLang) run asynchronously behind the trainer (see [07-07 RL Post-Training Infra](../07-ml-infra/07-rl-posttraining-infrastructure.md)), the behavior policy $\pi_{\mathrm{rollout}}$ lags $\pi_\theta$; bound staleness (e.g., $\le 2\text{–}4$ steps) and compute importance ratios against the **actual rollout logprobs**.
+- **Multi-turn tool / agentic RL**: when rollouts interleave assistant tokens with environment/tool observations (Python stdout, search results, compiler errors), **strictly mask non-assistant tokens out of the policy-gradient loss and KL term** so the model learns *which actions to take* rather than imitating tool outputs.
 
 ### 2.6 RLVR: verifiable rewards
 

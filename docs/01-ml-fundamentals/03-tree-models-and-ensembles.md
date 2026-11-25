@@ -126,9 +126,17 @@ A split is made only if the gain is $>0$; $\gamma$ is the threshold for splittin
 
 **Categorical features**: LightGBM handles categorical features directly by sorting categories according to gradient statistics and finding the optimal grouping, rather than one-hot encoding.
 
-### 2.6 CatBoost in brief
+### 2.6 CatBoost and the GBDT three-way comparison
 
-Two keywords for CatBoost: **ordered boosting** (train on "past" samples to compute residuals for the current sample, mitigating target leakage) and **ordered target statistics** (target encoding for categorical features computed incrementally in sample order, avoiding future labels). Its trees are **oblivious trees** (the same split at each level), which predict fast and resist overfitting; the default parameters are usually strong.
+Two keywords for CatBoost: **ordered boosting** (compute residuals for sample $i$ using models trained only on earlier samples in a random permutation, mitigating prediction shift / target leakage) and **ordered target statistics** (encode high-cardinality categoricals incrementally in sample order). Its trees are **oblivious (symmetric) trees** (every node at depth $d$ shares the same feature and threshold), which act as a structural regularizer and compile into fast bit-mask lookup tables at inference.
+
+| Dimension | XGBoost | LightGBM | CatBoost |
+| --- | --- | --- | --- |
+| Tree growth | Level-wise (or `lossguide`) | Leaf-wise (best-first) | Symmetric / oblivious trees |
+| Continuous splits | Exact / quantile / `hist` | Histogram (255 bins) + GOSS | Histogram / quantized borders |
+| Categoricals | Native (`enable_categorical`) or one-hot | Gradient-sorted optimal split | Ordered target stats + feature combos |
+| Main strength | Mature ecosystem, flexible regularizers | Fastest on huge tabular data | Strong defaults on categorical-heavy data, fastest inference |
+| Main risk | Slower exact mode; memory on wide data | Overfits small datasets if `num_leaves` high | Slower training on high-dimensional dense features |
 
 ### 2.7 Bias-variance summary
 

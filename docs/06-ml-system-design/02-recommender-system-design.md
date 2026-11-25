@@ -119,6 +119,14 @@ Rules plus algorithms: filter already-read/blocked items, frequency caps, creato
 - New items: multimodal embeddings (cover/title/ASR), a content retrieval channel, traffic support + small-traffic exploration, and default embeddings instead of random initialization.
 - Cold start is fundamentally an **explore-exploit problem**; Thompson Sampling/UCB can control the cost of trial and error.
 
+### 5.6 Generative recommendation, long sequences, and debiasing
+
+Three modern upgrades that frequently surface in Senior/Staff recsys interviews:
+
+- **Generative retrieval & Semantic IDs (TIGER / RQ-VAE)**: instead of flat item IDs + ANN search, quantize each item's content/collaborative embedding via a Residual-Quantized VAE (RQ-VAE) into a short hierarchical tuple of discrete codes (e.g., `(c1, c2, c3, c4)`). A sequence Transformer then autoregressively generates target Semantic IDs via beam search — sharing prefix structure across cold-start and related items without a giant flat embedding table.
+- **Unified sequential scaling (HSTU) & long-sequence modeling (SIM / TWIN)**: **HSTU** (Meta) reformulates retrieval and ranking as a unified autoregressive sequence transduction problem over heterogeneous user actions that obeys Transformer-like scaling laws. For $10^4$-length histories, **SIM / TWIN** uses a two-stage search (General Search Unit retrieves top-$K$ historical items consistent with the target item, then Exact Search Unit runs target attention with shared scoring parameters).
+- **Position-bias debiasing (PAL / IPS)**: top slots get more clicks regardless of relevance. Train with a separate **Position-Aware Learning (PAL)** auxiliary tower (feed `position` only during training, set to default/drop at inference) or weight losses by Inverse Propensity Scores (IPS).
+
 ## 6. Offline evaluation
 
 - **Ranking quality**: AUC (global), **GAUC** (per-user weighted, closer to online), NDCG@k, HR@k, Recall@k.

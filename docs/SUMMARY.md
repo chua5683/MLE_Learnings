@@ -19,6 +19,7 @@
   - [Evaluation metrics](01-ml-fundamentals/05-evaluation-metrics.md)
   - [Sampling and class imbalance](01-ml-fundamentals/06-sampling-and-class-imbalance.md)
   - [Probabilistic models and EM](01-ml-fundamentals/07-probabilistic-models-and-em.md)
+  - [Causal inference, uplift, and bandits](01-ml-fundamentals/08-causal-inference-and-bandits.md)
 
 ## Chapter 2 · Deep Learning Fundamentals
 
@@ -29,6 +30,7 @@
   - [CNNs and RNNs](02-dl-fundamentals/04-cnn-and-rnn.md)
   - [Transformer Basics](02-dl-fundamentals/05-transformer-basics.md)
   - [Optimizers and Training Tricks](02-dl-fundamentals/06-optimizers-and-training-tips.md)
+  - [Vision, Contrastive Learning, Diffusion, and GNNs](02-dl-fundamentals/07-vision-multimodal-diffusion-and-gnn.md)
 
 ## Chapter 3 · Reinforcement Learning and Alignment Algorithms
 
@@ -57,6 +59,7 @@
   - [Evaluation and hallucination](04-llm/10-evaluation-and-hallucination.md)
   - [RAG](04-llm/11-rag.md)
   - [Prompt engineering](04-llm/12-prompt-engineering.md)
+  - [Multimodal LLMs (VLMs & Omni)](04-llm/13-multimodal-llms.md)
 
 ## Chapter 5 · AI Agents
 
@@ -69,6 +72,9 @@
   - [Agentic RAG and knowledge augmentation](05-agents/06-agentic-rag.md)
   - [Production evaluation and safety](05-agents/07-evaluation-and-safety.md)
   - [Agent interview Q&A](05-agents/08-agent-interview-qa.md)
+  - [Harness engineering](05-agents/09-harness-engineering.md)
+  - [Enterprise governance and guardrails](05-agents/10-governance-and-guardrails.md)
+  - [Proactive and ambient agents](05-agents/11-proactive-and-ambient-agents.md)
 
 ## Chapter 6 · ML System Design
 
@@ -78,7 +84,7 @@
   - [Search and ads design](06-ml-system-design/03-search-and-ads-design.md)
   - [Risk and finance design](06-ml-system-design/04-risk-and-finance-design.md)
   - [LLM application system design](06-ml-system-design/05-llm-application-design.md)
-  - [Case library: 14 interview problems at a glance](06-ml-system-design/06-case-studies.md)
+  - [Case library: 18 interview problems at a glance](06-ml-system-design/06-case-studies.md)
 
 ## Chapter 7 · ML Infra
 
@@ -89,12 +95,15 @@
   - [Inference serving and GPU optimization](07-ml-infra/04-inference-serving-and-gpu-optimization.md)
   - [Data and experiment platform](07-ml-infra/05-data-and-experiment-platform.md)
   - [Infra interview cases](07-ml-infra/06-infra-case-studies.md)
+  - [RL post-training infrastructure and GPU orchestration](07-ml-infra/07-rl-posttraining-infrastructure.md)
 
 ## Chapter 8 · Interview Question Bank and Cheat Sheets
 
 - [Chapter 8 · Interview Question Bank and Cheat Sheets](08-interview-bank/README.md)
   - [ML / DL cheat sheet](08-interview-bank/01-ml-dl-cheatsheet.md)
   - [LLM cheat sheet](08-interview-bank/02-llm-cheatsheet.md)
+  - [RL and alignment cheat sheet](08-interview-bank/02b-rl-alignment-cheatsheet.md)
   - [Agent cheat sheet](08-interview-bank/03-agent-cheatsheet.md)
-  - [Top 100 Interview Questions](08-interview-bank/04-top-100-questions.md)
+  - [Top 100+ Interview Questions (Q1–Q120)](08-interview-bank/04-top-100-questions.md)
   - [System design and infra cheat sheet](08-interview-bank/05-system-design-and-infra-cheatsheet.md)
+  - [ML coding cheat sheet](08-interview-bank/06-ml-coding-cheatsheet.md)

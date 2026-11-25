@@ -137,6 +137,20 @@ The benefit of layering is that **planning, execution, permissions, and observab
 
 Selection rule of thumb: **single agent → LangGraph or the Agents SDK; retrieval-heavy → LlamaIndex; many roles → AutoGen or CrewAI; business teams must edit it → low-code platform.**
 
+### 2.6 Context engineering and production agent archetypes
+
+In long-horizon agents, **context engineering** (curating what enters each forward pass) often matters more than swapping models:
+
+- **Prefix stability for prompt caching**: keep system prompt + static tool schemas immutable at the start of the prompt (never inject dynamic timestamps into the system prefix), or every turn misses the KV prefix cache.
+- **Progressive disclosure**: instead of injecting 100 tool schemas or full manuals upfront, expose a lightweight index/router and load full schemas or skill docs on demand.
+- **Offload large outputs**: write large search/SQL/log payloads to scratch files and put only paths + compact previews in the message history.
+
+| Agent archetype | Core loop & tools | Hardest engineering bottleneck |
+| --- | --- | --- |
+| **Coding agent** (Claude Code / SWE agent) | Repo search (AST/ripgrep) → patch/diff edit → run tests/LSP → iterate | Safe edit formats, sandboxed execution, multi-file context compaction |
+| **Deep research agent** | Query decomposition → parallel web/doc browse → source synthesis & citations | Fan-out/fan-in token budgets, deduplicating claims, source provenance |
+| **Voice / realtime agent** | Audio stream → VAD (endpointing) → LLM / native speech-to-speech → TTS | Sub-500 ms turn-taking latency, **barge-in** (interrupting playback mid-sentence), echoing |
+
 ## 3. Implementation notes
 
 A minimal runnable loop (LLM call details omitted):

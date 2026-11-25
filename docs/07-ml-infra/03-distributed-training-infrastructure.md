@@ -90,6 +90,18 @@ $$t_{allreduce} \approx 2(N-1)\alpha + \frac{2S(N-1)}{N\,B} \approx 2(N-1)\alpha
 
 The same gradient is 18x slower across nodes than inside one — that is why **topology awareness** and **hybrid parallelism** exist. It also explains why large-model training constrains the DP group size and keeps communication inside the NVLink domain (TP within a node, DP across nodes), and why gradients are **bucketed and overlapped with backward computation**: as soon as the backward pass produces a layer's gradient, the all-reduce for that bucket starts so network transfer overlaps with the rest of the backward pass.
 
+#### Collective primitives and Context Parallelism quick reference
+
+| Collective | Data volume per GPU | Where it is used in LLM training |
+| --- | --- | --- |
+| **AllReduce** (Ring / Tree) | $2\frac{N-1}{N}S$ (Ring); $O(\log N)$ latency (Tree) | DDP gradient sync; Tensor Parallelism (2 per Transformer layer) |
+| **ReduceScatter** | $\frac{N-1}{N}S$ | FSDP / ZeRO-2/3 gradient sharding; Sequence Parallelism (SP) |
+| **AllGather** | $\frac{N-1}{N}S$ | FSDP / ZeRO-3 on-demand parameter reconstruction; SP activations |
+| **All-to-All** | $\frac{N-1}{N}S$ (imbalance-sensitive) | MoE Expert Parallelism (EP) token dispatch/combine; **DeepSpeed Ulysses** CP |
+| **P2P Send/Recv** | Activation boundary per micro-batch | Pipeline Parallelism (PP); **Ring Attention** Context Parallelism (CP) |
+
+**Context Parallelism (CP)** shards ultra-long sequences (128K–1M tokens) across GPUs: **Ring Attention** rotates KV blocks peer-to-peer around a ring while overlapping with FlashAttention compute; **DeepSpeed Ulysses** uses All-to-All to switch from sequence-sharded to head-sharded layout (requires `n_heads >= CP_size`, lower latency on high-BW links).
+
 ### 2.4 NCCL, RDMA, and topology
 
 - **NCCL**: NVIDIA's collective communication library; it probes the topology (NVLink/PCIe/IB/RoCE) and picks ring or tree algorithms, double binary trees, etc. PyTorch DDP runs on top of it.
@@ -111,6 +123,7 @@ The supporting engineering:
 - **Async checkpointing**: write quickly to local NVMe/memory, then a background thread copies to object storage so training never stalls; the cost is that the newest checkpoint may be lost on power failure.
 - **Sharded plus multi-tier retention**: each GPU writes only its own shard (aligned with FSDP/ZeRO sharding) in parallel; keep the last few plus a long-term copy every N hours so a bad checkpoint cannot overwrite a good one.
 - **Data-side resume point**: record consumed batches/shards (epoch + step or a global sample index) and skip them on resume, otherwise data repeats and the model overfits.
+- **Silent Data Corruption (SDC) & proactive health checks**: faulty GPU ALUs/HBM can flip bits without throwing CUDA/ECC errors, silently poisoning weights. Guard with pre-job **DCGM + GEMM checksum burn-in tests**, hot spare nodes for automatic replacement, per-rank gradient-norm / NaN divergence alarms, and periodic deterministic checksums across replicated shards.
 - **Elastic training**: torchrun's `--rdzv_backend=c10d --rdzv_endpoint=...` tolerates membership changes; on resize, rebuild the process group, recompute shards, and keep the LR schedule and data order correct. The hard part is "the batch composition changes after a shrink — what happens to gradient scale and optimizer state".
 
 ### 2.6 Training platform abstraction

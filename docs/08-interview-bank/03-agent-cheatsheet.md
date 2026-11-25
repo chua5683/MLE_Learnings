@@ -71,18 +71,19 @@
 | Metric | Notes |
 |---|---|
 | Steps vs success | Independent approximation $p^T$; with $p=0.95$ and $T=20$, about 36% |
-| pass@k | $1-\binom{n-c}{k}/\binom{n}{k}$; in practice also track the mean over k repeats and the worst 10% |
+| pass@k vs. pass^k | $\mathrm{pass@}k = 1-\binom{n-c}{k}/\binom{n}{k}$ (at least 1); $\mathrm{pass}^k = \binom{c}{k}/\binom{n}{k} \approx \hat{p}^k$ (all $k$ succeed) |
 | Three metric layers | Component (tool accuracy) / trajectory (steps, repeat rate) / end to end (success, cost, P95 latency) |
 | Cost levers | Fewer steps > compress context > cache > model routing > parallelism > early stop |
 | Multi-agent cost | Full connectivity is $O(n^2)$; a multi-agent research system uses about 15x chat tokens (Anthropic) |
 | RRF fusion | $\sum_i 1/(k+\mathrm{rank}_i)$, $k\approx 60$ |
 | Judge calibration | Align against 200-500 human labels and report agreement ($\kappa$) |
 
-## 8. Security and observability (bonus points in interviews)
+## 8. Harness engineering, governance, and proactive agents (differentiators)
 
-- **Minimum trace fields**: trace/span/parent, type, input/output (redacted), token/cost, latency, versions.
-- **Defense in depth**: input labeling → instruction/data separation → least privilege → sandbox → HITL → output filtering → audit → rollback.
-- **Why injection is worse**: agents actively read untrusted content and hold execution permissions.
+- **Harness engineering**: thin primitives + strong verification (re-ablate scaffolding as models improve); byte-immutable cached prefix (>80% KV cache hit); spill bulky tool outputs to disk with paths; unique search/patch ACI edits; fast deterministic backpressure (types/lint/schema) per step + test suite at completion; event-sourced checkpoints & mocked trajectory replay CI.
+- **Governance & guardrails**: prompts advise, **Policy-as-Code (OPA/Cedar)** decides; dual-principal identity $\mathrm{Perms}(\mathrm{NHI}) \cap \mathrm{Perms}(\mathrm{User})$ via OAuth OBO; 4-tier blast-radius gating (T0 public read → T1 scoped read/draft → T2 reversible write + undo → T3 HITL approval); L1 deterministic (<5 ms, fail-closed) → L2 fast classifier → L3 LLM guard (shadow-first); taint tracking; central MCP registry & hierarchical kill switches.
+- **Proactive / ambient agents**: act only when $p > C_{\mathrm{false}}/(V_{\mathrm{true}}+C_{\mathrm{false}})$ (**precision > recall**); ingress self-loop drop (`actor_id`, `hop_depth`) + entity cooldowns + cheap triage funnel (drops 80–95% noise); climb autonomy ladder (L0 Shadow → L1 Draft/Digest → L2 1-Click Approval → L3 Reversible Auto-Act); re-verify state preconditions (ETag/SHA + TTL) before executing delayed approvals; make `no_action` / `snooze` first-class tools.
+- **Minimum trace fields**: trace/span/parent, type, input/output (redacted), token/cost, latency, policy & harness versions.
 - **Canary**: split by session or user, 1% → 5% → 25% → full traffic, with automatic rollback.
 
 ## 9. Ten conclusions
@@ -108,4 +109,7 @@
 - [Agentic RAG and knowledge augmentation](../05-agents/06-agentic-rag.md)
 - [Production evaluation and safety](../05-agents/07-evaluation-and-safety.md)
 - [Agent interview Q&A](../05-agents/08-agent-interview-qa.md)
+- [Harness engineering](../05-agents/09-harness-engineering.md)
+- [Enterprise governance and guardrails](../05-agents/10-governance-and-guardrails.md)
+- [Proactive and ambient agents](../05-agents/11-proactive-and-ambient-agents.md)
 - [RAG](../04-llm/11-rag.md)

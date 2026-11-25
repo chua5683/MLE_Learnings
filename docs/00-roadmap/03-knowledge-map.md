@@ -50,7 +50,11 @@ flowchart TB
 | DPO | Preference modeling, KL regularization | 03-06 |
 | RAG | Retrieval, embeddings, generation | 04-11 |
 | Agents | LLMs, tool calling, planning | 05-01 |
+| Harness, Governance & Proactive Agents | Agent loop, MCP, event streams, auth/RBAC | 05-09 / 05-10 / 05-11 |
 | Feature store | Offline/online consistency | 07-02 |
+| Causal / Uplift & Bandits | Potential outcomes, propensities | 01-08 |
+| VLMs / Diffusion / GNNs | ViT, contrastive loss, message passing | 02-07 / 04-13 |
+| RL Post-Training Infra | Distributed training + vLLM/SGLang serving | 07-07 |
 
 ## 3. One-page index
 

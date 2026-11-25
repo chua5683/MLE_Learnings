@@ -13,7 +13,10 @@
 - [Multi-agent systems](05-multi-agent-systems.md) — collaboration topologies, communication, consensus and conflict, cost models, when not to use them
 - [Agentic RAG and knowledge augmentation](06-agentic-rag.md) — query planning, Self-RAG / CRAG, GraphRAG, enterprise knowledge bases
 - [Production evaluation and safety](07-evaluation-and-safety.md) — trace / span, task success rate, cost optimization, injection defense, sandboxes
-- [Agent interview Q&A](08-agent-interview-qa.md) — 50+ high-frequency questions organized by theme for quick review
+- [Agent interview Q&A](08-agent-interview-qa.md) — 65+ high-frequency questions organized by theme for quick review
+- [Harness engineering](09-harness-engineering.md) — thin primitives vs. brittle DAGs, ACI tool design, prompt-cache-safe context compilers, deterministic backpressure, durable execution & replay CI
+- [Enterprise governance and guardrails](10-governance-and-guardrails.md) — NHI + OAuth OBO delegation, Policy-as-Code (OPA/Cedar), 4-tier action blast-radius gating, layered runtime guardrails, taint tracking, kill switches & audit
+- [Proactive and ambient agents](11-proactive-and-ambient-agents.md) — event-driven triage funnels, interruption economics (precision > recall), graduated autonomy ladder, causal-loop & storm defense, stale-state checks
 
 ## One diagram for the whole chapter
 
@@ -37,7 +40,7 @@ flowchart LR
 
 ## The through-line of this chapter
 
-One idea runs through all eight notes: **the freedom that comes from "the model decides" has to be paid for with structure**.
+One idea runs through all eleven notes: **the freedom that comes from "the model decides" has to be paid for with structure**.
 
 | Degree of freedom | Risk | Structural countermeasure in this chapter |
 |---|---|---|
@@ -47,6 +50,9 @@ One idea runs through all eight notes: **the freedom that comes from "the model 
 | The model picks who does the work | Communication overhead, unclear ownership | topologies and arbitration in [05 Multi-agent](05-multi-agent-systems.md) |
 | The model picks what to retrieve | Hallucination, permission overreach | query planning and citations in [06 Agentic RAG](06-agentic-rag.md) |
 | The model picks how to run long tasks | Unobservable, not regressable | tracing and evaluation in [07 Production](07-evaluation-and-safety.md) |
+| The model interacts with messy environments | Context rot, cache misses, fragile edits | context compiler, ACI, backpressure, replay in [09 Harness engineering](09-harness-engineering.md) |
+| The model acts inside enterprise systems | Confused deputy, policy bypass, shadow AI | OBO identity, Policy-as-Code, layered guardrails in [10 Governance & guardrails](10-governance-and-guardrails.md) |
+| The model wakes without a human prompt | Alert fatigue, webhook loops, stale actions | triage funnel, autonomy ladder, loop/TOCTOU guards in [11 Proactive agents](11-proactive-and-ambient-agents.md) |
 
 ## Study plan
 
@@ -83,6 +89,9 @@ One idea runs through all eight notes: **the freedom that comes from "the model 
 | Trajectory | trajectory | All steps of one task (thought / action / observation) |
 | Task success rate | task success rate | The core end-to-end metric for an agent |
 | Context engineering | context engineering | Deciding what to put into the context at each step |
+| Agent harness | harness | Runtime loop, context compiler, ACI tools, verifiers, and durable state surrounding the LLM |
+| On-Behalf-Of delegation | OBO | OAuth token exchange intersecting agent NHI and invoking user permissions |
+| Proactive / ambient agent | proactive agent | Event- or schedule-driven agent acting asynchronously with graduated autonomy |
 
 ## Five common pitfalls (notes to myself)
 

@@ -24,14 +24,14 @@ All chapters are **rewritten and condensed notes** (not copied verbatim) for per
 | Chapter | Content | When to use it |
 | --- | --- | --- |
 | [00 · Learning Map](00-roadmap/README.md) | Roadmap, interview methodology, knowledge map | Read this first |
-| [01 · ML Fundamentals](01-ml-fundamentals/README.md) | Bias-variance, classical models, trees, evaluation, sampling, EM | First round for every ML role |
-| [02 · DL Fundamentals](02-dl-fundamentals/README.md) | Backprop, initialization, normalization, CNN/RNN, Transformer basics, optimizers | Derivations and detail questions |
+| [01 · ML Fundamentals](01-ml-fundamentals/README.md) | Bias-variance, classical models, trees, evaluation, sampling, EM, causal/bandits | First round for every ML role |
+| [02 · DL Fundamentals](02-dl-fundamentals/README.md) | Backprop, initialization, normalization, CNN/RNN, Transformer, optimizers, ViT/CLIP/Diffusion/GNN | Derivations and detail questions |
 | [03 · Reinforcement Learning](03-reinforcement-learning/README.md) | MDP, value methods, policy gradients, PPO, RLHF, DPO, GRPO | Alignment / reasoning roles |
-| [04 · Large Language Models](04-llm/README.md) | Architecture, pretraining, scaling laws, fine-tuning, distributed training, inference, quantization, evaluation, RAG, prompting | Core LLM track |
-| [05 · AI Agents](05-agents/README.md) | Agent architecture, tool use, planning, memory, multi-agent systems, engineering | Agent / application roles |
-| [06 · ML System Design](06-ml-system-design/README.md) | Answering framework plus recommender / search / ads / risk / LLM application designs | System design rounds |
-| [07 · ML Infra](07-ml-infra/README.md) | Feature stores, real-time features, training and serving infrastructure | Infra rounds |
-| [08 · Interview Bank](08-interview-bank/README.md) | Cheat sheets and top 100 questions | The day before the interview |
+| [04 · Large Language Models](04-llm/README.md) | Architecture, pretraining, scaling laws, fine-tuning, distributed training, inference, quantization, evaluation, RAG, prompting, multimodal VLMs | Core LLM track |
+| [05 · AI Agents](05-agents/README.md) | Agent architecture, tool use, planning, memory, multi-agent, harness engineering, governance/guardrails, proactive agents | Agent / application roles |
+| [06 · ML System Design](06-ml-system-design/README.md) | Answering framework plus recommender / search / ads / risk / LLM app designs (18 cases) | System design rounds |
+| [07 · ML Infra](07-ml-infra/README.md) | Feature stores, real-time features, training, serving, and RL post-training infrastructure | Infra rounds |
+| [08 · Interview Bank](08-interview-bank/README.md) | Cheat sheets (ML/DL, LLM, RL, Agent, Design/Infra, ML Coding) and 120 core questions | The day before the interview |
 
 ## How to use these notes
 

@@ -10,9 +10,11 @@
 | --- | --- | --- |
 | [ML/DL cheat sheet](01-ml-dl-cheatsheet.md) | Bias-variance, trees, evaluation, optimizers, BN and other formulas and comparison tables | Skim 30 minutes before the interview |
 | [LLM cheat sheet](02-llm-cheatsheet.md) | Architecture, KV cache, distributed training, fine-tuning, inference, RAG key numbers | Skim 30 minutes before the interview |
+| [RL & alignment cheat sheet](02b-rl-alignment-cheatsheet.md) | Bellman, GAE, PPO, RLHF, DPO/SimPO/KTO, GRPO/DAPO/RLOO, RLVR, diagnostics | Skim 15 minutes before a post-training round |
 | [Agent cheat sheet](03-agent-cheatsheet.md) | Agent loop, tool use, memory, multi-agent, evaluation metrics | Skim 15 minutes before the interview |
-| [Top 100 questions](04-top-100-questions.md) | Cross-topic 100 questions with answer points and chapter links | Mock interview / self-quiz |
+| [Top 100+ questions (Q1–Q120)](04-top-100-questions.md) | Cross-topic 120 questions (ML, DL, RL, LLM, Agents, System Design & Infra) with links | Mock interview / self-quiz |
 | [System design and infra cheat sheet](05-system-design-and-infra-cheatsheet.md) | Answering templates, capacity-estimation formulas, component checklists | One hour before a design round |
+| [ML coding cheat sheet](06-ml-coding-cheatsheet.md) | 10 canonical PyTorch/NumPy templates + edge-case checklist (paired with `ml_coding/` tests) | Drill before ML coding rounds |
 
 ## How to use it
 

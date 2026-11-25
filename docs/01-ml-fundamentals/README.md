@@ -13,6 +13,7 @@
 - [Evaluation metrics](05-evaluation-metrics.md) — Confusion matrix, ROC/AUC, PR/AP, regression metrics, ranking metrics, and online A/B tests.
 - [Sampling and class imbalance](06-sampling-and-class-imbalance.md) — Resampling, SMOTE, cost sensitivity, threshold moving, and probability calibration.
 - [Probabilistic models and EM](07-probabilistic-models-and-em.md) — Naive Bayes, MLE/MAP, EM/ELBO, GMM, HMM, and CRF.
+- [Causal inference, uplift, and bandits](08-causal-inference-and-bandits.md) — Potential outcomes, confounding, IPW/Doubly Robust, uplift meta-learners, UCB, Thompson Sampling, and contextual bandits.
 
 ## Chapter map
 

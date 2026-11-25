@@ -95,7 +95,18 @@ $\hat\Delta\pm1.96\,SE$ is the 95% confidence interval. The sample size is deter
 
 **Common pitfalls**: novelty effects, seasonality, non-independent assignment (the same user in both groups), sample-ratio mismatch (SRM), multiple comparisons, and Simpson's paradox. Besides the core metric, set **guardrail metrics** (latency, complaint rate, revenue).
 
-### 2.7 Metric selection quick reference
+### 2.7 Uncertainty quantification and Conformal Prediction
+
+Point predictions rarely tell downstream systems *how confident* the model is. Distinguish **aleatoric uncertainty** (irreducible data noise — more data will not shrink it) from **epistemic uncertainty** (model ignorance in sparse/OOD regions — shrinks with more data or ensembles).
+
+- **Calibration error (ECE & Brier)**: Expected Calibration Error partitions predictions into $M$ probability bins and measures $\mathrm{ECE} = \sum_{m=1}^{M}\frac{|B_m|}{n}|\mathrm{acc}(B_m) - \mathrm{conf}(B_m)|$; Brier score $\frac{1}{n}\sum(\hat{p}_i - y_i)^2$ decomposes into calibration + refinement.
+- **Split Conformal Prediction**: wraps *any* black-box model with a held-out calibration set of size $n_{\mathrm{cal}}$ to produce a prediction set $C(x)$ or interval guaranteed to cover the true label with probability $\ge 1-\alpha$ under exchangeability (distribution-free, no Gaussian assumption):
+  1. Compute nonconformity scores on calibration data (e.g., $s_i = |y_i - \hat{f}(x_i)|$ for regression, or $s_i = 1 - \hat{p}_{y_i}(x_i)$ for classification).
+  2. Set $\hat{q}$ to the $\lceil (n_{\mathrm{cal}}+1)(1-\alpha)\rceil / n_{\mathrm{cal}}$ quantile of $\{s_i\}$.
+  3. Output interval $[\hat{f}(x)-\hat{q},\; \hat{f}(x)+\hat{q}]$ (or set $\{y : 1-\hat{p}_y(x) \le \hat{q}\}$).
+  Useful for ETA P90 guarantees, medical/fraud abstention, and selective routing.
+
+### 2.8 Metric selection quick reference
 
 | Scenario | Primary metric | Notes |
 | --- | --- | --- |

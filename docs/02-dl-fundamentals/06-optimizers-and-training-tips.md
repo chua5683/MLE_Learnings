@@ -115,7 +115,16 @@ This is approximately equivalent to a large batch (note that BN statistics are s
 
 **Other**: weight EMA (use smoothed parameters at inference), label smoothing, dropout, and gradient checkpointing (trade compute for memory).
 
-### 2.8 Tuning experience
+### 2.8 Modern optimizers and large-scale stability (2024–2026)
+
+Beyond AdamW, frontier LLM training uses several upgrades for faster convergence and spike-free scaling:
+
+- **Muon (Momentum Orthogonalized by Newton-Schulz)**: applies Newton-Schulz orthogonalization to the 2D weight-matrix momentum update (keeping AdamW for 1D biases/norms and embeddings). Orthogonalizing updates equalizes singular-value step sizes across directions, reporting ~1.3–2× compute efficiency over AdamW on LLM pretraining.
+- **SOAP / Shampoo**: second-order Kronecker-factored preconditioners that approximate full-matrix curvature along rows and columns; SOAP runs Adam in Shampoo's rotated eigenbasis for lower tuning sensitivity.
+- **$\mu\mathrm{P}$ (Maximal Update Parametrization)**: scales initialization variance and per-layer learning rates with model width ($d$) so that optimal hyperparameters found on a small proxy model (e.g., 400M) transfer directly to a 70B+ run without re-sweeping.
+- **QK-Norm and z-loss**: normalizing $Q$ and $K$ (RMSNorm/LayerNorm per head) prevents attention-logit explosion at large scale; **z-loss** ($c \cdot \log^2 Z$ on the final softmax log-partition function) keeps output logits bounded and prevents BF16/FP8 divergence.
+
+### 2.9 Tuning experience
 
 - **Learning rate is the first priority**, usually searched on a $\log$ scale ($10^{-5}\sim10^{-1}$).
 - **Batch size and lr**: linear scaling $\eta\propto B$ (common for large batches) or square-root scaling $\eta\propto\sqrt{B}$; returns diminish beyond a critical batch size.

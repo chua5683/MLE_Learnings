@@ -107,7 +107,14 @@ Random undersampling can be corrected similarly using the prior ratio. A safer a
 - **PR-AUC**: Precision depends on the positive prior; sampling changes the prior, shifting the whole PR curve and the AP baseline (the positive rate), so results are not directly comparable to the un-sampled case.
 - **Conclusion**: under imbalance, report **PR-AUC, F1, Recall at a fixed Precision, and calibration curves**, not just AUC.
 
-### 2.6 Recommended workflow
+### 2.6 Time-series and right-censored (survival) data pitfalls
+
+Imbalanced business outcomes (churn, defaults, conversions) almost always arrive over time, introducing two extra data hazards:
+
+- **Time-series leakage & non-stationarity**: never random-split temporal data; compute lag/rolling aggregations strictly over $(-\infty, t]$, use expanding/rolling-origin CV, and check for stationarity or seasonal shifts before comparing offline metrics.
+- **Right-censored labels (survival / delayed conversion)**: a user who joined 3 days ago has not churned *yet* — treating them as a negative (`y=0`) biases the model downward. Options: (1) enforce a **maturity window** (only label cohorts older than $W$ days); (2) **survival modeling** (Cox proportional hazards, Kaplan-Meier, or discrete-time hazard $h(t)=P(T=t\mid T\ge t)$) that retains censored observations in the likelihood; or (3) **delayed-feedback importance weighting** in online conversion models.
+
+### 2.7 Recommended workflow
 
 1. Split train/validation/test first, and resample **only inside the training folds**.
 2. Try class weights or cost-sensitive losses first (simple and interpretable).

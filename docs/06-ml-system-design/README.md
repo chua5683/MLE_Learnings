@@ -36,7 +36,7 @@ flowchart TB
 | [03 Search and ads design](03-search-and-ads-design.md) | Query understanding, retrieval and ranking, CTR/CVR prediction, ESMM, calibration, bidding and auctions, search box | Search, ads, suggestions |
 | [04 Risk and finance design](04-risk-and-finance-design.md) | Fraud detection, class imbalance, graph features, rules + models, false-positive cost, credit and coupons | Risk, payments, credit, marketing |
 | [05 LLM application system design](05-llm-application-design.md) | RAG/agent systems, token cost and capacity, caching, streaming, evaluation, safety, multi-tenancy | Mandatory for LLM application roles |
-| [06 Case library](06-case-studies.md) | 14 interview questions at a glance: news feed, video search, POI, dedup, content safety, ETA... | Skim before an interview to fill gaps |
+| [06 Case library](06-case-studies.md) | 18 interview questions at a glance: news feed, video search, POI, dedup, content safety, ETA, coding agent, visual search, VLM moderation, marketplace pricing... | Skim before an interview to fill gaps |
 
 ## Interview rounds
 

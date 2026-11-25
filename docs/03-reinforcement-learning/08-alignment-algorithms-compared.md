@@ -105,7 +105,8 @@ Real training pipelines rarely use a single algorithm:
 - **SFT -> DPO -> GRPO/RLVR**: align format/style with preferences first, then train reasoning with verifiable rewards.
 - **R1 style**: cold-start SFT -> GRPO (RLVR) -> rejection-sampling SFT -> general RL.
 - **RM + GRPO**: keep the flexibility of an RM while dropping the critic.
-- **RLAIF / Constitutional AI**: replace human feedback with AI feedback to cut labeling cost.
+- **RLAIF / Constitutional AI**: replace or bootstrap human preference labeling with a critic model guided by explicit written principles (a "constitution"), using self-critique + revision for SFT and AI preference labels for RM/DPO/RL.
+- **Generative Reward Models (GenRM) & Rubric-Based RL**: for open-ended domains where programmatic RLVR fails (writing, nuanced instruction following, safety), replace scalar Bradley-Terry RMs with a **Generative RM** that produces a chain-of-thought critique before scoring against a **task-specific rubric** (binary/graded checklist items). Rubrics decompose vague "helpfulness" into verifiable sub-criteria, strongly curbing Goodhart's Law (verbosity and sycophancy reward hacking).
 
 ### 3.3 Production checklist
 

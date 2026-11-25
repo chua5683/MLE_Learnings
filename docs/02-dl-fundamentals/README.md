@@ -13,7 +13,8 @@
 | [03 Normalization techniques](03-normalization-techniques.md) | BN in training vs inference, LN/RMSNorm/GN/IN, Pre-LN vs Post-LN, normalization and residuals | ★★★★★ |
 | [04 CNNs and RNNs](04-cnn-and-rnn.md) | Convolution output size and receptive field, 1x1 and separable convolutions, classic networks such as ResNet, LSTM/GRU, the origin of seq2seq and attention | ★★★☆☆ |
 | [05 Transformer basics](05-transformer-basics.md) | self-attention formula and complexity, multi-head, positional encoding, FFN, masks, training vs inference | ★★★★★ |
-| [06 Optimizers and training tricks](06-optimizers-and-training-tips.md) | SGD/Momentum/Adam/AdamW, bias correction, learning-rate schedules, gradient clipping, mixed precision, gradient accumulation | ★★★★☆ |
+| [06 Optimizers and training tricks](06-optimizers-and-training-tips.md) | SGD/Momentum/Adam/AdamW, Muon/SOAP/μP, bias correction, learning-rate schedules, gradient clipping, mixed precision, gradient accumulation | ★★★★☆ |
+| [07 Vision, contrastive learning, diffusion, and GNNs](07-vision-multimodal-diffusion-and-gnn.md) | ViT, CLIP/SigLIP/MAE/DINOv2, DDPM vs. Flow Matching, DiT/CFG, and GNN message passing / over-smoothing | ★★★★☆ |
 
 ## Three threads through this chapter
 

@@ -43,6 +43,7 @@ flowchart LR
 - [04 · Inference serving and GPU optimization](04-inference-serving-and-gpu-optimization.md) — the layered online-inference architecture; dynamic batching and autoscaling; GPU utilization and MFU; profiling with nsys/ncu; eliminating small kernels (fused embedding lookup, one-shot H2D copy, CUDA graphs); custom Triton kernels; multi-model sharing; SLA and capacity-planning formulas.
 - [05 · Data and experiment platform](05-data-and-experiment-platform.md) — batch/stream data pipelines and idempotent reruns; data versioning and table formats (Iceberg/Hudi/Delta); data-quality checks; the experiment platform (assignment, layers, sample size, SRM, CUPED); model registry and CI/CD, canary and rollback; drift monitoring and alerting.
 - [06 · Infra interview cases](06-infra-case-studies.md) — a full pipeline walk-through (short-video recommendation); four component-design templates (feature store / real-time features / distributed training / GPU serving); capacity-estimation exercises with solutions; time allocation and common ways to lose points.
+- [07 · RL post-training infrastructure and GPU orchestration](07-rl-posttraining-infrastructure.md) — colocated (verl) vs. disaggregated async RL clusters, fast in-memory weight sync, long-tail CoT straggler mitigation, sandboxed verifiers, and Slurm vs. Kubernetes (+ Kueue/Volcano) vs. Ray.
 
 ## 4. The two question types and answer skeletons
 

@@ -111,6 +111,12 @@ When evaluation sets leak into the training corpus, scores are inflated. Detecti
 - **canary strings**: plant special strings in evaluation data and check whether the model can reproduce them;
 - **decontamination**: do it before training, not as an explanation after evaluation.
 
+### 2.6 Mid-training (annealing) and synthetic data
+
+Modern pretraining splits into **main pretraining** (broad web mix at high LR) followed by **mid-training / annealing** (last 5–15% of tokens during LR cooldown, e.g., WSD schedule):
+- **Annealing mix**: sharply upsample high-quality textbooks, math, code, academic papers, and long-context documents (extending RoPE base from 4K/8K → 32K–128K). A small, ultra-clean annealing budget often yields larger benchmark gains than trillions of raw web tokens.
+- **Synthetic data & model collapse**: teacher distillation, textbook rewrites (Phi / Nemotron), and verified math/code solutions expand scarce high-signal domains. To prevent **model collapse** (tail-distribution shrinkage from recursive self-training), always mix synthetic data with diverse real human data, verify synthetic outputs programmatically where possible, and filter for deduplication and diversity.
+
 ## 3. Implementation notes
 
 ```python

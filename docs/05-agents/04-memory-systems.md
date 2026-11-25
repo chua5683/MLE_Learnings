@@ -132,6 +132,12 @@ Core idea: the main context is limited, external storage acts as disk, and conte
 
 Unlike "passively running RAG once per turn", MemGPT emphasizes **active management of the memory substrate**: the model decides when to page and when to recall, which requires function-calling ability and an explicit control protocol.
 
+#### Context compaction and filesystem-as-external-memory
+
+For 30–100 step trajectories (coding, deep research), simple sliding windows drop early goals while naive summarization destroys exact IDs and paths:
+- **Structured compaction**: when context crosses a threshold (e.g., 75% of window), compact completed tool-call turns into a fixed schema (`goal`, `verified_facts`, `modified_files`, `open_errors`, `next_step`) while keeping the system prefix untouched (preserving prompt-cache hit rate) and leaving recent raw turns verbatim.
+- **Filesystem as working memory**: store large tool outputs (logs, tables, web dumps) as local/object files and give the agent `read_range` / `grep` tools so it fetches only needed lines on demand instead of stuffing raw megabytes into context.
+
 ### 2.7 Memory middleware and knowledge graphs
 
 - **Mem0-style components**: package "extract reusable memories from dialogue → update → retrieve" as a reusable layer, often combined with a vector store, a graph structure, and a user profile; the focus is engineering the **write pipeline and conflict handling**.

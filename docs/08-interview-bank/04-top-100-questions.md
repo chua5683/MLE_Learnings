@@ -4,7 +4,7 @@
 >
 > **Note**: questions are condensed from the Q&A across the book, grouped by topic and numbered continuously for random sampling.
 
-## A. Machine Learning Fundamentals (Q1–Q22)
+## A. Machine Learning Fundamentals (Q1–Q21)
 
 ### Q1. Write down the bias-variance decomposition and explain each term.
 **Answer**: $E[(y-\hat f)^2]=\mathrm{Bias}^2+\mathrm{Var}+\sigma^2$. Bias is the systematic gap between the model's assumptions and the true function; variance is sensitivity to training-set noise; $\sigma^2$ is the irreducible noise floor. More complex models lower bias and raise variance. Regularization and more data mainly reduce variance; better features or larger models reduce bias.
@@ -90,11 +90,11 @@
 **Answer**: Generative models model $P(x,y)$ (naive Bayes, GMM): they can sample and handle missing data but make strong assumptions. Discriminative models model $P(y|x)$ directly (LR, SVM, trees): usually more accurate and data-efficient.
 → See [Probabilistic models and EM](../01-ml-fundamentals/07-probabilistic-models-and-em.md)
 
+## B. Deep Learning (Q22–Q40)
+
 ### Q22. What is backpropagation, fundamentally?
 **Answer**: The chain rule plus dynamic programming on the computation graph: cache intermediates in the forward pass, then propagate gradients in reverse topological order; each node only needs its local Jacobian. Cost is the same order as the forward pass (about 2–3×).
 → See [Neural networks and backprop](../02-dl-fundamentals/01-neural-networks-and-backprop.md)
-
-## B. Deep Learning (Q23–Q40)
 
 ### Q23. What causes vanishing/exploding gradients, and how do you fix them?
 **Answer**: Deep products of Jacobians: spectral radius below 1 decays exponentially, above 1 explodes. Fixes: ReLU-family activations, proper initialization (Xavier/He), BatchNorm/LayerNorm, residual connections, gradient clipping, gated units (LSTM).
@@ -413,3 +413,85 @@
 ### Q100. What are the security risks of agents?
 **Answer**: Prompt injection (especially from web pages or documents), tool abuse or privilege escalation, data exfiltration, sandbox escapes in code execution, supply-chain risks (MCP servers), and irreversible actions. Defenses: least privilege, sandboxing, human confirmation, audit logs, and output filtering.
 → See [Evaluation and safety](../05-agents/07-evaluation-and-safety.md)
+
+## F. System Design, ML Infra, and Frontier Topics (Q101–Q120)
+
+### Q101. Why do modern recommender systems use a four-stage funnel (retrieval → pre-ranking → ranking → re-ranking)?
+**Answer**: Candidate pools hold $10^7$–$10^9$ items, while rich cross-feature deep models can only score $10^2$–$10^3$ within a ~50–100 ms SLA. Each stage trades model complexity for candidate volume, and re-ranking optimizes listwise objectives (diversity, freshness, ads/business rules) that pointwise rankers miss.
+→ See [Recommender system design](../06-ml-system-design/02-recommender-system-design.md)
+
+### Q102. What is training-serving skew, and how does a feature store prevent it?
+**Answer**: Training-serving skew occurs when offline training features differ from online serving features due to duplicated code, stale snapshots, or future leakage. A feature store fixes it with a single feature definition, point-in-time joins (`ASOF JOIN`) offline, dual offline/online storage, and online feature logging for training.
+→ See [Feature store and real-time features](../07-ml-infra/02-feature-store-and-realtime-features.md)
+
+### Q103. Why is probability calibration mandatory in ad CTR prediction but optional in organic ranking?
+**Answer**: Organic feeds only depend on item order, which is invariant to any monotonic score transform. Ad auctions compute $\mathrm{eCPM} = \mathrm{pCTR} \times \mathrm{bid}$ (and budget pacing), so uncalibrated probabilities systematically overpay or lose profitable impressions; monitor PCOC ($\sum \hat{p}/\sum y \approx 1$) and recalibrate with Platt/isotonic scaling.
+→ See [Search and ads design](../06-ml-system-design/03-search-and-ads-design.md)
+
+### Q104. How do you handle delayed feedback and sample selection bias in conversion/credit modeling?
+**Answer**: Conversions or loan defaults arrive days to months after exposure, so naïve labeling marks recent positives as negatives. Use waiting-window censoring, importance weighting (DFM / delayed feedback modeling), or survival analysis; for selection bias (only exposed/approved samples have labels), use reject inference, exploration traffic, or IPS/ESMM.
+→ See [Risk and finance design](../06-ml-system-design/04-risk-and-finance-design.md)
+
+### Q105. What is the difference between predictive modeling and uplift (causal) modeling?
+**Answer**: Predictive models estimate $P(Y=1 \mid X)$ ("who will buy"), whereas uplift models estimate the CATE $\tau(x) = \mathbb{E}[Y(1)-Y(0) \mid X=x]$ ("who will buy *because* of the treatment"). Targeting by $P(Y=1\mid X)$ wastes budget on "sure things" and can harm "sleeping dogs"; use randomized control data + meta-learners (T/X/R-learner) and evaluate with Qini / AUUC.
+→ See [Causal inference and bandits](../01-ml-fundamentals/08-causal-inference-and-bandits.md)
+
+### Q106. Compare Ring AllReduce, ReduceScatter, AllGather, and All-to-All in distributed training.
+**Answer**: Ring AllReduce equals ReduceScatter + AllGather and transfers $2\frac{N-1}{N}M$ bytes per rank (bandwidth-optimal, independent of $N$). FSDP/ZeRO-3 uses AllGather (forward/backward weights) and ReduceScatter (gradients); Tensor Parallelism uses AllReduce/AllGather per layer; MoE Expert Parallelism relies on All-to-All token dispatch/combine, which is latency- and load-imbalance-sensitive.
+→ See [Distributed training infrastructure](../07-ml-infra/03-distributed-training-infrastructure.md)
+
+### Q107. How does Prefill-Decode (PD) disaggregation work, and when is it worth the complexity?
+**Answer**: Prefill is compute-bound (sets TTFT) and decode is HBM-bandwidth-bound (sets TPOT); co-locating them causes long prefills to stall decode batches. PD disaggregation runs prefill and decode on separate GPU pools with different TP/batch configs and transfers KV cache over RDMA/NVLink; it pays off for long prompts under strict TTFT + TPOT SLOs.
+→ See [Inference optimization and serving](../04-llm/08-inference-optimization-and-serving.md)
+
+### Q108. How do you size GPU serving capacity for a latency-bound model?
+**Answer**: Compute $N_{\mathrm{GPU}} = (\mathrm{QPS} \times t_{\mathrm{GPU}}) / \eta$ with target utilization $\eta \in [0.4, 0.7]$ for burst headroom; for LLMs, also check the KV-cache concurrency cap $B_{\max}$ from VRAM budget and Little's Law ($L = \lambda W$). Optimize in order: reduce calls (caching) → batching → kernel/graph fusion (CUDA Graph, Triton) → quantization → more GPUs.
+→ See [Inference serving and GPU optimization](../07-ml-infra/04-inference-serving-and-gpu-optimization.md)
+
+### Q109. Why is RL post-training infrastructure (verl / OpenRLHF) harder than standard SFT training?
+**Answer**: RL loops alternate between autoregressive **rollouts** (decode-heavy, variable-length, straggler-prone, served by vLLM/SGLang) and **policy updates** (compute-heavy FSDP/Megatron), plus external verifiers/sandboxes. Key bottlenecks are weight-sync latency between trainer and rollout engines, GPU idle bubbles from long-tail CoT lengths, and off-policy staleness under async rollouts.
+→ See [RL post-training infrastructure](../07-ml-infra/07-rl-posttraining-infrastructure.md)
+
+### Q110. What is SRM in A/B testing, and how do you handle peeking and network interference?
+**Answer**: Sample Ratio Mismatch (chi-square $p < 0.001$) flags broken randomization, logging drops, or asymmetric timeouts and invalidates the test immediately. Prevent peeking inflation with fixed horizons or always-valid sequential tests (mSPRT); handle marketplace/social spillover with cluster randomization or time-based switchbacks.
+→ See [Data and experiment platform](../07-ml-infra/05-data-and-experiment-platform.md)
+
+### Q111. How does Interleaving compare to standard A/B testing for search and recommendation?
+**Answer**: Interleaving merges top-$K$ results from rankers A and B into one list (Team Draft / Probabilistic Interleaving) and attributes clicks within the same impression, removing user-level variance. It detects ranking gains with 10–100× less traffic than user-split A/B tests, so teams use it as a fast filter before full A/B confirmation of business and guardrail metrics.
+→ See [Data and experiment platform](../07-ml-infra/05-data-and-experiment-platform.md)
+
+### Q112. How do Vision-Language Models (VLMs) feed images into an LLM, and why does dynamic tiling matter?
+**Answer**: Modular VLMs encode an image with a vision encoder (e.g., SigLIP/ViT) and project patch tokens via an MLP or Q-Former into the LLM embedding space; native multimodal models tokenize image patches directly. Fixed low-resolution resizing blurs small text and charts, so dynamic tiling (AnyRes) splits high-res images into aspect-ratio-preserving crops plus a global thumbnail.
+→ See [Multimodal LLMs](../04-llm/13-multimodal-llms.md)
+
+### Q113. How do Diffusion models and Flow Matching differ?
+**Answer**: DDPM/score-based diffusion adds Gaussian noise over many steps along a curved SDE/ODE path and predicts noise $\epsilon$ or score $\nabla_x \log p_t(x)$. Flow Matching (rectified flow) directly regresses the velocity field $v_\theta(x_t, t)$ along straight linear paths $x_t = (1-t)x_0 + t x_1$, yielding simpler objectives and far fewer sampling steps (10–30 vs. 50–1000).
+→ See [Vision, multimodal, diffusion, and GNNs](../02-dl-fundamentals/07-vision-multimodal-diffusion-and-gnn.md)
+
+### Q114. What is over-smoothing in Graph Neural Networks, and how do you scale GNNs to billion-edge graphs?
+**Answer**: Stacking too many message-passing layers averages node embeddings across the whole graph until distinct nodes collapse to indistinguishable vectors; mitigate with shallow depth (2–4 hops), residual/JK connections, or DropEdge. Scale with mini-batch neighbor sampling (GraphSAGE), subgraph sampling (GraphSAINT), or precomputed propagation (SIGN).
+→ See [Vision, multimodal, diffusion, and GNNs](../02-dl-fundamentals/07-vision-multimodal-diffusion-and-gnn.md)
+
+### Q115. Compare CatBoost, LightGBM, and XGBoost.
+**Answer**: XGBoost pioneered second-order gain with explicit leaf regularization and exact/quantile splits; LightGBM speeds up training via histogram binning, leaf-wise growth, GOSS, and EFB; CatBoost uses symmetric (oblivious) trees for ultra-fast inference/regularization and ordered target statistics to handle high-cardinality categoricals without target leakage.
+→ See [Tree models and ensembles](../01-ml-fundamentals/03-tree-models-and-ensembles.md)
+
+### Q116. What is conformal prediction, and why is it useful in production ML?
+**Answer**: Conformal prediction wraps any black-box model with a calibration set to output prediction sets or intervals guaranteed to cover the true label with probability $\ge 1-\alpha$ under exchangeability — with no parametric distributional assumptions. It is ideal for high-stakes abstention, ETA confidence bands, and risk bounds.
+→ See [Evaluation metrics](../01-ml-fundamentals/05-evaluation-metrics.md)
+
+### Q117. What is the difference between `pass@k` and `pass^k` in agent evaluation?
+**Answer**: `pass@k` measures the probability that *at least one* of $k$ independent runs succeeds (capability ceiling, rises with $k$). `pass^k` measures the probability that *all $k$* independent runs succeed (production consistency, decays as $\hat{p}^k$). An agent with 80% single-run accuracy has `pass@4` ≈ 99.8% but `pass^4` ≈ 41%.
+→ See [Evaluation and safety](../05-agents/07-evaluation-and-safety.md)
+
+### Q118. What is context engineering for long-horizon agents?
+**Answer**: Managing the finite attention and cost budget across dozens of turns: keep system prompts and tool definitions static at the prefix for KV/prompt-cache hits, disclose tools/skills progressively instead of dumping 100 schemas, offload large tool outputs to external files/scratchpads, and compact stale trajectory steps into structured state summaries.
+→ See [Agent fundamentals and architecture](../05-agents/01-agent-fundamentals-and-architecture.md)
+
+### Q119. How do Semantic IDs (RQ-VAE / TIGER) change recommender retrieval?
+**Answer**: Instead of maintaining an ANN index over millions of flat item embeddings, RQ-VAE quantizes each item's content/collaborative embedding into a short hierarchical tuple of discrete codebook tokens (e.g., 4 tokens). A sequence Transformer then autoregressively generates target Semantic IDs via beam search, unifying retrieval and cold-start generalization.
+→ See [Recommender system design](../06-ml-system-design/02-recommender-system-design.md)
+
+### Q120. Why do large-scale LLM runs fail silently, and how do you recover fast at 10k-GPU scale?
+**Answer**: At 10k GPUs, hardware faults (Xid/NVLink/IB drops) occur daily and **Silent Data Corruption (SDC)** can poison weights without crashing. Production stacks combine automated health checks (DCGM/burn-in), **async in-memory/local-NVMe checkpointing** (seconds instead of minutes to object storage), hot spare nodes, deterministic step replay, and loss-spike/grad-norm canary monitors.
+→ See [Distributed training infrastructure](../07-ml-infra/03-distributed-training-infrastructure.md)

@@ -48,7 +48,7 @@ Checks must **shift left**: put them in the pipeline (run on every job) and fail
 ### 1.4 The experiment platform
 
 - **Assignment**: bucket by `hash(user_id + salt) % 10000` so the same user always lands in the same group;
-- **Layers**: place independent experiments in orthogonal layers so "experiment A perturbs experiment B's metrics";
+- **Layers**: place independent experiments in orthogonal layers so "experiment A does not perturb experiment B's metrics";
 - **Metrics**: a primary metric (north star) + guardrail metrics (latency, error rate, cost) + exploratory metrics;
 - **Analysis**: significance tests, confidence intervals, SRM checks, multiple-comparison correction.
 
@@ -110,10 +110,11 @@ That is about 750k **impressions** per group. If each user sees 20 impressions a
 Related concepts:
 
 - **SRM (sample ratio mismatch)**: the observed assignment ratio differs significantly from the design (chi-square test), usually meaning the assignment has a bug and the experiment is untrustworthy;
-- **Peeking**: checking while the test runs and stopping at the first significant result inflates the false-positive rate; either fix the sample size or use a sequential test;
-- **Multiple comparisons**: with 20 metrics, at least one "significant" result is guaranteed; apply Bonferroni or FDR correction, or pre-register the primary metric;
+- **Peeking & sequential testing**: checking while the test runs and stopping at the first $p < 0.05$ inflates the false-positive rate (often >20%); either fix the sample size upfront or use **always-valid $p$-values** (e.g., mSPRT / group sequential alpha-spending) that control type-I error under continuous monitoring;
+- **Multiple comparisons**: with 20 metrics, at least one "significant" result is guaranteed; apply Bonferroni or Benjamini-Hochberg FDR correction, or pre-register a single primary metric;
 - **CUPED**: use a pre-experiment covariate $X$ to reduce variance, $Y_{adj}=Y-\theta(X-\mathbb{E}[X])$, $\theta=\mathrm{Cov}(Y,X)/\mathrm{Var}(X)$; variance drops by $\rho^2$ ($\rho$ = correlation of $Y$ and $X$), equivalent to conjuring extra sample size;
-- **Network effects/spillover**: in social or two-sided markets the control group is affected by the treatment (e.g., a pricing experiment), so you need cluster randomization (by city or user group) or switchback experiments.
+- **Network effects / spillover**: in social graphs or two-sided markets (rideshare, delivery, ads) treatment units cannibalize or influence control units (violating SUTVA). Use **cluster randomization** (bucket by city, graph community, or store), **switchback experiments** (alternate treatment/control over time windows within the same geo, adjusting for carryover), or **two-sided randomization**;
+- **Interleaving (for ranking/search)**: merge top-$K$ results from ranker A and ranker B into one list (Team Draft or Probabilistic Interleaving) and credit whichever model's items receive clicks — **10–100× more sensitive** than user-split A/B tests for rapid offline-to-online screening, though it cannot measure long-term retention or latency trade-offs.
 
 ### 2.4 Drift detection
 

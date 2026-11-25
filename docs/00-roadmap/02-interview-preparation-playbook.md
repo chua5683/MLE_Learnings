@@ -48,7 +48,7 @@ Frequent problems:
 | Cross-entropy / softmax | Numerical stability, label smoothing |
 | Convolution output size | Formula and padding |
 
-Preparation: hand-write each algorithm once in PyTorch or NumPy, paying attention to dtype, device, numerical stability, and empty input.
+Preparation: hand-write each algorithm once in PyTorch or NumPy, paying attention to dtype, device, numerical stability, and empty input. Use the [ML Coding Cheat Sheet](../08-interview-bank/06-ml-coding-cheatsheet.md) and the runnable test suite in `ml_coding/` (`python3 -m unittest discover -s ml_coding -v`) to drill under time pressure.
 
 ### 2.3 ML fundamentals
 
@@ -107,6 +107,22 @@ The interviewer follows "why → how → impact → what if" five layers deep. T
 5. **Boundaries**: what you would change if data were 10× larger, latency halved, or labels arrived a week late.
 
 **Red lines**: do not claim team work as your own; do not invent numbers; do not be unable to explain your own module.
+
+### 2.8 AI-assisted coding
+
+Modern MLE interviews increasingly allow an AI coding assistant on a realistic mini-repo (debug a training pipeline, implement a retriever/ranker, fix a subtle numerical bug). What separates pass from fail:
+
+- **Scope before prompting**: read the existing tests and interfaces first; write a short plan before asking the AI to edit.
+- **Keep diffs small and verifiable**: ask for targeted changes, run unit tests after every step, and inspect every generated tensor shape, mask, and edge case.
+- **Narrate ownership**: never accept code you cannot explain line-by-line; interviewers deliberately ask "why did you choose this normalization / loss / data structure?".
+
+### 2.9 Level calibration (Mid vs. Senior vs. Staff)
+
+| Dimension | Mid (L4) | Senior (L5) | Staff (L6+) |
+| --- | --- | --- | --- |
+| Scope | Execute a well-scoped model or pipeline | Own an end-to-end ML product & launch | Define multi-quarter strategy across teams |
+| System design | Solid baseline + clean metrics | Deep trade-offs, failure modes, capacity math | ROI framing, build-vs-buy, org/infra bottlenecks |
+| Project dive | Knows own code and experiments | Drives iteration & debugging independently | Resolves ambiguity, aligns PM/infra/research |
 
 ## 3. Timeline (T-4 weeks to interview)
 

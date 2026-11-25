@@ -55,6 +55,7 @@ flowchart TB
 - [10 Evaluation and hallucination](10-evaluation-and-hallucination.md) - benchmarks, data contamination, LLM-as-judge, hallucination sources and mitigation, safety evaluation.
 - [11 RAG](11-rag.md) - chunking, embeddings, ANN indexes, hybrid retrieval and reranking, GraphRAG, RAG evaluation.
 - [12 Prompt engineering](12-prompt-engineering.md) - zero/few-shot, CoT, ReAct, structured output, prompt-injection defenses, context engineering.
+- [13 Multimodal LLMs (VLMs & Omni)](13-multimodal-llms.md) - modular ViT+projector vs. native early-fusion, dynamic high-res tiling (AnyRes / NaViT), video token compression, audio tokenization, and multimodal hallucination.
 
 ## Study plan
 

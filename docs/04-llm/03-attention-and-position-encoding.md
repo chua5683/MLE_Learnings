@@ -83,12 +83,14 @@ $$
 
 This satisfies both **numerical stability** (subtracting the max) and **incremental merging**, and the result is **exactly equal** to standard attention (not an approximation). Cost-wise: FLOPs are unchanged, HBM accesses drop from $\Theta(Nd+N^2)$ to $\Theta(N^2d^2/M)$ ($M$ is the SRAM size), and extra memory drops from $O(N^2)$ to $O(N)$. Backward does not store the score matrix but **recomputes** it, then backpropagates through the recomputed blocks - trading memory for compute, which still pays off overall. The causal mask skips upper-triangle blocks and saves roughly another half.
 
-### 2.4 Sparse and sliding-window attention
+- **FlashAttention-2 / 3 evolution**: FA-2 parallelizes over sequence length and swaps outer/inner loops to cut non-matmul FLOPs; **FlashAttention-3** exploits Hopper (H100) asynchronous **TMA (Tensor Memory Accelerator)**, warp-group specialization (overlapping producer memory loads with consumer GEMM/softmax), and incoherent-processed **FP8**, reaching ~75% of H100 peak FLOPs.
 
-- **Sliding window**: each token looks only at the most recent $w$ tokens, giving $O(Tw)$ complexity and a KV cache of size $w$. Mistral-7B uses a 4096 window.
-- **Global + local**: Longformer/BigBird use a few global tokens to aggregate information, balancing long-range coverage.
-- **Attention sinks**: StreamingLLM found that keeping the KV of the first few tokens stabilizes long streaming generation.
-- In practice sliding-window layers are interleaved with full-attention layers (local layers save cost, global layers preserve capability).
+### 2.4 Sparse, hybrid linear, and KV-eviction attention
+
+- **Sliding window & global+local**: each token looks only at the most recent $w$ tokens ($O(Tw)$ complexity, KV size $w$, e.g., Mistral 4K); Longformer/BigBird mix global tokens, and modern LLMs interleave sliding-window layers with full-attention layers.
+- **Native Sparse Attention (NSA / MoBA)**: hardware-aligned block-sparse attention trained end-to-end (combining coarse compressed blocks, dynamic top-$k$ selected blocks, and local sliding windows) so sparsity yields real wall-clock speedups in both training and prefill.
+- **Hybrid linear attention (Gated DeltaNet / Mamba-2 + Attention)**: replaces most full-attention layers with constant-state gated linear recurrence ($O(1)$ decode memory per token) and keeps periodic full-attention layers for exact needle-in-a-haystack retrieval.
+- **KV-cache eviction & compression**: **StreamingLLM** retains initial "attention sink" tokens + recent window; **H2O** (Heavy-Hitter Oracle) and **SnapKV** evict low-attention-score tokens during decode or prefill to shrink KV footprint without retraining.
 
 ### 2.5 Positional encoding: from absolute to relative
 

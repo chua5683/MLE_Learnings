@@ -7,7 +7,8 @@ Personal study notes on ML / DL / RL / LLM / Agents, published as a GitBook site
 - **[docs/README.md](docs/README.md)** — site homepage: how to use the notes and the full table of contents
 - **[docs/00-roadmap/](docs/00-roadmap/)** — 8-week learning roadmap, interview preparation playbook, knowledge map
 - **Chapters 01–07** — ML fundamentals, deep learning, reinforcement learning and alignment, large language models, AI agents, ML system design, ML infra
-- **[docs/08-interview-bank/](docs/08-interview-bank/)** — cheat sheets plus the top 100 questions
+- **[docs/08-interview-bank/](docs/08-interview-bank/)** — cheat sheets (including RL alignment & ML coding) plus 120 core interview questions
+- **[ml_coding/](ml_coding/)** — zero-dependency runnable Python implementations and unit tests for canonical ML coding problems (`python3 -m unittest discover -s ml_coding -v`)
 
 To read locally, open `docs/SUMMARY.md` in any Markdown editor, or start from `docs/README.md`.
 
