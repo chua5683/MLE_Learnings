@@ -24,29 +24,39 @@ Let the current node contain sample set $D$ with class proportions $p_k$.
 
 **Entropy and information gain (ID3)**:
 
-$$H(D)=-\sum_{k=1}^{K}p_k\log_2 p_k, \qquad g(D,A)=H(D)-\sum_{v}\frac{|D^v|}{|D|}H(D^v)$$
+$$
+H(D)=-\sum_{k=1}^{K}p_k\log_2 p_k, \qquad g(D,A)=H(D)-\sum_{v}\frac{|D^v|}{|D|}H(D^v)
+$$
 
 Information gain favors features with many distinct values; in the extreme, using an ID column can drive entropy to 0.
 
 **Information gain ratio (C4.5)** penalizes by the feature's own entropy:
 
-$$g_R(D,A)=\frac{g(D,A)}{H_A(D)}, \qquad H_A(D)=-\sum_{v}\frac{|D^v|}{|D|}\log_2\frac{|D^v|}{|D|}$$
+$$
+g_R(D,A)=\frac{g(D,A)}{H_A(D)}, \qquad H_A(D)=-\sum_{v}\frac{|D^v|}{|D|}\log_2\frac{|D^v|}{|D|}
+$$
 
 **Gini index (CART)**:
 
-$$\text{Gini}(D)=1-\sum_{k}p_k^2, \qquad \text{Gini}(D,A)=\sum_{v}\frac{|D^v|}{|D|}\text{Gini}(D^v)$$
+$$
+\text{Gini}(D)=1-\sum_{k}p_k^2, \qquad \text{Gini}(D,A)=\sum_{v}\frac{|D^v|}{|D|}\text{Gini}(D^v)
+$$
 
 For binary classification, $\text{Gini}=2p(1-p)$, which has a similar shape to entropy but avoids logarithms, so it is faster in engineering.
 
 **Regression trees** choose splits by squared error or variance reduction:
 
-$$\text{Var}(D)=\frac{1}{|D|}\sum_{i\in D}(y_i-\bar y_D)^2, \qquad \Delta=\text{Var}(D)-\sum_v\frac{|D^v|}{|D|}\text{Var}(D^v)$$
+$$
+\text{Var}(D)=\frac{1}{|D|}\sum_{i\in D}(y_i-\bar y_D)^2, \qquad \Delta=\text{Var}(D)-\sum_v\frac{|D^v|}{|D|}\text{Var}(D^v)
+$$
 
 **Continuous features**: sort the feature, then consider midpoints between adjacent values as candidate thresholds; a single feature costs $O(m\log m)$, and the greedy search for the best split costs about $O(md\log m)$ per level.
 
 **Pruning**: pre-pruning (max_depth, min_samples_split, min_impurity_decrease) trains fast but may underfit; post-pruning grows the full tree and then prunes bottom-up, which works better but costs more. CART uses cost-complexity pruning:
 
-$$R_\alpha(T)=R(T)+\alpha|T|$$
+$$
+R_\alpha(T)=R(T)+\alpha|T|
+$$
 
 Larger $\alpha$ means a simpler tree; choose $\alpha$ on a validation set.
 
@@ -56,11 +66,13 @@ Bagging draws $B$ bootstrap samples with replacement, trains one tree on each, a
 
 **Why it works**: if a single tree has variance $\sigma^2$ and the pairwise correlation between trees is $\rho$, averaging $B$ trees gives variance
 
-$$\text{Var}=\rho\sigma^2+\frac{1-\rho}{B}\sigma^2$$
+$$
+\text{Var}=\rho\sigma^2+\frac{1-\rho}{B}\sigma^2
+$$
 
 Bagging shrinks the second term, and feature randomness lowers $\rho$; the two act together.
 
-**OOB (out-of-bag) estimate**: each sample has probability roughly $(1-1/m)^m\to e^{-1}\approx36.8\%$ of not being sampled by a given tree. These out-of-bag samples provide an almost free validation estimate of generalization error.
+**OOB (out-of-bag) estimate**: each sample has probability roughly $(1-1/m)^m\to e^{-1}\approx 36.8$% of not being sampled by a given tree. These out-of-bag samples provide an almost free validation estimate of generalization error.
 
 **Feature importance**:
 - **MDI (mean decrease impurity)**: accumulates the impurity decrease attributed to a feature; computed on the training set, fast, but biased toward high-cardinality and continuous features.
@@ -71,11 +83,15 @@ Bagging shrinks the second term, and feature randomness lowers $\rho$; the two a
 
 GBDT is an additive model trained with forward stagewise fitting:
 
-$$F_m(x)=F_{m-1}(x)+\nu f_m(x)$$
+$$
+F_m(x)=F_{m-1}(x)+\nu f_m(x)
+$$
 
 where $f_m$ is a regression tree and $\nu\in(0,1]$ is the learning rate (shrinkage). Round $m$ fits the **negative gradient (pseudo-residual)**:
 
-$$r_{im}=-\left[\frac{\partial L(y_i,F(x_i))}{\partial F(x_i)}\right]_{F=F_{m-1}}$$
+$$
+r_{im}=-\left[\frac{\partial L(y_i,F(x_i))}{\partial F(x_i)}\right]_{F=F_{m-1}}
+$$
 
 - Squared loss: $r_{im}=y_i-F_{m-1}(x_i)$, exactly the residual.
 - Log loss ($p=\sigma(F)$): $r_{im}=y_i-p_i$.
@@ -86,23 +102,33 @@ Leaf values can be found by a line search that minimizes the loss; for log loss,
 
 XGBoost adds an explicit tree-complexity regularizer to the objective:
 
-$$\mathcal{L}^{(t)}=\sum_{i=1}^{m}l(y_i,\hat y_i^{(t-1)}+f_t(x_i))+\Omega(f_t), \qquad \Omega(f)=\gamma T+\frac{1}{2}\lambda\|w\|^2$$
+$$
+\mathcal{L}^{(t)}=\sum_{i=1}^{m}l(y_i,\hat y_i^{(t-1)}+f_t(x_i))+\Omega(f_t), \qquad \Omega(f)=\gamma T+\frac{1}{2}\lambda\|w\|^2
+$$
 
 where $T$ is the number of leaves and $w$ is the leaf-weight vector. Take a second-order Taylor expansion of the loss ($g_i=\partial_{\hat y}l$, $h_i=\partial^2_{\hat y}l$):
 
-$$\mathcal{L}^{(t)}\approx\sum_{i=1}^{m}\left[g_i f_t(x_i)+\frac{1}{2}h_i f_t^2(x_i)\right]+\gamma T+\frac{1}{2}\lambda\sum_{j=1}^{T}w_j^2+\text{const}$$
+$$
+\mathcal{L}^{(t)}\approx\sum_{i=1}^{m}\left[g_i f_t(x_i)+\frac{1}{2}h_i f_t^2(x_i)\right]+\gamma T+\frac{1}{2}\lambda\sum_{j=1}^{T}w_j^2+\text{const}
+$$
 
-Group samples by leaf, $I_j=\{i\mid q(x_i)=j\}$; the objective becomes an independent quadratic in each leaf:
+Group samples by leaf, $I_j=\lbrace i\mid q(x_i)=j\rbrace$; the objective becomes an independent quadratic in each leaf:
 
-$$\mathcal{L}^{(t)}=\sum_{j=1}^{T}\left[(\sum_{i\in I_j}g_i)w_j+\frac{1}{2}(\sum_{i\in I_j}h_i+\lambda)w_j^2\right]+\gamma T$$
+$$
+\mathcal{L}^{(t)}=\sum_{j=1}^{T}\left[(\sum_{i\in I_j}g_i)w_j+\frac{1}{2}(\sum_{i\in I_j}h_i+\lambda)w_j^2\right]+\gamma T
+$$
 
 Differentiating with respect to $w_j$ gives the optimal leaf weight:
 
-$$w_j^*=-\frac{G_j}{H_j+\lambda}, \qquad G_j=\sum_{i\in I_j}g_i, \ H_j=\sum_{i\in I_j}h_i$$
+$$
+w_j^*=-\frac{G_j}{H_j+\lambda}, \qquad G_j=\sum_{i\in I_j}g_i, \ H_j=\sum_{i\in I_j}h_i
+$$
 
 Substituting back gives the optimal objective value $-\frac{1}{2}\sum_j\frac{G_j^2}{H_j+\lambda}+\gamma T$. This defines the **split gain**:
 
-$$\text{Gain}=\frac{1}{2}\left[\frac{G_L^2}{H_L+\lambda}+\frac{G_R^2}{H_R+\lambda}-\frac{(G_L+G_R)^2}{H_L+H_R+\lambda}\right]-\gamma$$
+$$
+\text{Gain}=\frac{1}{2}\left[\frac{G_L^2}{H_L+\lambda}+\frac{G_R^2}{H_R+\lambda}-\frac{(G_L+G_R)^2}{H_L+H_R+\lambda}\right]-\gamma
+$$
 
 A split is made only if the gain is $>0$; $\gamma$ is the threshold for splitting, and $\lambda$ shrinks leaf weights. For logistic loss, $g_i=p_i-y_i$ and $h_i=p_i(1-p_i)$.
 
@@ -120,7 +146,7 @@ A split is made only if the gain is $>0$; $\gamma$ is the threshold for splittin
 
 **Leaf-wise (best-first) growth**: at each step, split the leaf with the largest gain, instead of expanding level by level as in level-wise growth. For the same number of leaves, leaf-wise training error is lower, but trees become deeper and overfit more easily, so num_leaves, max_depth, and min_data_in_leaf are needed.
 
-**GOSS (Gradient-based One-Side Sampling)**: samples with large gradients contribute more to the gain, so keep the top $a\%$ by absolute gradient; randomly sample $b\%$ from the rest and multiply their weights by $(1-a)/b$ to keep the distribution unbiased. This estimates gains from fewer samples.
+**GOSS (Gradient-based One-Side Sampling)**: samples with large gradients contribute more to the gain, so keep the top $a$% by absolute gradient; randomly sample $b$% from the rest and multiply their weights by $(1-a)/b$ to keep the distribution unbiased. This estimates gains from fewer samples.
 
 **EFB (Exclusive Feature Bundling)**: in sparse data many features are mutually exclusive (not nonzero at the same time); bundle such features into one, reducing dimensionality. The conflict rate is controlled by max_conflict_rate.
 
@@ -236,7 +262,7 @@ Suggested tuning order: first fix the learning rate and number of trees (with ea
 | Gini | $1-\sum_k p_k^2$, CART classification |
 | Regression tree | Variance reduction / MSE minimization |
 | RF variance | $\rho\sigma^2+(1-\rho)\sigma^2/B$ |
-| OOB | About $1/e\approx36.8\%$ of samples out of bag |
+| OOB | About $1/e\approx 36.8$% of samples out of bag |
 | GBDT | Fit the negative gradient, $F_m=F_{m-1}+\nu f_m$ |
 | XGB leaf | $w_j^*=-G_j/(H_j+\lambda)$ |
 | XGB gain | $\frac12[\frac{G_L^2}{H_L+\lambda}+\frac{G_R^2}{H_R+\lambda}-\frac{(G_L+G_R)^2}{H_L+H_R+\lambda}]-\gamma$ |

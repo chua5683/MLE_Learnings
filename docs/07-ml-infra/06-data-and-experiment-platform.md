@@ -97,13 +97,17 @@ After adding a feature or fixing a bug you must recompute history. Watch out for
 
 **Hypothesis testing**: the null $H_0$ is no difference between the groups; the alternative $H_1$ is a difference. Given significance level $\alpha$ (type-I error) and power $1-\beta$ (type-II error), the required sample size per group (equal groups) is:
 
-$$n = \frac{\left(z_{1-\alpha/2}+z_{1-\beta}\right)^2 \left(p_1(1-p_1)+p_2(1-p_2)\right)}{\Delta^2} \approx \frac{16\,\sigma^2}{\Delta^2}$$
+$$
+n = \frac{\left(z_{1-\alpha/2}+z_{1-\beta}\right)^2 \left(p_1(1-p_1)+p_2(1-p_2)\right)}{\Delta^2} \approx \frac{16\,\sigma^2}{\Delta^2}
+$$
 
 (For $\alpha=0.05, \beta=0.2$ the two $z$ values sum to about 2.8, squared about 7.84; use $\sigma^2$ for continuous metrics and $p(1-p)$ for proportions.)
 
 **Worked example**: baseline CTR 5%, targeting detection of 5%→5.1% (a relative +2%, absolute $\Delta=0.001$), $\sigma^2 \approx p(1-p)=0.0475$:
 
-$$n \approx \frac{7.84 \times (0.0475+0.0479)}{10^{-6}} \approx 7.5\times10^{5}$$
+$$
+n \approx \frac{7.84 \times (0.0475+0.0479)}{10^{-6}} \approx 7.5\times10^{5}
+$$
 
 That is about 750k **impressions** per group. If each user sees 20 impressions a day and traffic splits 1:1, the number of impressions each group can accumulate per day determines how many days the test must run. **A small-traffic experiment cannot detect a small gain** — which is exactly why you compute the sample size first.
 
@@ -120,7 +124,9 @@ Related concepts:
 
 When the training and serving distributions diverge, metrics degrade silently. A common metric:
 
-$$PSI = \sum_{i=1}^{B} (p_i - q_i)\ln\frac{p_i}{q_i}$$
+$$
+PSI = \sum_{i=1}^{B} (p_i - q_i)\ln\frac{p_i}{q_i}
+$$
 
 Split the feature into $B$ buckets, with $p_i$ and $q_i$ the shares during training and now. Rules of thumb: $<0.1$ stable, $0.1\sim0.25$ watch, $>0.25$ significant drift. For continuous features you can also use a KS test; for categorical features, chi-square or the share of unseen categories. Monitor: input feature distributions, prediction distribution, label distribution, business metrics.
 

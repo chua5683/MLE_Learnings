@@ -67,7 +67,9 @@ Tuning is fundamentally the same **recall-latency curve**: larger efSearch/nprob
 
 BM25 (sparse) excels at exact matches - model numbers, error codes, names, legal clauses, code identifiers - but does not understand paraphrase; dense retrieval excels at semantic matching but is insensitive to rare entities and numbers. Their failure modes are complementary, so the mainstream choice is hybrid + fusion:
 
-$$\text{RRF}(d) = \sum_{r \in R} \frac{1}{k + \text{rank}_r(d)}, \qquad k \approx 60$$
+$$
+\text{RRF}(d) = \sum_{r \in R} \frac{1}{k + \text{rank}_r(d)}, \qquad k \approx 60
+$$
 
 RRF uses only ranks, not scores, which neatly sidesteps incompatible score scales across retrievers and needs almost no tuning; you can also weight normalized scores, but the weights are sensitive to distribution shift.
 
@@ -75,7 +77,9 @@ RRF uses only ranks, not scores, which neatly sidesteps incompatible score scale
 
 Bi-encoder recall trades query-doc interaction for speed, so its precision is limited; a **cross-encoder** encodes both together and can judge "does this passage really answer the question", but only for a small candidate set - hence two stages:
 
-$$\text{Full corpus} \xrightarrow{\text{ANN}} \text{Top-}50 \xrightarrow{\text{cross-encoder}} \text{Top-}5 \xrightarrow{\text{LLM}} \text{answer}$$
+$$
+\text{Full corpus} \xrightarrow{\text{ANN}} \text{Top-}50 \xrightarrow{\text{cross-encoder}} \text{Top-}5 \xrightarrow{\text{LLM}} \text{answer}
+$$
 
 The price is latency: reranking 50 passages usually costs 20-200 ms and must fit the end-to-end budget; an LLM reranker (RankGPT-style) works better but is more expensive, so it is reserved for offline evaluation or high-value queries. Set a relevance threshold after rerank - better to drop low-scoring candidates than to let noise pull the LLM off course.
 
@@ -117,7 +121,7 @@ Multi-hop questions ("who is the CEO of the company that acquired A") need chain
 | Generation | Answer Relevance | Is the answer on-topic (reverse-generate a question and compare) |
 | Generation | Context Precision/Recall | Share of useful information in the retrieved content / whether it covers what is needed |
 
-RAGAS, TruLens, and DeepEval are all essentially **LLM-as-judge + embedding similarity**. Three steps to land it: (1) human-annotate 100-300 golden items (query, relevant doc ids, reference answer), with retrieval metrics that are reproducible; (2) align the generation-side judge with humans first (see [10 Evaluation and hallucination](10-evaluation-and-hallucination.md)); (3) add online metrics: no-answer rate, refusal rate, citation accuracy, end-to-end latency.
+RAGAS, TruLens, and DeepEval are all essentially **LLM-as-judge + embedding similarity**. Three steps to land it: (1) human-annotate 100-300 golden items (query, relevant doc ids, reference answer), with retrieval metrics that are reproducible; (2) align the generation-side judge with humans first (see [11 Evaluation and hallucination](11-evaluation-and-hallucination.md)); (3) add online metrics: no-answer rate, refusal rate, citation accuracy, end-to-end latency.
 
 ### 2.7 Failure modes and engineering practice
 

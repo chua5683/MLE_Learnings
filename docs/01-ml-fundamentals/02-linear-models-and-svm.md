@@ -8,7 +8,9 @@
 
 A linear model is written uniformly as
 
-$$f(x) = w^\top x + b$$
+$$
+f(x) = w^\top x + b
+$$
 
 Models differ only in **how the output is interpreted** and **how the loss is defined**:
 
@@ -27,25 +29,35 @@ Linear models are **discriminative**: they model $p(y|x)$ or the decision bounda
 
 Fold the bias into the weight vector and let $X\in\mathbb{R}^{m×(d+1)}$ and $y\in\mathbb{R}^m$. The least-squares objective is
 
-$$J(w) = \frac{1}{2}\|Xw - y\|_2^2$$
+$$
+J(w) = \frac{1}{2}\|Xw - y\|_2^2
+$$
 
 Taking the gradient with respect to $w$ and setting it to zero gives
 
-$$\nabla_w J = X^\top(Xw - y) = 0 \quad\Longrightarrow\quad X^\top X w = X^\top y$$
+$$
+\nabla_w J = X^\top(Xw - y) = 0 \quad\Longrightarrow\quad X^\top X w = X^\top y
+$$
 
 If $X^\top X$ has full rank ($m\ge d+1$ and the features are not collinear), we obtain the **normal equation**:
 
-$$w^* = (X^\top X)^{-1}X^\top y$$
+$$
+w^* = (X^\top X)^{-1}X^\top y
+$$
 
 The cost is about $O(md^2 + d^3)$: usable when there are many samples and the feature dimension is moderate; when $d$ is large, gradient descent or the dual form is more common. If collinearity makes $X^\top X$ singular, the solution is not unique; use the pseudoinverse or add L2 regularization (Ridge):
 
-$$J(w) = \|Xw-y\|_2^2 + \lambda\|w\|_2^2 \quad\Longrightarrow\quad w^* = (X^\top X + \lambda I)^{-1}X^\top y$$
+$$
+J(w) = \|Xw-y\|_2^2 + \lambda\|w\|_2^2 \quad\Longrightarrow\quad w^* = (X^\top X + \lambda I)^{-1}X^\top y
+$$
 
 Because $X^\top X$ is positive semidefinite, adding $\lambda I$ with $\lambda>0$ makes every eigenvalue at least $\lambda$, so the matrix is invertible.
 
 **Probabilistic interpretation**: if $y = w^\top x + \varepsilon$ with $\varepsilon\sim\mathcal{N}(0,\sigma^2)$, the negative log-likelihood is
 
-$$-\log p(y|X,w) = \frac{1}{2\sigma^2}\|Xw-y\|^2 + \text{const}$$
+$$
+-\log p(y|X,w) = \frac{1}{2\sigma^2}\|Xw-y\|^2 + \text{const}
+$$
 
 So **MLE under Gaussian noise is equivalent to least squares**. This also explains why squared loss is sensitive to outliers: the Gaussian tail is light, and large residuals get squared.
 
@@ -53,19 +65,27 @@ So **MLE under Gaussian noise is equivalent to least squares**. This also explai
 
 Sigmoid maps the linear output to a probability:
 
-$$p(y=1|x) = \sigma(w^\top x + b), \qquad \sigma(z)=\frac{1}{1+e^{-z}}$$
+$$
+p(y=1|x) = \sigma(w^\top x + b), \qquad \sigma(z)=\frac{1}{1+e^{-z}}
+$$
 
 Maximum likelihood is equivalent to minimizing the negative log-likelihood (cross-entropy):
 
-$$J(w) = -\frac{1}{m}\sum_{i=1}^{m}\left[y_i\log p_i + (1-y_i)\log(1-p_i)\right]$$
+$$
+J(w) = -\frac{1}{m}\sum_{i=1}^{m}\left[y_i\log p_i + (1-y_i)\log(1-p_i)\right]
+$$
 
 Differentiate with respect to $z_i = w^\top x_i + b$ and use $\sigma'(z)=\sigma(z)(1-\sigma(z))$:
 
-$$\frac{\partial J}{\partial z_i} = p_i - y_i \quad\Longrightarrow\quad \nabla_w J = \frac{1}{m}X^\top(p-y)$$
+$$
+\frac{\partial J}{\partial z_i} = p_i - y_i \quad\Longrightarrow\quad \nabla_w J = \frac{1}{m}X^\top(p-y)
+$$
 
 In vector form: $\frac{\partial J}{\partial w} = \frac{1}{m}\sum_i (p_i-y_i)x_i$. The second derivative (Hessian) is
 
-$$H = \frac{1}{m}X^\top \mathrm{diag}(p_i(1-p_i)) X \succeq 0$$
+$$
+H = \frac{1}{m}X^\top \mathrm{diag}(p_i(1-p_i)) X \succeq 0
+$$
 
 Therefore the cross-entropy loss is convex in $w$ and has a unique global optimum (unless the data are degenerate). There is no closed form, so we use gradient descent, L-BFGS, or Newton's method/IRLS.
 
@@ -73,7 +93,9 @@ Therefore the cross-entropy loss is convex in $w$ and has a unique global optimu
 
 **Softmax regression** is the natural extension to multi-class classification:
 
-$$p(y=k|x) = \frac{\exp(z_k)}{\sum_{j=1}^{K}\exp(z_j)}, \qquad J = -\frac{1}{m}\sum_i \sum_k y_{ik}\log p_{ik}$$
+$$
+p(y=k|x) = \frac{\exp(z_k)}{\sum_{j=1}^{K}\exp(z_j)}, \qquad J = -\frac{1}{m}\sum_i \sum_k y_{ik}\log p_{ik}
+$$
 
 The gradient is again $\frac{1}{m}X^\top(P-Y)$. Note that softmax is invariant to adding a constant to all $z$; the parameters are redundant, and L2 regularization is usually used to pin down the scale.
 
@@ -81,47 +103,67 @@ The gradient is again $\frac{1}{m}X^\top(P-Y)$. Note that softmax is invariant t
 
 Start with the hard-margin, linearly separable case. The hyperplane is $w^\top x + b = 0$, and the geometric distance from a sample to it is
 
-$$\frac{|w^\top x_i + b|}{\|w\|}$$
+$$
+\frac{|w^\top x_i + b|}{\|w\|}
+$$
 
 Because rescaling $w,b$ together does not change the hyperplane, we can require the closest samples to satisfy $|w^\top x_i+b|=1$; then the **geometric margin** is $1/\|w\|$. Maximizing the margin is equivalent to minimizing $\|w\|^2$:
 
-$$\min_{w,b} \frac{1}{2}\|w\|^2 \quad \text{s.t.}\quad y_i(w^\top x_i + b) \ge 1, \quad i=1,\dots,m$$
+$$
+\min_{w,b} \frac{1}{2}\|w\|^2 \quad \text{s.t.}\quad y_i(w^\top x_i + b) \ge 1, \quad i=1,\dots,m
+$$
 
 **Why maximize the margin?** The larger the margin, the less sensitive the decision boundary is to sample perturbation or measurement error, and the better the generalization bound (which depends on the margin). Geometrically, we are finding the widest separating strip between the two class convex hulls.
 
 **Dual derivation**. The Lagrangian is
 
-$$L(w,b,\alpha) = \frac{1}{2}\|w\|^2 - \sum_i \alpha_i\left[y_i(w^\top x_i+b)-1\right], \quad \alpha_i\ge 0$$
+$$
+L(w,b,\alpha) = \frac{1}{2}\|w\|^2 - \sum_i \alpha_i\left[y_i(w^\top x_i+b)-1\right], \quad \alpha_i\ge 0
+$$
 
 Setting $\partial L/\partial w=0$ and $\partial L/\partial b=0$ gives:
 
-$$w = \sum_i \alpha_i y_i x_i, \qquad \sum_i \alpha_i y_i = 0$$
+$$
+w = \sum_i \alpha_i y_i x_i, \qquad \sum_i \alpha_i y_i = 0
+$$
 
 Substituting back gives the dual problem:
 
-$$\max_{\alpha} \sum_i \alpha_i - \frac{1}{2}\sum_i\sum_j \alpha_i\alpha_j y_i y_j x_i^\top x_j \quad \text{s.t.}\quad \sum_i \alpha_i y_i = 0, \ \alpha_i\ge 0$$
+$$
+\max_{\alpha} \sum_i \alpha_i - \frac{1}{2}\sum_i\sum_j \alpha_i\alpha_j y_i y_j x_i^\top x_j \quad \text{s.t.}\quad \sum_i \alpha_i y_i = 0, \ \alpha_i\ge 0
+$$
 
 The KKT complementary slackness condition is
 
-$$\alpha_i\left[y_i(w^\top x_i+b)-1\right] = 0$$
+$$
+\alpha_i\left[y_i(w^\top x_i+b)-1\right] = 0
+$$
 
 So only **support vectors** (with $y_i f(x_i)=1$) have $\alpha_i>0$; all other $\alpha_i=0$. Prediction depends only on the support vectors:
 
-$$f(x) = \sum_i \alpha_i y_i x_i^\top x + b$$
+$$
+f(x) = \sum_i \alpha_i y_i x_i^\top x + b
+$$
 
 **Soft margin** allows a few violations by introducing slack variables $\xi_i\ge 0$:
 
-$$\min \frac{1}{2}\|w\|^2 + C\sum_i \xi_i \quad \text{s.t.}\quad y_i(w^\top x_i+b) \ge 1-\xi_i, \ \xi_i\ge 0$$
+$$
+\min \frac{1}{2}\|w\|^2 + C\sum_i \xi_i \quad \text{s.t.}\quad y_i(w^\top x_i+b) \ge 1-\xi_i, \ \xi_i\ge 0
+$$
 
 The dual constraint becomes $0\le\alpha_i\le C$. Larger $C$ tolerates fewer misclassifications (higher variance, easier to overfit); smaller $C$ gives a wider margin (higher bias). It is equivalent to the Hinge-loss form:
 
-$$\min_{w} \frac{1}{2}\|w\|^2 + C\sum_i \max\left(0, 1-y_i f(x_i)\right)$$
+$$
+\min_{w} \frac{1}{2}\|w\|^2 + C\sum_i \max\left(0, 1-y_i f(x_i)\right)
+$$
 
 ### 2.4 Kernel trick
 
 In the dual, samples appear only through inner products $x_i^\top x_j$. If we map $x$ to a higher-dimensional space via $\phi(x)$, it suffices to compute a kernel function
 
-$$K(x_i,x_j) = \phi(x_i)^\top\phi(x_j)$$
+$$
+K(x_i,x_j) = \phi(x_i)^\top\phi(x_j)
+$$
 
 without explicitly constructing $\phi$. This is the **kernel trick**. Common kernels:
 

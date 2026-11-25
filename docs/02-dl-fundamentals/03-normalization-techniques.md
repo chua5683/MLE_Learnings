@@ -19,15 +19,21 @@ Designing a normalization layer means answering four questions:
 
 ### 2.1 BatchNorm
 
-For a mini-batch $\mathcal{B}=\{x_1,\dots,x_m\}$ and a given channel (or feature dimension):
+For a mini-batch $\mathcal{B}=\lbrace x_1,\dots,x_m\rbrace$ and a given channel (or feature dimension):
 
-$$\mu_\mathcal{B}=\frac{1}{m}\sum_{i=1}^{m}x_i, \qquad \sigma_\mathcal{B}^2=\frac{1}{m}\sum_{i=1}^{m}(x_i-\mu_\mathcal{B})^2$$
+$$
+\mu_\mathcal{B}=\frac{1}{m}\sum_{i=1}^{m}x_i, \qquad \sigma_\mathcal{B}^2=\frac{1}{m}\sum_{i=1}^{m}(x_i-\mu_\mathcal{B})^2
+$$
 
-$$\hat{x}_i=\frac{x_i-\mu_\mathcal{B}}{\sqrt{\sigma_\mathcal{B}^2+\epsilon}}, \qquad y_i=\gamma\,\hat{x}_i+\beta$$
+$$
+\hat{x}_i=\frac{x_i-\mu_\mathcal{B}}{\sqrt{\sigma_\mathcal{B}^2+\epsilon}}, \qquad y_i=\gamma\,\hat{x}_i+\beta
+$$
 
 $\gamma,\beta$ are learnable parameters that let the network "undo" normalization when needed. **Training** uses the current batch statistics while also updating global statistics with a running average:
 
-$$\mu_{run}\leftarrow(1-\alpha)\mu_{run}+\alpha\,\mu_\mathcal{B}, \qquad \sigma^2_{run}\leftarrow(1-\alpha)\sigma^2_{run}+\alpha\,\sigma^2_\mathcal{B}$$
+$$
+\mu_{run}\leftarrow(1-\alpha)\mu_{run}+\alpha\,\mu_\mathcal{B}, \qquad \sigma^2_{run}\leftarrow(1-\alpha)\sigma^2_{run}+\alpha\,\sigma^2_\mathcal{B}
+$$
 
 $\alpha$ is usually $0.1$. **Inference** uses $\mu_{run},\sigma^2_{run}$ and ignores the current input, so a single sample can be processed and the result is deterministic. This also means BN can be **folded into the preceding convolution/linear layer** at inference time: $y=\frac{\gamma(Wx+b-\mu)}{\sqrt{\sigma^2+\epsilon}}+\beta$ is equivalent to a new $W',b'$ with zero extra cost.
 
@@ -43,7 +49,9 @@ $\alpha$ is usually $0.1$. **Inference** uses $\mu_{run},\sigma^2_{run}$ and ign
 
 Compute mean and variance over **a single sample's** feature dimensions (in a Transformer, over $d_{model}$):
 
-$$\mu=\frac{1}{d}\sum_{j=1}^{d}x_j, \qquad \sigma^2=\frac{1}{d}\sum_{j=1}^{d}(x_j-\mu)^2, \qquad y=\gamma\odot\frac{x-\mu}{\sqrt{\sigma^2+\epsilon}}+\beta$$
+$$
+\mu=\frac{1}{d}\sum_{j=1}^{d}x_j, \qquad \sigma^2=\frac{1}{d}\sum_{j=1}^{d}(x_j-\mu)^2, \qquad y=\gamma\odot\frac{x-\mu}{\sqrt{\sigma^2+\epsilon}}+\beta
+$$
 
 It is independent of the batch and behaves identically in training and inference, which makes it suitable for variable-length sequences, small batches, and autoregressive generation. For a Transformer, each token's vector is normalized independently, which naturally matches the view that "each position is a sample".
 
@@ -51,7 +59,9 @@ It is independent of the batch and behaves identically in training and inference
 
 A simplified LayerNorm: **do not subtract the mean, just divide by the root mean square**.
 
-$$\mathrm{RMS}(x)=\sqrt{\frac{1}{d}\sum_{j=1}^{d}x_j^2+\epsilon}, \qquad y=\gamma\odot\frac{x}{\mathrm{RMS}(x)}$$
+$$
+\mathrm{RMS}(x)=\sqrt{\frac{1}{d}\sum_{j=1}^{d}x_j^2+\epsilon}, \qquad y=\gamma\odot\frac{x}{\mathrm{RMS}(x)}
+$$
 
 It drops both the mean computation and the shift parameter $\beta$. In LLM training the FLOP share is small but it runs in every layer, so the savings add up; in practice RMSNorm matches LN, which is why models such as LLaMA and Qwen use it widely.
 
@@ -64,9 +74,13 @@ It drops both the mean computation and the shift parameter $\beta$. In LLM train
 
 There are two classic placements in a Transformer ($x$ is the residual stream, $F$ the sublayer):
 
-$$\text{Post-LN:}\quad x_{l+1}=\mathrm{LN}\big(x_l+F(x_l)\big)$$
+$$
+\text{Post-LN:}\quad x_{l+1}=\mathrm{LN}\big(x_l+F(x_l)\big)
+$$
 
-$$\text{Pre-LN:}\quad x_{l+1}=x_l+F\big(\mathrm{LN}(x_l)\big)$$
+$$
+\text{Pre-LN:}\quad x_{l+1}=x_l+F\big(\mathrm{LN}(x_l)\big)
+$$
 
 - **Post-LN** (the original Transformer): every layer's output is normalized, which keeps representations well-behaved, but backward gradients must pass through the LN Jacobian, making deep models unstable; learning-rate warmup is usually required to train.
 - **Pre-LN** (mainstream since GPT-2): the residual stream is a **pure identity path**, so gradients flow from the last layer back to the first without attenuation and training is very stable with little dependence on warmup. The price is that the norm of the residual stream grows layer by layer, so a final LN is usually added, and at equal depth it may trail a well-tuned Post-LN.
@@ -75,7 +89,9 @@ $$\text{Pre-LN:}\quad x_{l+1}=x_l+F\big(\mathrm{LN}(x_l)\big)$$
 
 Instead of normalizing activations, reparameterize the weights:
 
-$$w=\frac{g}{\lVert v\rVert}\,v$$
+$$
+w=\frac{g}{\lVert v\rVert}\,v
+$$
 
 This decouples "direction" $v/\lVert v\rVert$ from "length" $g$ and makes the gradient insensitive to weight scale. It has been used in GANs and RNNs and is less common than BN/LN today, but the idea (decoupling scale from direction) is worth knowing.
 

@@ -27,7 +27,7 @@ Key design points: **stateless services with horizontal scaling**, **co-locate t
 | --- | --- | --- |
 | p50 / p99 latency | End-to-end time at a percentile | SLAs usually target p99; averages lie |
 | QPS / throughput | Requests per second | Strongly tied to batch size and model size |
-| TTFT / TPOT | Time to first token / time per output token | Core metrics for LLMs (see [Chapter 4](../04-llm/08-inference-optimization-and-serving.md)) |
+| TTFT / TPOT | Time to first token / time per output token | Core metrics for LLMs (see [Chapter 4](../04-llm/09-inference-optimization-and-serving.md)) |
 | GPU utilization / MFU | Share of compute actually used | Low utilization usually means the bottleneck is not compute |
 | goodput | Throughput that meets the SLO | Closer to business value than raw QPS |
 | USD per million requests | Unit cost | One of the ultimate north stars for inference optimization |
@@ -49,7 +49,9 @@ Key design points: **stateless services with horizontal scaling**, **co-locate t
 
 GPUs excel at **massive parallelism plus high arithmetic intensity (FLOPs / Bytes)**. Use the roofline model to tell whether an op is **compute-bound** or **memory-bound**:
 
-$$\text{attainable performance} = \min(P_{peak},\ I \times B_{mem})$$
+$$
+\text{attainable performance} = \min(P_{peak},\ I \times B_{mem})
+$$
 
 where $I$ is arithmetic intensity and $B_{mem}$ is memory bandwidth. GEMM/convolution have large $I$ and are compute-bound; LayerNorm, elementwise ops, and embedding lookups have small $I$ and are memory-bound, so the fix is fusion and fewer reads/writes, not a faster math library.
 
@@ -75,7 +77,7 @@ The pattern: **as batch grows, throughput rises quickly then saturates, while la
 
 - Offline/batch inference: use the largest batch possible (even queue requests for minutes).
 - Online: use **dynamic batching** — set a max batch and a max waiting window (e.g., `max_batch=32, timeout=5ms`); requests accumulate until the batch is full or the timeout fires, and the two together bound latency.
-- LLMs use **continuous batching**: do not wait for a whole batch to finish; schedule token by token, retire finished requests immediately, and admit new ones (the core of vLLM/SGLang, see [Chapter 4](../04-llm/08-inference-optimization-and-serving.md)).
+- LLMs use **continuous batching**: do not wait for a whole batch to finish; schedule token by token, retire finished requests immediately, and admit new ones (the core of vLLM/SGLang, see [Chapter 4](../04-llm/09-inference-optimization-and-serving.md)).
 
 ### 2.3 Profiling: timeline first, then kernels
 
@@ -119,7 +121,9 @@ Common graph optimizations: constant folding, operator fusion, layout conversion
 
 **GPU count estimate** (the most-used interview formula):
 
-$$N_{GPU} = \frac{\text{QPS} \times t_{GPU}}{\eta}, \qquad \eta \in [0.4, 0.7]$$
+$$
+N_{GPU} = \frac{\text{QPS} \times t_{GPU}}{\eta}, \qquad \eta \in [0.4, 0.7]
+$$
 
 $t_{GPU}$ is the GPU-seconds per request (already amortized by batching) and $\eta$ is the target utilization (leaving headroom for bursts and tail latency). Example: peak 20k QPS, $t_{GPU}=2$ ms, $\eta=0.5$ → $N=20000\times0.002/0.5=80$ GPUs. At 2 USD per GPU-hour that is about 160 USD per hour; at 72 million requests per hour, about **2.2 USD per million requests**.
 
@@ -246,4 +250,4 @@ Note: CUDA graphs require **fixed addresses and fixed shapes**, so input/output 
 - [Introducing Triton: Open-Source GPU Programming for Neural Networks](https://openai.com/index/triton/)
 - [Triton Inference Server · Dynamic Batcher](https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/user_guide/batcher.html)
 - [NVIDIA Nsight Systems documentation](https://docs.nvidia.com/nsight-systems/)
-- [Chapter 4 · Inference optimization and deployment](../04-llm/08-inference-optimization-and-serving.md) (LLM KV cache / continuous batching / PD disaggregation)
+- [Chapter 4 · Inference optimization and deployment](../04-llm/09-inference-optimization-and-serving.md) (LLM KV cache / continuous batching / PD disaggregation)

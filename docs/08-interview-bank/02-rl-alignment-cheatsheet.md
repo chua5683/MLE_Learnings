@@ -27,16 +27,35 @@
 
 ## 3. Essential formulas to recite
 
-- **Bradley-Terry Reward Model loss**:
-  $$\mathcal{L}_{\mathrm{RM}} = -\mathbb{E}_{(x,y_w,y_l)}\big[\log\sigma(r_\phi(x,y_w)-r_\phi(x,y_l))\big]$$
-- **KL-regularized RLHF optimum** (the bridge from PPO to DPO):
-  $$\pi^*(y\mid x) = \frac{1}{Z(x)}\pi_{\mathrm{ref}}(y\mid x)\exp\!\left(\frac{r(x,y)}{\beta}\right) \implies r(x,y) = \beta\log\frac{\pi^*(y\mid x)}{\pi_{\mathrm{ref}}(y\mid x)} + \beta\log Z(x)$$
-- **DPO loss** ($Z(x)$ cancels in pairwise difference):
-  $$\mathcal{L}_{\mathrm{DPO}} = -\mathbb{E}\left[\log\sigma\left(\beta\log\frac{\pi_\theta(y_w\mid x)}{\pi_{\mathrm{ref}}(y_w\mid x)} - \beta\log\frac{\pi_\theta(y_l\mid x)}{\pi_{\mathrm{ref}}(y_l\mid x)}\right)\right]$$
-- **GRPO advantage & k3 KL estimator**:
-  $$\hat{A}_i = \frac{r_i - \mathrm{mean}(r)}{\mathrm{std}(r)} \text{ (drop std in Dr. GRPO)}, \qquad \widehat{\mathrm{KL}}_{\mathrm{k3}} = \frac{\pi_{\mathrm{ref}}}{\pi_\theta} - \log\frac{\pi_{\mathrm{ref}}}{\pi_\theta} - 1 \ge 0$$
-- **Evaluation metrics (`pass@k` vs `pass^k`)**:
-  $$\mathrm{pass@}k = 1 - \frac{\binom{n-c}{k}}{\binom{n}{k}} \text{ (at least 1)}, \qquad \mathrm{pass}^k = \frac{\binom{c}{k}}{\binom{n}{k}} \approx \hat{p}^k \text{ (all } k \text{ succeed)}$$
+**Bradley-Terry Reward Model loss**:
+
+$$
+\mathcal{L}_{\mathrm{RM}} = -\mathbb{E}_{(x,y_w,y_l)}\big[\log\sigma(r_\phi(x,y_w)-r_\phi(x,y_l))\big]
+$$
+
+**KL-regularized RLHF optimum** (the bridge from PPO to DPO):
+
+$$
+\pi^*(y\mid x) = \frac{1}{Z(x)}\pi_{\mathrm{ref}}(y\mid x)\exp\!\left(\frac{r(x,y)}{\beta}\right) \Longrightarrow r(x,y) = \beta\log\frac{\pi^*(y\mid x)}{\pi_{\mathrm{ref}}(y\mid x)} + \beta\log Z(x)
+$$
+
+**DPO loss** ($Z(x)$ cancels in pairwise difference):
+
+$$
+\mathcal{L}_{\mathrm{DPO}} = -\mathbb{E}\left[\log\sigma\left(\beta\log\frac{\pi_\theta(y_w\mid x)}{\pi_{\mathrm{ref}}(y_w\mid x)} - \beta\log\frac{\pi_\theta(y_l\mid x)}{\pi_{\mathrm{ref}}(y_l\mid x)}\right)\right]
+$$
+
+**GRPO advantage & k3 KL estimator**:
+
+$$
+\hat{A}_i = \frac{r_i - \mathrm{mean}(r)}{\mathrm{std}(r)} \text{ (drop std in Dr. GRPO)}, \qquad \widehat{\mathrm{KL}}_{\mathrm{k3}} = \frac{\pi_{\mathrm{ref}}}{\pi_\theta} - \log\frac{\pi_{\mathrm{ref}}}{\pi_\theta} - 1 \ge 0
+$$
+
+**Evaluation metrics (`pass@k` vs `pass^k`)**:
+
+$$
+\mathrm{pass@}k = 1 - \frac{\binom{n-c}{k}}{\binom{n}{k}} \text{ (at least 1)}, \qquad \mathrm{pass}^k = \frac{\binom{c}{k}}{\binom{n}{k}} \approx \hat{p}^k \text{ (all } k \text{ succeed)}
+$$
 
 ## 4. Six rapid-fire interview answers
 
@@ -58,4 +77,4 @@
 
 ## 6. Related chapters
 
-- [04 PPO and TRPO](../03-reinforcement-learning/04-ppo-and-trpo.md) · [05 RLHF pipeline](../03-reinforcement-learning/05-rlhf-pipeline.md) · [06 DPO](../03-reinforcement-learning/06-dpo-and-preference-optimization.md) · [07 GRPO & Reasoning RL](../03-reinforcement-learning/07-grpo-and-reasoning-rl.md) · [08 Alignment compared](../03-reinforcement-learning/08-alignment-algorithms-compared.md) · [07-05 RL Post-Training Infra](../07-ml-infra/05-rl-posttraining-infrastructure.md)
+- [04 PPO and TRPO](../03-reinforcement-learning/04-ppo-and-trpo.md) · [05 RLHF pipeline](../03-reinforcement-learning/05-rlhf-pipeline.md) · [06 DPO](../03-reinforcement-learning/06-dpo-and-preference-optimization.md) · [07 GRPO & Reasoning RL](../03-reinforcement-learning/07-grpo-and-reasoning-rl.md) · [08 Alignment compared](../03-reinforcement-learning/08-alignment-algorithms-compared.md) · [04-07 Post-training pipeline](../04-llm/07-post-training-pipeline.md) · [07-05 RL Post-Training Infra](../07-ml-infra/05-rl-posttraining-infrastructure.md)

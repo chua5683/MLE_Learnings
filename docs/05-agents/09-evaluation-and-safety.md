@@ -62,7 +62,7 @@ $$
 $$
 
 - **$\mathrm{pass@}k$** (capability ceiling): probability of **at least one** success in $k$ attempts — rises with $k$.
-- **$\mathrm{pass}^k$** (consistency / reliability, introduced in $\tau$-bench): probability that **all $k$** independent runs succeed — decays exponentially with $k$ (a 70% single-run agent has $\mathrm{pass}^4 \approx 24\%$).
+- **$\mathrm{pass}^k$** (consistency / reliability, introduced in $\tau$-bench): probability that **all $k$** independent runs succeed — decays exponentially with $k$ (a 70% single-run agent has $\mathrm{pass}^4 \approx 24$%).
 
 In production, pair $\mathrm{pass@}1$ with $\mathrm{pass}^k$ (reliability) and **worst-10% task success** (long-tail collapse).
 

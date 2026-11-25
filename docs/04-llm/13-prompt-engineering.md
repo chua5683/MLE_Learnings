@@ -98,7 +98,7 @@ Be willing to state the conclusion: **injection cannot be fully eliminated**, be
 
 A term heard more often since 2025; its core is "**what goes into the limited window, in what order, and how it is compressed**", which is more systematic than "writing a good prompt":
 
-- **Static first, dynamic later**: put system instructions and fixed few-shot examples at the very front and user input/retrieved content later, so prefix caching can hit (see [08 Inference optimization and deployment](08-inference-optimization-and-serving.md)); the reverse misses the cache entirely.
+- **Static first, dynamic later**: put system instructions and fixed few-shot examples at the very front and user input/retrieved content later, so prefix caching can hit (see [09 Inference optimization and deployment](09-inference-optimization-and-serving.md)); the reverse misses the cache entirely.
 - **Layering**: persistent (system) -> session (history summary) -> task (this round's evidence/tool results); each layer has a budget.
 - **Compression**: rolling history summaries, truncated/structured tool results, chunked on-demand loading of long documents.
 - **Anti-decay**: long context suffers from lost-in-the-middle, so restate key constraints at the start and remind again at the end (the "sandwich" strategy).

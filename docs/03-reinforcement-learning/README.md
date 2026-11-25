@@ -66,7 +66,7 @@ Self-test: without notes, draw the three-stage RLHF pipeline, write the PPO-clip
 
 - **To [Machine Learning Fundamentals](../01-ml-fundamentals/README.md)**: the Bellman equations are dynamic programming in disguise; evaluation metrics (win rate, pass@k) and the bias-variance tradeoff run through this whole chapter.
 - **To [Deep Learning Fundamentals](../02-dl-fundamentals/README.md)**: policy and value networks are MLPs/Transformers; PPO stability is tied to optimizers, normalization, and gradient clipping (see [Optimizers and Training Tricks](../02-dl-fundamentals/06-optimizers-and-training-tips.md)).
-- **To [Chapter 4: Large Language Models](../04-llm/README.md)**: SFT data engineering, LoRA, distributed training, and inference engines are the engineering foundation for RLHF/GRPO; this chapter covers algorithms and derivations only, while the practical bridge is [Fine-tuning and PEFT](../04-llm/06-fine-tuning-and-peft.md).
+- **To [Chapter 4: Large Language Models](../04-llm/README.md)**: SFT data engineering, LoRA, post-training data/reward architecture, distributed training, and inference engines are the engineering foundation for RLHF/GRPO; this chapter covers RL algorithms and derivations, while the LLM-side recipe and data flywheel live in [Fine-tuning and PEFT](../04-llm/06-fine-tuning-and-peft.md) and [Post-training and alignment pipeline](../04-llm/07-post-training-pipeline.md).
 - **To [Chapter 5: AI Agents](../05-agents/README.md)**: multi-step decisions and tool-feedback loops in agents can be modeled as RL; the policy gradient/GAE material here is the basis for understanding Agent RL.
 - **To [Chapter 8: Interview Bank](../08-interview-bank/README.md)**: this chapter's Q&A and cheat sheets feed the quick-reference cards.
 

@@ -8,11 +8,15 @@
 
 Training means solving an optimization problem:
 
-$$\min_{\theta}\;L(\theta)=\frac{1}{N}\sum_{i=1}^{N}\ell\big(f_\theta(x_i),y_i\big)$$
+$$
+\min_{\theta}\;L(\theta)=\frac{1}{N}\sum_{i=1}^{N}\ell\big(f_\theta(x_i),y_i\big)
+$$
 
 Every first-order optimizer can be written in the same template:
 
-$$\theta_{t+1}=\theta_t-\eta_t\,u_t$$
+$$
+\theta_{t+1}=\theta_t-\eta_t\,u_t
+$$
 
 The only difference is how the update direction/scale $u_t$ is computed from gradient history:
 
@@ -27,19 +31,25 @@ The only difference is how the update direction/scale $u_t$ is computed from gra
 
 Estimate the gradient with a mini-batch $\mathcal{B}$:
 
-$$g_t=\frac{1}{|\mathcal{B}|}\sum_{i\in\mathcal{B}}\nabla_\theta\ell_i(\theta_t), \qquad \theta_{t+1}=\theta_t-\eta g_t$$
+$$
+g_t=\frac{1}{|\mathcal{B}|}\sum_{i\in\mathcal{B}}\nabla_\theta\ell_i(\theta_t), \qquad \theta_{t+1}=\theta_t-\eta g_t
+$$
 
 $g_t$ is an unbiased estimate of the full gradient, with variance inversely proportional to batch size. SGD is simple and often generalizes better; the downsides are one shared learning rate for all parameters and severe oscillation on poorly conditioned (ravine-shaped) loss surfaces.
 
 ### 2.2 Momentum and Nesterov
 
-$$v_t=\mu v_{t-1}+g_t, \qquad \theta_{t+1}=\theta_t-\eta v_t$$
+$$
+v_t=\mu v_{t-1}+g_t, \qquad \theta_{t+1}=\theta_t-\eta v_t
+$$
 
 $v_t$ is an exponential moving average of gradients, equivalent to adding inertia: dimensions with a consistent direction accumulate speed, while oscillating dimensions cancel out. In steady state the effective learning rate is about $\eta/(1-\mu)$ (about 10x when $\mu=0.9$).
 
 **Nesterov** is "look ahead along the momentum, then compute the gradient there":
 
-$$v_t=\mu v_{t-1}+\nabla_\theta L(\theta_t-\eta\mu v_{t-1})$$
+$$
+v_t=\mu v_{t-1}+\nabla_\theta L(\theta_t-\eta\mu v_{t-1})
+$$
 
 It is more sensitive to overshooting, has a better theoretical convergence bound, and is often slightly more stable than standard momentum in practice.
 
@@ -47,13 +57,17 @@ It is more sensitive to overshooting, has a better theoretical convergence bound
 
 **AdaGrad** accumulates all historical squared gradients:
 
-$$G_t=G_{t-1}+g_t^2, \qquad \theta_{t+1}=\theta_t-\frac{\eta}{\sqrt{G_t}+\epsilon}\,g_t$$
+$$
+G_t=G_{t-1}+g_t^2, \qquad \theta_{t+1}=\theta_t-\frac{\eta}{\sqrt{G_t}+\epsilon}\,g_t
+$$
 
 Each parameter's learning rate decreases monotonically during training, which suits sparse features (rare features get larger updates), but $G_t$ only grows: the learning rate approaches 0 late in training and progress stalls prematurely.
 
 **RMSProp** replaces "accumulate" with an "exponential moving average":
 
-$$s_t=\beta s_{t-1}+(1-\beta)g_t^2, \qquad \theta_{t+1}=\theta_t-\frac{\eta}{\sqrt{s_t}+\epsilon}\,g_t$$
+$$
+s_t=\beta s_{t-1}+(1-\beta)g_t^2, \qquad \theta_{t+1}=\theta_t-\frac{\eta}{\sqrt{s_t}+\epsilon}\,g_t
+$$
 
 The learning rate no longer decays monotonically, making it a common improvement for non-stationary objectives.
 
@@ -61,8 +75,13 @@ The learning rate no longer decays monotonically, making it a common improvement
 
 Adam = Momentum + RMSProp:
 
-$$m_t=\beta_1m_{t-1}+(1-\beta_1)g_t, \qquad v_t=\beta_2v_{t-1}+(1-\beta_2)g_t^2$$
-$$\hat{m}_t=\frac{m_t}{1-\beta_1^t}, \qquad \hat{v}_t=\frac{v_t}{1-\beta_2^t}, \qquad \theta_{t+1}=\theta_t-\eta\,\frac{\hat{m}_t}{\sqrt{\hat{v}_t}+\epsilon}$$
+$$
+m_t=\beta_1m_{t-1}+(1-\beta_1)g_t, \qquad v_t=\beta_2v_{t-1}+(1-\beta_2)g_t^2
+$$
+
+$$
+\hat{m}_t=\frac{m_t}{1-\beta_1^t}, \qquad \hat{v}_t=\frac{v_t}{1-\beta_2^t}, \qquad \theta_{t+1}=\theta_t-\eta\,\frac{\hat{m}_t}{\sqrt{\hat{v}_t}+\epsilon}
+$$
 
 **Why bias correction is needed**: with $m_0=0$, expanding gives $m_t=(1-\beta_1)\sum_{i=1}^{t}\beta_1^{t-i}g_i$. For stationary gradients, $\mathbb{E}[m_t]=(1-\beta_1^t)\,\mathbb{E}[g]$, so early estimates are systematically shrunk (with $\beta_1=0.9$ the first step is only $0.1$ of the true gradient). Dividing by $1-\beta_1^t$ gives $\mathbb{E}[\hat{m}_t]=\mathbb{E}[g]$, and the same holds for $v$. Without correction the first few updates are abnormally small, especially for $v$ with $\beta_2=0.999$, where the bias is worse.
 
@@ -72,13 +91,17 @@ $$\hat{m}_t=\frac{m_t}{1-\beta_1^t}, \qquad \hat{v}_t=\frac{v_t}{1-\beta_2^t}, \
 
 **L2 regularization + Adam (coupled)**: add $\lambda\theta$ to the gradient, then divide everything by $\sqrt{\hat{v}}$:
 
-$$g_t\leftarrow g_t+\lambda\theta_t \quad\Rightarrow\quad \theta_{t+1}=\theta_t-\eta\frac{\hat{m}_t+\lambda\theta_t}{\sqrt{\hat{v}_t}+\epsilon}$$
+$$
+g_t\leftarrow g_t+\lambda\theta_t \quad\Rightarrow\quad \theta_{t+1}=\theta_t-\eta\frac{\hat{m}_t+\lambda\theta_t}{\sqrt{\hat{v}_t}+\epsilon}
+$$
 
 The problem: parameters with large gradients have large $\sqrt{\hat{v}}$, so the regularization term is adaptively shrunk; parameters with small gradients are regularized harder. **The assumption that regularization strength is independent of the parameter is broken.**
 
 **AdamW (decoupled)**:
 
-$$\theta_{t+1}=\theta_t-\eta\left(\frac{\hat{m}_t}{\sqrt{\hat{v}}_t+\epsilon}+\lambda\theta_t\right)$$
+$$
+\theta_{t+1}=\theta_t-\eta\left(\frac{\hat{m}_t}{\sqrt{\hat{v}}_t+\epsilon}+\lambda\theta_t\right)
+$$
 
 Weight decay acts directly on the parameters without adaptive scaling, so the regularization strength is controllable. This is the standard recipe for Transformer/LLM training.
 
@@ -97,7 +120,9 @@ Weight decay acts directly on the parameters without adaptive scaling, so the re
 
 **Gradient clipping**: clip by global norm to prevent individual batches from exploding:
 
-$$g\leftarrow g\cdot\min\left(1,\frac{c}{\lVert g\rVert_2}\right)$$
+$$
+g\leftarrow g\cdot\min\left(1,\frac{c}{\lVert g\rVert_2}\right)
+$$
 
 $c$ is usually 1.0. It only handles exploding gradients, not vanishing ones.
 
@@ -109,7 +134,9 @@ $c$ is usually 1.0. It only handles exploding gradients, not vanishing ones.
 
 **Gradient accumulation**: when a large batch does not fit in memory, accumulate gradients over $k$ micro-batches and update once:
 
-$$B_{eff}=B_{micro}\times k\times N_{GPU}$$
+$$
+B_{eff}=B_{micro}\times k\times N_{GPU}
+$$
 
 This is approximately equivalent to a large batch (note that BN statistics are still computed per micro-batch, so it is not strictly equivalent).
 

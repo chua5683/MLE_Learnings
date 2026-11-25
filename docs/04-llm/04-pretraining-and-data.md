@@ -166,7 +166,7 @@ Two more engineering details: **sample-level dedup should run before tokenizatio
 
 ### Q6. What is the difference between bf16 and fp16? Why do large models train in bf16?
 **Answer**: bf16 has 8 exponent bits and 7 mantissa bits, giving the same dynamic range as fp32 but lower precision; fp16 has 5 exponent bits and 10 mantissa bits, giving higher precision but a narrower range that overflows/underflows easily and requires loss scaling. In large-model training, gradients and activations vary widely, so bf16 needs no loss scaling and is more stable, while the fp32 master weights restore mantissa precision.
-**Follow-up**: fp16 or bf16 for inference? Either works, but bf16 is more stable; quantized inference is a separate story (see [09](09-quantization-and-compression.md)).
+**Follow-up**: fp16 or bf16 for inference? Either works, but bf16 is more stable; quantized inference is a separate story (see [10](10-quantization-and-compression.md)).
 
 ### Q7. How do you diagnose and handle loss spikes during training?
 **Answer**: First localize - is it global or in a specific layer, does it coincide with a gradient-norm spike, is it correlated with a particular data batch? Then: 1) roll back to the checkpoint before the spike; 2) skip that data; 3) lower the peak LR or extend warmup; 4) add z-loss/QK-norm to bound logits; 5) increase gradient clipping. If spikes are frequent, check for anomalous samples and numerical overflow.

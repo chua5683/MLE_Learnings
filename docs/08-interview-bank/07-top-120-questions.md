@@ -254,11 +254,11 @@
 
 ### Q61. What is the KV cache, and why does it speed up decoding?
 **Answer**: During autoregressive generation, the K/V of past tokens are cached; a new token only computes its own Q and attends to the cache, avoiding recomputation and reducing per-step cost from $O(n^2)$ to $O(n)$. The price is memory that grows linearly with sequence length.
-→ See [Inference optimization and serving](../04-llm/08-inference-optimization-and-serving.md)
+→ See [Inference optimization and serving](../04-llm/09-inference-optimization-and-serving.md)
 
 ### Q62. How do you estimate KV cache memory?
-**Answer**: Per token per layer: $2\times n_{kv\_heads}\times d_{head}\times$ bytes, multiplied by layers, batch size, and sequence length. Example: Llama-3-8B (32 layers, 8 KV heads, head_dim 128, bf16) is about 128 KB/token, roughly 1 GB per 8k-token sequence.
-→ See [Inference optimization and serving](../04-llm/08-inference-optimization-and-serving.md)
+**Answer**: Per token per layer: $2\times n_{\mathrm{kv}}\times d_{\mathrm{head}}\times$ bytes, multiplied by layers, batch size, and sequence length. Example: Llama-3-8B (32 layers, 8 KV heads, head_dim 128, bf16) is about 128 KB/token, roughly 1 GB per 8k-token sequence.
+→ See [Inference optimization and serving](../04-llm/09-inference-optimization-and-serving.md)
 
 ### Q63. What is the difference between MHA, MQA, and GQA?
 **Answer**: MHA gives every head its own K/V. MQA shares one K/V across all heads, cutting KV cache by $1/h$ at some quality cost. GQA groups query heads and shares K/V within each group, trading quality against memory; Llama 2/3 use it.
@@ -302,11 +302,11 @@
 
 ### Q73. What do the three ZeRO stages shard?
 **Answer**: Stage 1 shards optimizer states; stage 2 also shards gradients; stage 3 also shards parameters (all-gathered on demand in the forward pass). Memory drops roughly by $1/N$ for $N$ devices, at the cost of more communication.
-→ See [Distributed training](../04-llm/07-distributed-training.md)
+→ See [Distributed training](../04-llm/08-distributed-training.md)
 
 ### Q74. What is the difference between tensor parallelism and pipeline parallelism?
 **Answer**: TP splits a single layer's matrices across devices with frequent intra-layer communication (all-reduce), best within a node over NVLink. PP puts different layers on different devices and pipelines micro-batches (1F1B); communication is light but bubbles appear, and it suits cross-node scaling.
-→ See [Distributed training](../04-llm/07-distributed-training.md)
+→ See [Distributed training](../04-llm/08-distributed-training.md)
 
 ### Q75. Why does the SFT loss mask the prompt?
 **Answer**: Only answer tokens contribute to cross-entropy, so the model does not learn to repeat the user input and the loss focuses on the distribution to generate. In practice prompt labels are set to -100.
@@ -318,59 +318,59 @@
 
 ### Q77. What does PagedAttention solve?
 **Answer**: It manages the KV cache in fixed-size blocks, like virtual memory, allocating on demand and supporting prefix sharing and copy-on-write. This nearly eliminates fragmentation and gives vLLM several times the throughput.
-→ See [Inference optimization and serving](../04-llm/08-inference-optimization-and-serving.md)
+→ See [Inference optimization and serving](../04-llm/09-inference-optimization-and-serving.md)
 
 ### Q78. Why does continuous batching achieve higher throughput than static batching?
 **Answer**: It schedules at iteration granularity: finished requests leave immediately and new ones join at any step, avoiding padding and idle time caused by waiting for the longest sequence in a static batch. With PagedAttention, memory utilization is also higher.
-→ See [Inference optimization and serving](../04-llm/08-inference-optimization-and-serving.md)
+→ See [Inference optimization and serving](../04-llm/09-inference-optimization-and-serving.md)
 
 ### Q79. How does speculative decoding work?
 **Answer**: A small draft model proposes $k$ tokens; the large model verifies them in parallel and corrects sampling according to acceptance probabilities. The accept-reject scheme preserves the target distribution and can give a 2–3× speedup when the draft is good, trading memory for latency.
-→ See [Inference optimization and serving](../04-llm/08-inference-optimization-and-serving.md)
+→ See [Inference optimization and serving](../04-llm/09-inference-optimization-and-serving.md)
 
 ### Q80. What is the difference between PTQ and QAT?
 **Answer**: PTQ quantizes after training and uses calibration data to set scales; it is simple but loses accuracy, especially at W4. QAT simulates quantization during training for better accuracy at higher cost. LLMs commonly use GPTQ/AWQ (PTQ) or FP8 post-training quantization.
-→ See [Quantization and compression](../04-llm/09-quantization-and-compression.md)
+→ See [Quantization and compression](../04-llm/10-quantization-and-compression.md)
 
 ### Q81. What is the difference between GPTQ and AWQ?
 **Answer**: GPTQ performs layer-wise error compensation using the Hessian to quantize weights to 3–4 bits. AWQ observes that a few salient channels matter and protects them via per-channel scaling based on activation magnitude, which is more robust and general at 4-bit.
-→ See [Quantization and compression](../04-llm/09-quantization-and-compression.md)
+→ See [Quantization and compression](../04-llm/10-quantization-and-compression.md)
 
 ### Q82. How do you detect and mitigate benchmark contamination in LLM evaluation?
 **Answer**: Use n-gram overlap detection, training-data provenance, dynamic or private test sets, and paraphrased questions; report contamination risk. Inflated leaderboard scores often come from contamination and prompt overfitting.
-→ See [Evaluation and hallucination](../04-llm/10-evaluation-and-hallucination.md)
+→ See [Evaluation and hallucination](../04-llm/11-evaluation-and-hallucination.md)
 
 ### Q83. What biases does LLM-as-a-judge have, and how do you calibrate it?
 **Answer**: Position bias (prefers the first answer), length bias, self-preference, and style bias. Mitigations: swap order, use multiple judges, provide reference answers, pairwise comparison with a rubric, align with human annotations, and spot-check regularly.
-→ See [Evaluation and hallucination](../04-llm/10-evaluation-and-hallucination.md)
+→ See [Evaluation and hallucination](../04-llm/11-evaluation-and-hallucination.md)
 
 ### Q84. What causes hallucination, and how do you mitigate it?
 **Answer**: Causes: missing or outdated pretraining knowledge, stochastic decoding, alignment that encourages confidence, and retrieval errors in RAG. Mitigations: RAG with citations, factual SFT/RLHF, constrained decoding, uncertainty estimation, tool-based verification, and faithfulness evaluation.
-→ See [Evaluation and hallucination](../04-llm/10-evaluation-and-hallucination.md)
+→ See [Evaluation and hallucination](../04-llm/11-evaluation-and-hallucination.md)
 
 ### Q85. What is the full RAG pipeline?
 **Answer**: Offline: parse documents, chunk, embed, index. Online: rewrite the query, retrieve (vector/BM25/hybrid), rerank, assemble context, generate, then cite and post-process. Evaluation splits into retrieval (recall@k) and generation (faithfulness/relevance).
-→ See [Rag](../04-llm/11-rag.md)
+→ See [Rag](../04-llm/12-rag.md)
 
 ### Q86. What are common chunking and reranking strategies?
 **Answer**: Chunk by semantics, headings, or fixed length with overlap, keeping metadata; rerank the top-k with a cross-encoder to balance recall and precision. Parent-child chunks or sentence-window retrieval help with long documents.
-→ See [Rag](../04-llm/11-rag.md)
+→ See [Rag](../04-llm/12-rag.md)
 
 ### Q87. How does HNSW work?
 **Answer**: A hierarchical navigable small-world graph: sparse upper layers for long jumps and a dense bottom layer for fine search; queries descend greedily from the top, about $O(\log n)$. Parameters M, efConstruction, and efSearch control recall and latency.
-→ See [Rag](../04-llm/11-rag.md)
+→ See [Rag](../04-llm/12-rag.md)
 
 ### Q88. How do you choose between long context and RAG?
 **Answer**: Long context suits deep understanding of a few documents with less engineering; RAG suits large, frequently updated corpora that need permissions and citations at lower cost. In practice they are combined: retrieve first, then read with a long context, or use long context for reranking.
-→ See [Rag](../04-llm/11-rag.md)
+→ See [Rag](../04-llm/12-rag.md)
 
 ### Q89. How do you defend against prompt injection?
 **Answer**: Separate instructions from data, apply least privilege, whitelist tools and require human confirmation, filter inputs and outputs, sandbox execution, isolate the system prompt, and detect injection in retrieved content. There is no silver bullet; use defense in depth.
-→ See [Prompt engineering](../04-llm/12-prompt-engineering.md)
+→ See [Prompt engineering](../04-llm/13-prompt-engineering.md)
 
 ### Q90. Why do CoT and self-consistency work?
 **Answer**: CoT externalizes implicit computation into intermediate tokens, giving the model more computation steps; self-consistency samples multiple reasoning paths and votes, reducing single-path errors. For small models or trivial tasks they can be neutral or harmful.
-→ See [Prompt engineering](../04-llm/12-prompt-engineering.md)
+→ See [Prompt engineering](../04-llm/13-prompt-engineering.md)
 
 ## E. AI Agents and Engineering (Q91–Q100)
 
@@ -442,7 +442,7 @@
 
 ### Q107. How does Prefill-Decode (PD) disaggregation work, and when is it worth the complexity?
 **Answer**: Prefill is compute-bound (sets TTFT) and decode is HBM-bandwidth-bound (sets TPOT); co-locating them causes long prefills to stall decode batches. PD disaggregation runs prefill and decode on separate GPU pools with different TP/batch configs and transfers KV cache over RDMA/NVLink; it pays off for long prompts under strict TTFT + TPOT SLOs.
-→ See [Inference optimization and serving](../04-llm/08-inference-optimization-and-serving.md)
+→ See [Inference optimization and serving](../04-llm/09-inference-optimization-and-serving.md)
 
 ### Q108. How do you size GPU serving capacity for a latency-bound model?
 **Answer**: Compute $N_{\mathrm{GPU}} = (\mathrm{QPS} \times t_{\mathrm{GPU}}) / \eta$ with target utilization $\eta \in [0.4, 0.7]$ for burst headroom; for LLMs, also check the KV-cache concurrency cap $B_{\max}$ from VRAM budget and Little's Law ($L = \lambda W$). Optimize in order: reduce calls (caching) → batching → kernel/graph fusion (CUDA Graph, Triton) → quantization → more GPUs.
@@ -462,7 +462,7 @@
 
 ### Q112. How do Vision-Language Models (VLMs) feed images into an LLM, and why does dynamic tiling matter?
 **Answer**: Modular VLMs encode an image with a vision encoder (e.g., SigLIP/ViT) and project patch tokens via an MLP or Q-Former into the LLM embedding space; native multimodal models tokenize image patches directly. Fixed low-resolution resizing blurs small text and charts, so dynamic tiling (AnyRes) splits high-res images into aspect-ratio-preserving crops plus a global thumbnail.
-→ See [Multimodal LLMs](../04-llm/13-multimodal-llms.md)
+→ See [Multimodal LLMs](../04-llm/14-multimodal-llms.md)
 
 ### Q113. How do Diffusion models and Flow Matching differ?
 **Answer**: DDPM/score-based diffusion adds Gaussian noise over many steps along a curved SDE/ODE path and predicts noise $\epsilon$ or score $\nabla_x \log p_t(x)$. Flow Matching (rectified flow) directly regresses the velocity field $v_\theta(x_t, t)$ along straight linear paths $x_t = (1-t)x_0 + t x_1$, yielding simpler objectives and far fewer sampling steps (10–30 vs. 50–1000).
@@ -481,7 +481,7 @@
 → See [Evaluation metrics](../01-ml-fundamentals/05-evaluation-metrics.md)
 
 ### Q117. What is the difference between `pass@k` and `pass^k` in agent evaluation?
-**Answer**: `pass@k` measures the probability that *at least one* of $k$ independent runs succeeds (capability ceiling, rises with $k$). `pass^k` measures the probability that *all $k$* independent runs succeed (production consistency, decays as $\hat{p}^k$). An agent with 80% single-run accuracy has `pass@4` ≈ 99.8% but `pass^4` ≈ 41%.
+**Answer**: `pass@k` measures the probability that *at least one* of $k$ independent runs succeeds (capability ceiling, rises with $k$). `pass^k` measures the probability that *all* $k$ independent runs succeed (production consistency, decays as $\hat{p}^k$). An agent with 80% single-run accuracy has `pass@4` ≈ 99.8% but `pass^4` ≈ 41%.
 → See [Evaluation and safety](../05-agents/09-evaluation-and-safety.md)
 
 ### Q118. What is context engineering for long-horizon agents?

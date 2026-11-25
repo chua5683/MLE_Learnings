@@ -46,7 +46,9 @@ Resizing a $2000\times 1500$ PDF screenshot to $336\times 336$ makes text unread
 
 **Visual token budget math**: an image of $H \times W$ with patch size $P=14$ and $2\times 2$ spatial merge produces:
 
-$$N_{\mathrm{vis}} = \frac{H}{2P} \times \frac{W}{2P} = \frac{H \cdot W}{784}$$
+$$
+N_{\mathrm{vis}} = \frac{H}{2P} \times \frac{W}{2P} = \frac{H \cdot W}{784}
+$$
 
 A $1120 \times 1120$ page uses $1600$ tokens — equivalent to ~1,200 words of prompt prefill! Controlling max pixels per image directly controls TTFT and KV-cache footprint.
 

@@ -21,7 +21,9 @@ An intuitive framework: **learning = balancing model capacity against data size*
 
 Assume the data-generating process is
 
-$$y = f(x) + \varepsilon, \qquad \mathbb{E}[\varepsilon]=0, \qquad \mathrm{Var}(\varepsilon)=\sigma^2$$
+$$
+y = f(x) + \varepsilon, \qquad \mathbb{E}[\varepsilon]=0, \qquad \mathrm{Var}(\varepsilon)=\sigma^2
+$$
 
 The training set $D$ is sampled independently from the data distribution, and the learner outputs $f_D(x)$. At a fixed test point $x$, take the expectation over the randomness of the training set and the noise:
 

@@ -43,7 +43,9 @@ Saying clearly "my system leans block or feature" in an interview scores better 
 
 Let impression $i$ happen at $t_i$, and let feature $x$ be a mergeable aggregate over events in the past $W$ time. Then the feature value in the training sample must be
 
-$$x_i = \bigoplus_{\{e \,:\, t_e < \min(t_i,\ w_i)\}} \phi(e)$$
+$$
+x_i = \bigoplus_{\lbrace e \,:\, t_e < \min(t_i,\ w_i)\rbrace} \phi(e)
+$$
 
 where $\oplus$ is an associative, commutative aggregate (count/sum/max) and $w_i$ is the **feature watermark** recorded with the request ("I only trust blocks up to this time"). We cap at $\min(t_i, w_i)$ rather than $t_i$ because the online scoring may have read a slightly older block (database sync lag), and training must reproduce what the model **actually saw**, not what was "theoretically correct". That is point-in-time correctness: **use the value from that moment, not the most accurate value**.
 
@@ -91,7 +93,7 @@ The key trade-off: **Kafka does not guarantee global ordering, only per-partitio
 Stream processing has to handle three things: **out-of-order** events (arrival order is not event order), **late** events (arriving after the watermark), and **duplicates** (at-least-once delivery).
 
 - **Event time vs. processing time**: features must aggregate by when the event happened to match offline; with processing time, a traffic spike mixes events from different moments into one window.
-- **Watermark**: the system's estimate of event-time progress, $watermark = max\,event\_time - allowed\,lateness$. A window fires when the watermark passes its end.
+- **Watermark**: the system's estimate of event-time progress, $\mathrm{watermark} = \max(\text{event time}) - \text{allowed lateness}$. A window fires when the watermark passes its end.
 - **Window types**: tumbling (non-overlapping), sliding (overlapping, used for "last 5 minutes, updated every minute"), session (split by inactivity gaps).
 - **State and checkpointing**: aggregates live in a state backend (RocksDB) and are checkpointed to HDFS/S3 periodically; on restart the job recovers from the checkpoint so results do not regress.
 - **Exactly-once**: replayable source + state checkpoints + two-phase-commit sink (or idempotent upsert). Feature pipelines often prefer **idempotent writes** (overwrite by key + window) over transactions: simpler and fast enough.
@@ -193,7 +195,7 @@ ASOF LEFT JOIN feature_snapshots f
 **Follow-up**: Can Kafka duplicate or lose events? Default semantics are at-least-once, so consumers must be idempotent (dedupe by offset/event id); only `acks=all` plus replication avoids loss.
 
 ### Q6. What is Flink's watermark, and how do you handle late data?
-**Answer**: A watermark is a monotonically advancing estimate of event-time progress that decides when a window can fire. With allowed disorder $L$, $watermark = \max(event\_time) - L$. Late data has three treatments: allow lateness and update the window after it closes (`allowedLateness`), emit to a side output for separate correction, or drop it and rely on a batch recompute to fill in.
+**Answer**: A watermark is a monotonically advancing estimate of event-time progress that decides when a window can fire. With allowed disorder $L$, $\mathrm{watermark} = \max(\text{event time}) - L$. Late data has three treatments: allow lateness and update the window after it closes (`allowedLateness`), emit to a side output for separate correction, or drop it and rely on a batch recompute to fill in.
 **Follow-up**: What goes wrong if the watermark is too large or too small? Too large: windows fire late and features become stale; too small: late events are dropped and results undercount.
 
 ### Q7. How do you keep real-time aggregates correct after a restart?

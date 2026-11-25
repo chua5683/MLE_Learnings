@@ -62,8 +62,8 @@ Classify every tool and parameter range into explicit risk tiers enforced by the
 | --- | --- | --- | --- |
 | **Tier 0** | Read-only (user-scoped) | Search docs, read ticket, `SELECT` with row-level ACL | OBO auth + rate limit + audit log |
 | **Tier 1** | Reversible / draft write | Create draft email, open draft PR, add internal note | Schema validation + idempotency key + auto-undo metadata |
-| **Tier 2** | External / material impact | Send customer email, refund \$50–\$500, merge PR, deploy staging | **Explicit HITL approval** showing exact diff/payload + step-up check |
-| **Tier 3** | Irreversible / privileged | Prod DB DDL/delete, IAM policy edit, refund >\$500, bulk delete | **Deny by default** or dual-control approval + out-of-band verification |
+| **Tier 2** | External / material impact | Send customer email, refund USD 50–500, merge PR, deploy staging | **Explicit HITL approval** showing exact diff/payload + step-up check |
+| **Tier 3** | Irreversible / privileged | Prod DB DDL/delete, IAM policy edit, refund >USD 500, bulk delete | **Deny by default** or dual-control approval + out-of-band verification |
 
 Notice that tiering is **argument-aware**, not just tool-name-based: `refund_order(amount=15)` may be Tier 1 auto-approved, while `refund_order(amount=2500)` escalates to Tier 3.
 

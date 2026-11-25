@@ -46,9 +46,9 @@
 | Gain ratio | Information gain / intrinsic feature entropy, C4.5 |
 | Gini | $1-\sum_k p_k^2$, CART classification |
 | Regression tree | Variance reduction / MSE minimization, leaf outputs the mean |
-| Pruning | Pre-pruning is fast but underfits easily; post-pruning works better but costs more; $R_\alpha(T)=R(T)+\alpha\vert T\vert $ |
+| Pruning | Pre-pruning is fast but underfits easily; post-pruning works better but costs more; $R_\alpha(T)=R(T)+\alpha\vert T\vert$ |
 | RF | Bagging + feature randomness; variance $\rho\sigma^2+(1-\rho)\sigma^2/B$ |
-| OOB | About $1/e\approx36.8\%$ of samples are out of bag |
+| OOB | About $1/e\approx 36.8$% of samples are out of bag |
 | GBDT | Additive model fitting the negative gradient $r_{im}=-\partial L/\partial F$ |
 | XGB objective | $\sum_i[g_i f_t+\frac12 h_i f_t^2]+\gamma T+\frac12\lambda\|w\|^2$ |
 | XGB leaf | $w_j^*=-G_j/(H_j+\lambda)$ |

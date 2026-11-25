@@ -21,33 +21,45 @@
 
 **Sigmoid**
 
-$$\sigma(z)=\frac{1}{1+e^{-z}}, \qquad \sigma'(z)=\sigma(z)\big(1-\sigma(z)\big)\in\left(0,\tfrac14\right]$$
+$$
+\sigma(z)=\frac{1}{1+e^{-z}}, \qquad \sigma'(z)=\sigma(z)\big(1-\sigma(z)\big)\in\left(0,\tfrac14\right]
+$$
 
 The output lies in $(0,1)$ and can be read as a probability, but it is not zero-mean (which biases the gradients of later layers) and its derivative peaks at only $0.25$.
 
 **Tanh**
 
-$$\tanh(z)=\frac{e^{z}-e^{-z}}{e^{z}+e^{-z}}, \qquad \tanh'(z)=1-\tanh^2(z)\in(0,1]$$
+$$
+\tanh(z)=\frac{e^{z}-e^{-z}}{e^{z}+e^{-z}}, \qquad \tanh'(z)=1-\tanh^2(z)\in(0,1]
+$$
 
 Zero-mean and steeper than sigmoid, but it still saturates on both ends.
 
 **ReLU family**
 
-$$\mathrm{ReLU}(z)=\max(0,z), \qquad \mathrm{ReLU}'(z)=\begin{cases}1,&z>0\\0,&z<0\end{cases}$$
+$$
+\mathrm{ReLU}(z)=\max(0,z), \qquad \mathrm{ReLU}'(z)=\begin{cases}1,&z>0\\0,&z<0\end{cases}
+$$
 
-$$\mathrm{LeakyReLU}(z)=\max(\alpha z,z), \qquad \mathrm{LeakyReLU}'(z)=\begin{cases}1,&z>0\\\alpha,&z<0\end{cases}\ (\alpha\ \text{around}\ 0.01)$$
+$$
+\mathrm{LeakyReLU}(z)=\max(\alpha z,z), \qquad \mathrm{LeakyReLU}'(z)=\begin{cases}1,&z>0\\\alpha,&z<0\end{cases}\ (\alpha\ \text{around}\ 0.01)
+$$
 
 ReLU has derivative exactly 1 on the positive half, so it never saturates and is extremely cheap; the price is zero gradient on the negative half (**dying ReLU**) and a non-zero-mean output.
 
 **GELU (Gaussian Error Linear Unit)**
 
-$$\mathrm{GELU}(z)=z\,\Phi(z)\approx 0.5z\left(1+\tanh\left[\sqrt{\tfrac{2}{\pi}}\left(z+0.044715z^3\right)\right]\right)$$
+$$
+\mathrm{GELU}(z)=z\,\Phi(z)\approx 0.5z\left(1+\tanh\left[\sqrt{\tfrac{2}{\pi}}\left(z+0.044715z^3\right)\right]\right)
+$$
 
 where $\Phi$ is the standard normal CDF. It acts as a soft gate based on the input magnitude, is smooth everywhere, and is used by models such as BERT and GPT-2.
 
 **SwiGLU (gated linear unit)**
 
-$$\mathrm{SwiGLU}(x)=\mathrm{Swish}(xW_1)\odot(xV), \qquad \mathrm{Swish}(z)=z\,\sigma(z)$$
+$$
+\mathrm{SwiGLU}(x)=\mathrm{Swish}(xW_1)\odot(xV), \qquad \mathrm{Swish}(z)=z\,\sigma(z)
+$$
 
 It turns the FFN from "two linear layers plus an activation" into "three projections plus a multiplicative gate", as used by LLaMA and others.
 
@@ -55,23 +67,31 @@ It turns the FFN from "two linear layers plus an activation" into "three project
 
 Consider a linear layer $z_i=\sum_{j=1}^{n_{in}}w_{ij}x_j$ (ignoring the bias) and assume $w_{ij}$ are i.i.d. with mean 0 and variance $\sigma_w^2$, while $x_j$ has mean 0, variance $\sigma_x^2$, and is independent of $w$:
 
-$$\mathrm{Var}(z_i)=\sum_{j=1}^{n_{in}}\mathrm{Var}(w_{ij}x_j)=n_{in}\,\sigma_w^2\,\sigma_x^2$$
+$$
+\mathrm{Var}(z_i)=\sum_{j=1}^{n_{in}}\mathrm{Var}(w_{ij}x_j)=n_{in}\,\sigma_w^2\,\sigma_x^2
+$$
 
 For $\mathrm{Var}(z_i)=\sigma_x^2$ (variance unchanged across layers) we need
 
-$$\sigma_w^2=\frac{1}{n_{in}}$$
+$$
+\sigma_w^2=\frac{1}{n_{in}}
+$$
 
 **The backward pass is symmetric**: gradients travel from layer $l$ back to $l-1$ multiplied by $W^T$, so keeping their variance unchanged requires $\sigma_w^2=1/n_{out}$.
 
 **Xavier/Glorot**: balances forward and backward, taking the harmonic mean of the two:
 
-$$\sigma_w^2=\frac{2}{n_{in}+n_{out}}$$
+$$
+\sigma_w^2=\frac{2}{n_{in}+n_{out}}
+$$
 
 For a uniform distribution $w\sim U(-a,a)$ we have $\sigma_w^2=a^2/3$, hence $a=\sqrt{6/(n_{in}+n_{out})}$. This suits zero-mean, nearly linear activations such as tanh/sigmoid.
 
 **He/Kaiming**: ReLU zeros the entire negative half. If $z$ is zero-mean and symmetric, then $\mathbb{E}[\mathrm{ReLU}(z)^2]=\tfrac12\mathrm{Var}(z)$, so the variance is halved. Compensating by a factor of 2 requires
 
-$$\sigma_w^2=\frac{2}{n_{in}}$$
+$$
+\sigma_w^2=\frac{2}{n_{in}}
+$$
 
 This is He initialization (Kaiming normal), the default choice for ReLU networks.
 
@@ -81,7 +101,9 @@ This is He initialization (Kaiming normal), the default choice for ReLU networks
 
 Approximate the numerical gradient with a central difference and compare it with your own backward pass:
 
-$$\frac{\partial L}{\partial\theta_i}\approx\frac{L(\theta_i+\epsilon)-L(\theta_i-\epsilon)}{2\epsilon}$$
+$$
+\frac{\partial L}{\partial\theta_i}\approx\frac{L(\theta_i+\epsilon)-L(\theta_i-\epsilon)}{2\epsilon}
+$$
 
 A relative error $\frac{|g_{num}-g_{ana}|}{\max(1,|g_{num}|+|g_{ana}|)}$ below roughly $10^{-6}$ usually means the implementation is correct. Note: you must use **float64**, a small network, and $\epsilon\approx10^{-6}$; otherwise float32 rounding error drowns out the difference.
 

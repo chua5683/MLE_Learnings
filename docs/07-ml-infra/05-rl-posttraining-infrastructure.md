@@ -144,3 +144,4 @@ Mnemonic: **"Rollout dominates, sync weights in RAM, pass raw token IDs, kill st
 - [AReaL: A Large-Scale Asynchronous Reinforcement Learning System · Fu et al., 2025](https://arxiv.org/abs/2505.24298)
 - [Kimi k1.5 Technical Report (Partial Rollouts & Long-CoT RL Infra) · 2025](https://arxiv.org/abs/2501.12599)
 - [Kubernetes Kueue documentation](https://kueue.sigs.k8s.io/) / [Ray Core documentation](https://docs.ray.io/)
+- [Chapter 4 · Post-training and alignment pipeline](../04-llm/07-post-training-pipeline.md) & [Chapter 3 · GRPO and Reasoning RL](../03-reinforcement-learning/07-grpo-and-reasoning-rl.md)

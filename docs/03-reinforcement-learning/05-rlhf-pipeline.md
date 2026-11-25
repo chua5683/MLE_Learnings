@@ -45,7 +45,7 @@ P(y_w\succ y_l\mid x)=\frac{\exp\left(s(x,y_w)\right)}{\exp\left(s(x,y_w)\right)
 =\sigma\left(s(x,y_w)-s(x,y_l)\right) \qquad (1)
 $$
 
-Replace $s$ by a reward model $r_\phi$ with parameters $\phi$ and maximize the likelihood of preference data $\mathcal{D}=\{(x,y_w,y_l)\}$; this gives the **pairwise ranking loss**:
+Replace $s$ by a reward model $r_\phi$ with parameters $\phi$ and maximize the likelihood of preference data $\mathcal{D}=\lbrace(x,y_w,y_l)\rbrace$; this gives the **pairwise ranking loss**:
 
 $$
 \mathcal{L}_{\mathrm{RM}}(\phi)=-\mathbb{E}_{(x,y_w,y_l)\sim\mathcal{D}}\left[\log\sigma\left(r_\phi(x,y_w)-r_\phi(x,y_l)\right)\right] \qquad (2)

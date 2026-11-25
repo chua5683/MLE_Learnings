@@ -95,10 +95,10 @@ $$
 
   KS > 0.3 is usually considered usable; KS measures "the maximum gap between the score CDFs of good and bad samples".
 - **Ranking/recall**: Precision@fixed approval rate, Recall@fixed false-positive rate; in business terms, "how much does bad debt drop at the same approval rate".
-- **Stability**: **PSI** (Population Stability Index):
+- **Stability**: **PSI** (Population Stability Index), where $p_i$ and $q_i$ are the actual and expected bin proportions in bucket $i$:
 
 $$
-PSI=\sum_i\left(\text{actual}_i\%-\text{expected}_i\%\right)\ln\frac{\text{actual}_i\%}{\text{expected}_i\%}
+\mathrm{PSI}=\sum_i (p_i - q_i)\ln\frac{p_i}{q_i}
 $$
 
   PSI < 0.1 is stable, 0.1–0.25 needs attention, > 0.25 indicates significant drift.

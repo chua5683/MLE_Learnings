@@ -43,7 +43,9 @@ flowchart LR
 
 Symmetric quantization (common for weights):
 
-$$q = \text{clamp}\left(\text{round}\left(\frac{x}{s}\right), -2^{b-1}, 2^{b-1}-1\right), \qquad \hat{x} = s\cdot q$$
+$$
+q = \text{clamp}\left(\text{round}\left(\frac{x}{s}\right), -2^{b-1}, 2^{b-1}-1\right), \qquad \hat{x} = s\cdot q
+$$
 
 Asymmetric quantization adds a zero point $z$ (common for activations, whose distributions are skewed): $q=\text{round}(x/s)+z$, $\hat{x}=s(q-z)$.
 
@@ -56,7 +58,7 @@ So the core of PTQ is **choosing the scale**: min-max (keeps the dynamic range, 
 
 ### 2.2 Why quantization speeds things up: find the bottleneck first
 
-Decode is bandwidth-bound (see [08 Inference optimization and deployment](08-inference-optimization-and-serving.md)), so halving weight bytes doubles the theoretical ceiling:
+Decode is bandwidth-bound (see [09 Inference optimization and deployment](09-inference-optimization-and-serving.md)), so halving weight bytes doubles the theoretical ceiling:
 
 | Precision | 7B weights | 70B weights | Decode ceiling (vs FP16) |
 | --- | --- | --- | --- |
@@ -75,7 +77,9 @@ A handful of LLM activation channels are tens to hundreds of times larger than t
 - **LLM.int8()**: mixed-precision decomposition - keep the few outlier dimensions (about 0.1%) in FP16, run the rest in INT8, and add the results. Simple idea, but the kernel is complex and the speedup is limited.
 - **SmoothQuant**: a **mathematically equivalent** transform that migrates part of the activation's quantization difficulty onto the weights:
 
-$$Y = XW = \underbrace{\left(X\,\text{diag}(s)^{-1}\right)}_{\tilde X \text{ easier to quantize}}\;\underbrace{\left(\text{diag}(s)W\right)}_{\tilde W \text{ slightly harder but fine}}$$
+$$
+Y = XW = \underbrace{\left(X\,\text{diag}(s)^{-1}\right)}_{\tilde X \text{ easier to quantize}}\;\underbrace{\left(\text{diag}(s)W\right)}_{\tilde W \text{ slightly harder but fine}}
+$$
 
 The per-channel scale is $s_j = \dfrac{\max |X_j|^\alpha}{\max |W_j|^{1-\alpha}}$ with $\alpha\in[0,1]$ controlling how much difficulty moves (0.5 is typical). $\alpha=1$ moves everything to the weights (crushing them), $\alpha=0$ moves nothing. Because $\text{diag}(s)$ folds into the previous operator (the LayerNorm scale or the previous layer's output), inference has **zero extra cost**. This is the standard prerequisite for deploying W8A8.
 
@@ -83,11 +87,15 @@ The per-channel scale is $s_j = \dfrac{\max |X_j|^\alpha}{\max |W_j|^{1-\alpha}}
 
 The objective is to minimize the **layer output** error, not the Euclidean distance between weights:
 
-$$\min_{\hat W} \|WX - \hat W X\|_2^2$$
+$$
+\min_{\hat W} \|WX - \hat W X\|_2^2
+$$
 
 GPTQ follows OBQ (Optimal Brain Quantization): quantize the weights column by column, compute the error $e = w_q - \text{quant}(w_q)$ for column $q$, then use the inverse Hessian $H^{-1}=(2XX^\top)^{-1}$ to **compensate that error proportionally onto the not-yet-quantized columns**:
 
-$$\delta = -\frac{e}{[H^{-1}]_{qq}}\,H^{-1}_{:,q}, \qquad W_{:,q+1:} \mathrel{+}= \delta_{q+1:}$$
+$$
+\delta = -\frac{e}{[H^{-1}]_{qq}}\,H^{-1}_{:,q}, \qquad W_{:,q+1:} \mathrel{+}= \delta_{q+1:}
+$$
 
 Intuition: the output shift caused by quantizing one column is cancelled by a small adjustment of the remaining columns. Engineering details: Cholesky factorization for speed, block-wise updates, `act-order` (quantize in order of activation magnitude, so important columns go later), group_size=128, and a calibration set of about 128 samples. At 4-bit, GPTQ is one of the quality benchmarks, but **quantization requires a calibration pass** (tens of minutes) and depends on a GPU.
 
@@ -97,7 +105,9 @@ AWQ's observation: weights are not equally important - **about 1% of channels (i
 
 The trick is to scale each channel by a factor $s$ (and fold $1/s$ into the previous layer):
 
-$$W' = W\cdot\text{diag}(s), \qquad X' = X\cdot\text{diag}(s)^{-1}$$
+$$
+W' = W\cdot\text{diag}(s), \qquad X' = X\cdot\text{diag}(s)^{-1}
+$$
 
 $s$ is found by grid search over the calibration set minimizing output MSE (no backpropagation), plus "clipped max" on the weights to reduce clipping error. Upside: **cheap calibration, good generalization, and usually better than GPTQ at the same 4-bit width**, with friendly kernels (AWQ's GEMM kernel uses per-group scale and is fast). Downside: no per-column error compensation, so optimality is weaker in theory and some tasks are beaten by GPTQ - which is why "which is better" must be measured on your own eval set.
 

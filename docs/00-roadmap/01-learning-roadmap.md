@@ -11,8 +11,8 @@ The same body of knowledge carries very different weight across roles. Below are
 | Role | Typical work | High-weight chapters | Lower-weight chapters |
 | --- | --- | --- | --- |
 | **Traditional MLE** (recsys / ads / search / risk) | Features, model iteration, A/B tests, offline-online consistency | 01, 02, 06, the pipeline part of 07 | 03; inference details in 04 |
-| **LLM application engineer** | RAG, agents, prompting, evaluation, serving | 04 (08–13), 05, 06-05 | Tree-model derivations in 01; 07 |
-| **LLM training / inference engineer** | Pretraining, fine-tuning, distributed training, inference optimization | 02, 03, 04 (01–09), 07 | Business design in 06 |
+| **LLM application engineer** | RAG, agents, prompting, evaluation, serving | 04 (09–14), 05, 06-05 | Tree-model derivations in 01; 07 |
+| **LLM training / inference engineer** | Pretraining, fine-tuning, distributed training, inference optimization | 02, 03, 04 (01–10), 07 | Business design in 06 |
 | **Agent / application architect** | Tool use, multi-agent systems, engineering | 04, 05, 06-05 | Formula-heavy parts of 01 and 02 |
 
 **Advice**: apply mainly to one profile and secondarily to one more. The primary profile drives your 8-week plan; the secondary only needs its minimum reading list in the final two weeks.
@@ -24,9 +24,9 @@ The same body of knowledge carries very different weight across roles. Below are
 | 1 | ML fundamentals | All of 01 | Derive bias-variance; explain XGBoost vs GBDT; write 10 Q&A |
 | 2 | DL fundamentals | All of 02 | Derive backprop and BN; write self-attention; compare optimizers |
 | 3 | LLM architecture and pretraining | 04-01 to 04-05 | Draw Llama; compute KV cache; explain Chinchilla |
-| 4 | Fine-tuning and distributed training | 04-06, 04-07 | Explain LoRA/QLoRA; compute ZeRO memory; explain TP/PP |
-| 5 | Inference and evaluation | 04-08 to 04-10 | Explain PagedAttention and speculative decoding; design an eval plan |
-| 6 | RAG, prompting, agents | 04-11 to 04-13, all of 05 | Design a RAG system; write a tool schema |
+| 4 | Fine-tuning, post-training, and distributed training | 04-06 to 04-08 | Explain LoRA/QLoRA and post-training stages; compute ZeRO memory; explain TP/PP |
+| 5 | Inference and evaluation | 04-09 to 04-11 | Explain PagedAttention and speculative decoding; design an eval plan |
+| 6 | RAG, prompting, agents | 04-12 to 04-14, all of 05 | Design a RAG system; write a tool schema |
 | 7 | System design | All of 06 plus 07-01/02/04 | Two 45-minute designs; draw a feature store |
 | 8 | Final sprint | 03 (role-dependent), chapter 08 | Three mock interviews; finalize project stories; review mistakes |
 
@@ -47,15 +47,15 @@ The same body of knowledge carries very different weight across roles. Below are
 - 06-01 answering framework, 06-02 recommender systems, 07-01 overview, 07-02 feature platform
 
 ### LLM applications
-- 04-01 tokenization, 04-02 architecture, 04-05 scaling laws, 04-06 fine-tuning
-- 04-08 inference, 04-10 evaluation, 04-11 RAG, 04-12 prompting, 04-13 multimodal
+- 04-01 tokenization, 04-02 architecture, 04-05 scaling laws, 04-06 fine-tuning, 04-07 post-training
+- 04-09 inference, 04-11 evaluation, 04-12 RAG, 04-13 prompting, 04-14 multimodal
 - 05-01 agent fundamentals, 05-02 tool use, 05-04 memory, 05-08 harness engineering, 05-09 evaluation & safety
 - 06-05 LLM application system design
 
 ### LLM training / inference
 - 02-05 Transformer, 04-02 architecture, 04-03 attention, 04-04 pretraining
-- 04-05 scaling laws, 04-06 fine-tuning, 04-07 distributed training
-- 04-08 inference, 04-09 quantization, 07-03 training infrastructure, 07-04 GPU serving, 07-05 RL post-training infra
+- 04-05 scaling laws, 04-06 fine-tuning, 04-07 post-training, 04-08 distributed training
+- 04-09 inference, 04-10 quantization, 07-03 training infrastructure, 07-04 GPU serving, 07-05 RL post-training infra
 
 ## 5. Common pitfalls
 

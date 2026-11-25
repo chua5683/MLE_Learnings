@@ -1,6 +1,6 @@
 # Distributed training infrastructure
 
-> **One-line summary**: The algorithm side answers "how do we split the model" (see [Chapter 4](../04-llm/07-distributed-training.md) for the DP/TP/PP/ZeRO derivations); the infrastructure side answers "how do we turn ten thousand GPUs into one machine" — **gang scheduling so it is all-or-nothing, all-reduce with NCCL/RDMA and topology awareness so communication is not the bottleneck, checkpointing and elasticity so failures do not kill the job, and MFU so you can put a price on it**.
+> **One-line summary**: The algorithm side answers "how do we split the model" (see [Chapter 4](../04-llm/08-distributed-training.md) for the DP/TP/PP/ZeRO derivations); the infrastructure side answers "how do we turn ten thousand GPUs into one machine" — **gang scheduling so it is all-or-nothing, all-reduce with NCCL/RDMA and topology awareness so communication is not the bottleneck, checkpointing and elasticity so failures do not kill the job, and MFU so you can put a price on it**.
 >
 > **Keywords**: `gang scheduling` `Kubernetes` `parameter server` `ring all-reduce` `NCCL` `RDMA` `checkpoint` `elastic training` `MFU`
 
@@ -74,11 +74,15 @@ Synchronous PS (a barrier every round) actually degenerates into a centralized a
 
 Total steps $2(N-1)$, each sending $S/N$, so each GPU sends:
 
-$$V_{ring} = 2(N-1)\cdot\frac{S}{N} = 2S\left(1-\frac{1}{N}\right) \xrightarrow{N\gg1} 2S$$
+$$
+V_{ring} = 2(N-1)\cdot\frac{S}{N} = 2S\left(1-\frac{1}{N}\right) \xrightarrow{N\gg1} 2S
+$$
 
 This is independent of $N$ and close to the lower bound (each GPU must at least send its own $S$ and receive the reduced result, i.e. $2S$), so ring all-reduce is **bandwidth-optimal**. Time model ($\alpha$ = per-transfer latency, $B$ = effective bandwidth):
 
-$$t_{allreduce} \approx 2(N-1)\alpha + \frac{2S(N-1)}{N\,B} \approx 2(N-1)\alpha + \frac{2S}{B}$$
+$$
+t_{allreduce} \approx 2(N-1)\alpha + \frac{2S(N-1)}{N\,B} \approx 2(N-1)\alpha + \frac{2S}{B}
+$$
 
 **A feel for the numbers** (7B parameters, bf16 gradients = 14 GB):
 
@@ -115,9 +119,11 @@ At scale, failures are normal: GPU/node failures, ECC errors, NIC drops, silent 
 
 **The optimal checkpoint interval (Young/Daly approximation)**: let $C$ be the time for one checkpoint and $MTBF = M$ the job's mean time between failures; the optimal interval is
 
-$$\tau_{opt} = \sqrt{2CM}, \qquad \text{wasted fraction} \approx \sqrt{\frac{2C}{M}}$$
+$$
+\tau_{opt} = \sqrt{2CM}, \qquad \text{wasted fraction} \approx \sqrt{\frac{2C}{M}}
+$$
 
-Example: $M = 5$ hours (a typical scale for a 10k-GPU job, the per-GPU MTBF divided by the GPU count), $C = 60$ s, then $\tau_{opt}=\sqrt{2\times60\times18000}\approx1470$ s, about 24.5 minutes, wasting about $2\times60/1470\approx8\%$.
+Example: $M = 5$ hours (a typical scale for a 10k-GPU job, the per-GPU MTBF divided by the GPU count), $C = 60$ s, then $\tau_{opt}=\sqrt{2\times60\times18000}\approx1470$ s, about 24.5 minutes, wasting about $2\times60/1470\approx 8$%.
 
 The supporting engineering:
 - **Async checkpointing**: write quickly to local NVMe/memory, then a background thread copies to object storage so training never stalls; the cost is that the newest checkpoint may be lost on power failure.
@@ -147,13 +153,17 @@ The platform layer also provides: environment pinning, data mounts and caching, 
 
 **MFU (Model FLOPs Utilization)** measures how much of the compute you bought is actually used:
 
-$$MFU = \frac{6ND}{T \cdot P_{peak} \cdot N_{GPU}}$$
+$$
+MFU = \frac{6ND}{T \cdot P_{peak} \cdot N_{GPU}}
+$$
 
 where $N$ is the parameter count, $D$ the number of training tokens, $T$ the wall-clock time, $P_{peak}$ the per-GPU peak (dense bf16), and $N_{GPU}$ the GPU count. $6ND$ comes from $2ND$ forward plus $4ND$ backward.
 
 Example: a 7B model trained on 1T tokens with 1000 H100s ($P_{peak}\approx990$ TFLOPS bf16), measured at 29.4 hours:
 
-$$MFU = \frac{6\times7\times10^9\times10^{12}}{1.06\times10^5 \times 990\times10^{12}\times1000} \approx 0.40$$
+$$
+MFU = \frac{6\times7\times10^9\times10^{12}}{1.06\times10^5 \times 990\times10^{12}\times1000} \approx 0.40
+$$
 
 That is **29,400 GPU-hours**; at 2 USD per GPU-hour it costs about **59k USD**, or about **0.06 USD per million tokens**. In practice 30%-50% MFU is normal and >55% is very good; MFU drops because of unoverlapped communication, starved data loading, inefficient kernels, small batches, or frequent checkpoints.
 
@@ -199,7 +209,7 @@ torchrun --nnodes=4 --nproc_per_node=8 \
 **Follow-up**: Why tree algorithms then? For large $N$ and small messages the $2(N-1)\alpha$ latency term dominates; trees and double binary trees reduce hop count, and NCCL picks the algorithm by message size.
 
 ### Q4. Is DDP enough for a 7B model? Why also TP/PP?
-**Answer**: Memory says no — full-parameter AdamW training of 7B needs ~112 GB of state (28 GB parameters + 28 GB gradients + 56 GB optimizer, roughly fp32), which does not fit in one 80 GB GPU; even with ZeRO/FSDP sharding the optimizer state, a single layer may exceed memory, and DP's gradient all-reduce is a lot of traffic. TP splits a layer's matrices across GPUs (frequent but over NVLink), PP splits layers across machines (point-to-point, with bubbles), and the combination fits and performs. See [Chapter 4](../04-llm/07-distributed-training.md) for the derivations.
+**Answer**: Memory says no — full-parameter AdamW training of 7B needs ~112 GB of state (28 GB parameters + 28 GB gradients + 56 GB optimizer, roughly fp32), which does not fit in one 80 GB GPU; even with ZeRO/FSDP sharding the optimizer state, a single layer may exceed memory, and DP's gradient all-reduce is a lot of traffic. TP splits a layer's matrices across GPUs (frequent but over NVLink), PP splits layers across machines (point-to-point, with bubbles), and the combination fits and performs. See [Chapter 4](../04-llm/08-distributed-training.md) for the derivations.
 **Follow-up**: Why do recommenders not do this? The model is small (GB scale) and the data is huge (hundreds of billions of samples), so the bottleneck is data throughput, not memory; DDP with large batches suffices, and only giant embedding tables need model splitting.
 
 ### Q5. How do you overlap communication with computation?
@@ -260,4 +270,4 @@ torchrun --nnodes=4 --nproc_per_node=8 \
 - [NCCL documentation](https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/)
 - [Volcano](https://volcano.sh/en/docs/) / [Kueue](https://kueue.sigs.k8s.io/) (gang scheduling and queue quotas on K8s)
 - [Distributed Machine Learning Patterns · parameter servers and collective communication](https://github.com/mercari/distributed-ml-patterns)
-- [Chapter 4 · Distributed training](../04-llm/07-distributed-training.md) (algorithm derivations for DP/TP/PP/ZeRO, complementary to this note)
+- [Chapter 4 · Distributed training](../04-llm/08-distributed-training.md) (algorithm derivations for DP/TP/PP/ZeRO, complementary to this note)

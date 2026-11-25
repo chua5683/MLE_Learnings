@@ -220,7 +220,7 @@
 **Answer**: Prompts are probabilistic hints mixed into the same token stream as untrusted inputs. Hard security and business invariants (ACLs, refund caps, DLP, SQL write bans) must live in a deterministic **Policy-as-Code gateway** (OPA/Cedar) evaluated outside the LLM before tool execution.
 
 ### Q66. How does On-Behalf-Of (OBO) delegation prevent the Confused Deputy problem?
-**Answer**: Instead of giving an agent a shared admin key, the gateway exchanges the invoking user's token (OAuth RFC 8693) for a short-lived scoped token representing $\mathrm{Perms}(\mathrm{Agent\_NHI}) \cap \mathrm{Perms}(\mathrm{User})$. The agent can never access data the invoking user cannot access.
+**Answer**: Instead of giving an agent a shared admin key, the gateway exchanges the invoking user's token (OAuth RFC 8693) for a short-lived scoped token representing $\mathrm{Perms}(\mathrm{NHI}) \cap \mathrm{Perms}(\mathrm{User})$. The agent can never access data the invoking user cannot access.
 
 ### Q67. How should enterprise runtime guardrails be layered?
 **Answer**: L1 deterministic (<5 ms, fail-closed: OPA/Cedar, JSON Schema, SQL AST, DLP regex, URL allowlists, spend caps) → L2 fast classifiers (10–50 ms: injection/toxicity) → L3 semantic LLM guard (100–500 ms on Tier 2/3 actions). Roll out L2/L3 in shadow mode first to calibrate false-positive rates before blocking.

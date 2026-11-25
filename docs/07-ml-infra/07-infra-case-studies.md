@@ -31,7 +31,9 @@ For the more general clarifying/metrics/capacity template see [Chapter 6 · Answ
 
 Assumptions (state every number explicitly and let the interviewer correct you): Explore feed, organic content; 100M DAU, 10 requests per user per day; a corpus of 1B videos; end-to-end p99 < 500 ms; 99.9% availability; the focus today is online ranking + real-time features.
 
-$$\text{average QPS} = \frac{10^8 \times 10}{86400} \approx 1.2\times10^4, \qquad \text{peak} \approx 8\times \approx 10^5$$
+$$
+\text{average QPS} = \frac{10^8 \times 10}{86400} \approx 1.2\times10^4, \qquad \text{peak} \approx 8\times \approx 10^5
+$$
 
 ### 2.2 Online path and latency budget
 
@@ -84,7 +86,9 @@ Key design trade-offs (interviewers love these):
 
 **Capacity estimate** (L2 is the GPU-heavy stage): peak 100k QPS, about 2 ms of L2 GPU time per request (already amortized by batching), target utilization 0.5:
 
-$$N_{GPU} = \frac{10^5 \times 2\times10^{-3}}{0.5} = 400 \text{ GPUs}$$
+$$
+N_{GPU} = \frac{10^5 \times 2\times10^{-3}}{0.5} = 400 \text{ GPUs}
+$$
 
 At 2 USD per GPU-hour that is about **800 USD/hour**; if demand were flat over 24 hours (it is not; elasticity saves 30%-50%) about **14k USD/day**. L1 and candidate generation can run on CPU clusters, counted separately.
 
@@ -213,4 +217,4 @@ Baseline CTR 5%, targeting a +2% relative lift ($\Delta=0.001$); each group need
 - [ML System Design 2.0 · Yuan Meng](https://www.yuan-meng.com/posts/mle_interviews_2.0/) (model and metric perspectives beyond the pipeline)
 - [System Design Interview (Alex Xu)](https://www.systemdesigninterview.com/) (capacity estimation and general distributed-systems patterns)
 - [Chapter 6 · ML system design](../06-ml-system-design/README.md): model design for recommendation/search/ads, complementary to this note
-- [Chapter 4 · Distributed training](../04-llm/07-distributed-training.md): parallelism strategy derivations
+- [Chapter 4 · Distributed training](../04-llm/08-distributed-training.md): parallelism strategy derivations

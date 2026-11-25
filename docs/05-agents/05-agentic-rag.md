@@ -1,6 +1,6 @@
 # Agentic RAG and knowledge augmentation
 
-> **One-line summary**: Agentic RAG turns retrieval from a fixed step in the pipeline into a capability the agent **can call, judge, and retry**: the model decides what to look up, how many times, whether the evidence is enough, and whether to switch tools. It complements the indexing, retrieval, and reranking in [RAG](../04-llm/11-rag.md); this note covers only **orchestration and control flow**.
+> **One-line summary**: Agentic RAG turns retrieval from a fixed step in the pipeline into a capability the agent **can call, judge, and retry**: the model decides what to look up, how many times, whether the evidence is enough, and whether to switch tools. It complements the indexing, retrieval, and reranking in [RAG](../04-llm/12-rag.md); this note covers only **orchestration and control flow**.
 >
 > **Keywords**: `agentic RAG` `query planning` `multi-hop` `Self-RAG` `CRAG` `GraphRAG` `RRF` `citation`
 
@@ -222,5 +222,5 @@ Three guardrails you must add: **deduplicate retrieved results** (or the same pa
 - [Corrective Retrieval Augmented Generation (CRAG)](https://arxiv.org/abs/2401.15884)
 - [From Local to Global: A Graph RAG Approach to Query-Focused Summarization](https://arxiv.org/abs/2404.16130)
 - [Interleaving Retrieval with Chain-of-Thought Reasoning (IRCoT)](https://arxiv.org/abs/2212.10509)
-- [RAG (Chapter 4)](../04-llm/11-rag.md)
+- [RAG (Chapter 4)](../04-llm/12-rag.md)
 - [AI Agent Interview Guide · RAG techniques](https://github.com/bcefghj/ai-agent-interview-guide)

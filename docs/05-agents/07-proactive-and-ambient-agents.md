@@ -38,10 +38,12 @@ flowchart LR
 
 In a proactive system, every notification or autonomous action imposes an **interruption or cleanup cost** $C_{\mathrm{false}}$ on a busy human, while a useful intervention yields value $V_{\mathrm{true}}$. Act or interrupt only when expected net utility is positive:
 
-$$\mathbb{E}[\mathrm{Utility}] = p \cdot V_{\mathrm{true}} - (1 - p) \cdot C_{\mathrm{false}} > 0 \quad\Longleftrightarrow\quad p > \frac{C_{\mathrm{false}}}{V_{\mathrm{true}} + C_{\mathrm{false}}}$$
+$$
+\mathbb{E}[\mathrm{Utility}] = p \cdot V_{\mathrm{true}} - (1 - p) \cdot C_{\mathrm{false}} > 0 \quad\Longleftrightarrow\quad p > \frac{C_{\mathrm{false}}}{V_{\mathrm{true}} + C_{\mathrm{false}}}
+$$
 
 - **Urgent outage root-cause** ($V_{\mathrm{true}}$ huge): moderate precision threshold is acceptable.
-- **Slack DM / email draft nudge** ($C_{\mathrm{false}}$ high due to attention tax): require very high precision (often $>85\text{–}90\%$) or downgrade to an **async daily digest** ($C_{\mathrm{false}} \approx 0$).
+- **Slack DM / email draft nudge** ($C_{\mathrm{false}}$ high due to attention tax): require very high precision (often $>85\text{–}90$%) or downgrade to an **async daily digest** ($C_{\mathrm{false}} \approx 0$).
 - **Interruptibility budget**: cap proactive interruptions per user/channel per day (e.g., max 3 real-time nudges/day; overflow coalesces into a single digest).
 
 ### 2.2 The graduated autonomy spectrum
@@ -59,9 +61,9 @@ Never launch a proactive agent at full autonomy on Day 1. Production teams ramp 
 
 Invoking a frontier reasoning model on every raw webhook or log line is financially ruinous. Filter in three cheap-to-expensive stages:
 
-1. **Stage 1 — Deterministic ingress (<1 ms, \$0)**: drop self-authored events (loop guard), deduplicate identical event fingerprints, apply per-entity **cooldown windows** (e.g., don't re-investigate the same failing service more than once per 15 min), and enforce hard entity/tenant rate limits.
-2. **Stage 2 — Lightweight triage (50 ms, ~\$0.0001)**: rules + small classifier or tiny LLM scores `(relevance, urgency, novelty)` and selects `drop` / `batch_for_digest` / `wake_agent`. Typically eliminates **80–95%** of raw events.
-3. **Stage 3 — Full durable agent (seconds–minutes, \$0.05–\$1)**: runs read-only investigation across tools (logs, git history, metrics, CRM) and emits either `no_action(reason)` or a structured proposal/action.
+1. **Stage 1 — Deterministic ingress (<1 ms, USD 0)**: drop self-authored events (loop guard), deduplicate identical event fingerprints, apply per-entity **cooldown windows** (e.g., don't re-investigate the same failing service more than once per 15 min), and enforce hard entity/tenant rate limits.
+2. **Stage 2 — Lightweight triage (50 ms, ~USD 0.0001)**: rules + small classifier or tiny LLM scores `(relevance, urgency, novelty)` and selects `drop` / `batch_for_digest` / `wake_agent`. Typically eliminates **80–95%** of raw events.
+3. **Stage 3 — Full durable agent (seconds–minutes, USD 0.05–1)**: runs read-only investigation across tools (logs, git history, metrics, CRM) and emits either `no_action(reason)` or a structured proposal/action.
 
 ### 2.4 Four failure modes unique to proactive agents
 
@@ -132,7 +134,7 @@ def execute_approved_action(proposal, live_state_fn, tool_fn):
 ### Q1. How does designing a proactive (ambient) agent differ from designing a reactive chat agent?
 **Answer**: Reactive agents start from explicit user intent and tolerate minor back-and-forth steering. Proactive agents wake on external events or schedules with **no human watching**, so three things dominate: (1) **precision over recall** (false alarms cause alert fatigue and uninstalls); (2) **multi-stage triage** (deterministic dedup/cooldown + cheap classifier before waking a frontier LLM); and (3) **distributed-systems hygiene** (causal-loop guards, storm coalescing, interruptibility budgets, and stale-state checks).
 
-### Q2. How do you prevent a proactive agent from burning \$10,000 during an incident alert storm or webhook loop?
+### Q2. How do you prevent a proactive agent from burning USD 10,000 during an incident alert storm or webhook loop?
 **Answer**: Four layers: (1) **Self-loop guard** at ingress dropping any event carrying the agent's actor ID or exceeding `max_hops`; (2) **Debouncing & dedup** coalescing alerts per entity/service within a cooldown window; (3) **Token-bucket concurrency & spend circuit breakers** per tenant and globally; and (4) **Cheap pre-LLM triage** dropping 80–95% of low-signal events before the reasoning model runs.
 
 ### Q3. How do you roll out a proactive agent safely to an engineering or support org?

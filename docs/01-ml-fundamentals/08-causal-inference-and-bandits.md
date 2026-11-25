@@ -6,7 +6,7 @@
 
 ## 1. Core concepts
 
-- **Potential outcomes (Rubin Causal Model)**: each unit $i$ has two potential outcomes under binary treatment $T\in\{0,1\}$: $Y_i(1)$ (treated) and $Y_i(0)$ (control). Only one is ever observed ($Y_i = T_i Y_i(1) + (1-T_i) Y_i(0)$) — the **fundamental problem of causal inference**.
+- **Potential outcomes (Rubin Causal Model)**: each unit $i$ has two potential outcomes under binary treatment $T\in\lbrace0,1\rbrace$: $Y_i(1)$ (treated) and $Y_i(0)$ (control). Only one is ever observed ($Y_i = T_i Y_i(1) + (1-T_i) Y_i(0)$) — the **fundamental problem of causal inference**.
 - **Estimands**:
   - **ATE** (Average Treatment Effect): $\tau = \mathbb{E}[Y(1) - Y(0)]$.
   - **CATE** (Conditional ATE / Uplift): $\tau(x) = \mathbb{E}[Y(1) - Y(0) \mid X=x]$ — personalizes *who* to treat.
@@ -40,13 +40,17 @@ To estimate causal effects from observational data, three assumptions must hold:
 
 The **propensity score** $e(x) = P(T=1\mid X=x)$ summarizes all confounders into a scalar (Rosenbaum & Rubin). **Inverse Propensity Weighting (IPW)** reweights samples to mimic a randomized trial:
 
-$$\hat{\tau}_{\mathrm{IPW}} = \frac{1}{n}\sum_{i=1}^{n}\left(\frac{T_i Y_i}{\hat{e}(X_i)} - \frac{(1-T_i) Y_i}{1-\hat{e}(X_i)}\right)$$
+$$
+\hat{\tau}_{\mathrm{IPW}} = \frac{1}{n}\sum_{i=1}^{n}\left(\frac{T_i Y_i}{\hat{e}(X_i)} - \frac{(1-T_i) Y_i}{1-\hat{e}(X_i)}\right)
+$$
 
 IPW is unbiased when $\hat{e}(x)$ is exact, but has **explosive variance** when $\hat{e}(x)$ is near $0$ or $1$ (mitigated by clipping or Self-Normalized IPW / Hájek estimator).
 
 **Doubly Robust (DR / AIPW)** combines an outcome model $\hat{\mu}_t(x) \approx \mathbb{E}[Y\mid X=x, T=t]$ with propensity weighting:
 
-$$\hat{\tau}_{\mathrm{DR}} = \frac{1}{n}\sum_{i=1}^{n}\left[\hat{\mu}_1(X_i) - \hat{\mu}_0(X_i) + \frac{T_i (Y_i - \hat{\mu}_1(X_i))}{\hat{e}(X_i)} - \frac{(1-T_i)(Y_i - \hat{\mu}_0(X_i))}{1-\hat{e}(X_i)}\right]$$
+$$
+\hat{\tau}_{\mathrm{DR}} = \frac{1}{n}\sum_{i=1}^{n}\left[\hat{\mu}_1(X_i) - \hat{\mu}_0(X_i) + \frac{T_i (Y_i - \hat{\mu}_1(X_i))}{\hat{e}(X_i)} - \frac{(1-T_i)(Y_i - \hat{\mu}_0(X_i))}{1-\hat{e}(X_i)}\right]
+$$
 
 $\hat{\tau}_{\mathrm{DR}}$ is consistent if **either** the outcome model $\hat{\mu}$ **or** the propensity model $\hat{e}$ is correctly specified, and achieves lower variance than IPW. The same formula underpins **Offline Policy Evaluation (OPE)** in bandits and recommenders.
 
@@ -70,7 +74,9 @@ Minimize cumulative regret $R_T = \sum_{t=1}^{T}(\mu^* - \mu_{a_t})$ over $K$ ar
 - **$\epsilon$-greedy**: explore uniformly with probability $\epsilon$; simple but wastes exploration on clearly bad arms (linear regret if $\epsilon$ is fixed).
 - **UCB1 (Upper Confidence Bound)**: optimism in the face of uncertainty — pick the arm maximizing empirical mean plus an exploration bonus:
 
-$$a_t = \arg\max_a \left(\hat{\mu}_a + c\sqrt{\frac{\ln t}{N_a}}\right)$$
+$$
+a_t = \arg\max_a \left(\hat{\mu}_a + c\sqrt{\frac{\ln t}{N_a}}\right)
+$$
 
 Achieves logarithmic regret $O(\sum_{\Delta_a>0}\frac{\ln T}{\Delta_a})$.
 
@@ -123,7 +129,7 @@ Production checklist:
 ## 5. Pitfalls and follow-ups
 
 - **Confusing correlation with uplift**: Observational logs encode past targeting policies; training a standard classifier on historical coupon logs learns the old targeting heuristic, not incrementality.
-- **Forgetting to log propensities**: Deterministic greedy policies have $e(x)\in\{0,1\}$, making offline IPS/DR evaluation mathematically impossible without an exploration floor (e.g., 5% random traffic).
+- **Forgetting to log propensities**: Deterministic greedy policies have $e(x)\in\lbrace0,1\rbrace$, making offline IPS/DR evaluation mathematically impossible without an exploration floor (e.g., 5% random traffic).
 - **Evaluating bandits with naive online CTR**: Without controlling for exploration traffic, higher exploration looks worse short-term; measure cumulative regret or hold out a global control bucket.
 - **Ignoring budget constraints**: Uplift tells you the marginal lift per user, but under a fixed budget you solve a fractional knapsack (rank by $\hat{\tau}_i / c_i$, or LP when multiple coupon tiers exist).
 

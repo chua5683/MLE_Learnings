@@ -8,11 +8,15 @@
 
 **Neuron**: take a weighted sum of the inputs, add a bias, and pass the result through a nonlinear function:
 
-$$z = \sum_i w_i x_i + b, \qquad a = f(z)$$
+$$
+z = \sum_i w_i x_i + b, \qquad a = f(z)
+$$
 
 **Multilayer perceptron (MLP)**: stack neurons in layers, feeding the output of layer $l$ into layer $l+1$:
 
-$$z^{(l)} = W^{(l)} a^{(l-1)} + b^{(l)}, \qquad a^{(l)} = f\big(z^{(l)}\big), \qquad a^{(0)} = x$$
+$$
+z^{(l)} = W^{(l)} a^{(l-1)} + b^{(l)}, \qquad a^{(l)} = f\big(z^{(l)}\big), \qquad a^{(0)} = x
+$$
 
 **Forward pass**: compute from the input to the output and obtain the loss $L$.
 
@@ -26,27 +30,37 @@ $$z^{(l)} = W^{(l)} a^{(l-1)} + b^{(l)}, \qquad a^{(l)} = f\big(z^{(l)}\big), \q
 
 Let the input be $x \in \mathbb{R}^{d_0}$, with $L$ layers and width $d_l$ at layer $l$:
 
-$$a^{(0)} = x, \quad z^{(l)} = W^{(l)}a^{(l-1)} + b^{(l)}, \quad a^{(l)} = f(z^{(l)}), \quad l = 1,\dots,L$$
+$$
+a^{(0)} = x, \quad z^{(l)} = W^{(l)}a^{(l-1)} + b^{(l)}, \quad a^{(l)} = f(z^{(l)}), \quad l = 1,\dots,L
+$$
 
 where $W^{(l)} \in \mathbb{R}^{d_l \times d_{l-1}}$ and $b^{(l)} \in \mathbb{R}^{d_l}$. The final output is written $\hat{y} = a^{(L)}$.
 
 **Loss**: cross-entropy (with softmax) for classification, mean squared error for regression:
 
-$$L_{CE} = -\sum_{c} y_c \log \hat{y}_c, \qquad L_{MSE} = \frac{1}{2}\lVert \hat{y} - y \rVert^2$$
+$$
+L_{CE} = -\sum_{c} y_c \log \hat{y}_c, \qquad L_{MSE} = \frac{1}{2}\lVert \hat{y} - y \rVert^2
+$$
 
 ### 2.2 Chain rule and error terms
 
 Backpropagation is built around an **error term** per layer (the gradient of the loss with respect to that layer's pre-activation $z^{(l)}$):
 
-$$\delta^{(l)} \triangleq \frac{\partial L}{\partial z^{(l)}}$$
+$$
+\delta^{(l)} \triangleq \frac{\partial L}{\partial z^{(l)}}
+$$
 
 By the chain rule, the error of the next layer propagates to the previous one as:
 
-$$\delta^{(l)} = \left(W^{(l+1)T}\delta^{(l+1)}\right) \odot f'\big(z^{(l)}\big)$$
+$$
+\delta^{(l)} = \left(W^{(l+1)T}\delta^{(l+1)}\right) \odot f'\big(z^{(l)}\big)
+$$
 
 where $\odot$ is elementwise multiplication. The parameter gradients are:
 
-$$\frac{\partial L}{\partial W^{(l)}} = \delta^{(l)}\big(a^{(l-1)}\big)^T, \qquad \frac{\partial L}{\partial b^{(l)}} = \delta^{(l)}, \qquad \frac{\partial L}{\partial a^{(l-1)}} = W^{(l)T}\delta^{(l)}$$
+$$
+\frac{\partial L}{\partial W^{(l)}} = \delta^{(l)}\big(a^{(l-1)}\big)^T, \qquad \frac{\partial L}{\partial b^{(l)}} = \delta^{(l)}, \qquad \frac{\partial L}{\partial a^{(l-1)}} = W^{(l)T}\delta^{(l)}
+$$
 
 **Output layer**: softmax plus cross-entropy gives the neat result $\delta^{(L)} = \hat{y} - y$ (derivation in the Q2 follow-up); MSE with an identity output gives $\delta^{(L)} = \hat{y} - y$ as well. Interviews often ask you to start from $\delta^{(L)}$ and work backward, so remembering this starting point saves a lot of time.
 
@@ -72,7 +86,9 @@ Reverse-mode automatic differentiation costs about twice a forward pass, which i
 
 Expand the recursion for the error term:
 
-$$\delta^{(l)} = \prod_{k=l+1}^{L} \left(W^{(k)T}\,\mathrm{diag}\big(f'(z^{(k-1)})\big)\right)\delta^{(L)}$$
+$$
+\delta^{(l)} = \prod_{k=l+1}^{L} \left(W^{(k)T}\,\mathrm{diag}\big(f'(z^{(k-1)})\big)\right)\delta^{(L)}
+$$
 
 The gradient is a product of matrices. If their singular values are mostly $<1$, the gradient decays exponentially with depth (**vanishing gradients**); if mostly $>1$, it blows up (**exploding gradients**).
 
@@ -88,7 +104,9 @@ Mitigations: ReLU-family activations, Xavier/He initialization, normalization (B
 
 The core idea of ResNet is to let a layer learn a **residual** instead of the full mapping:
 
-$$y = x + F(x) \quad\Longrightarrow\quad \frac{\partial y}{\partial x} = I + \frac{\partial F}{\partial x}$$
+$$
+y = x + F(x) \quad\Longrightarrow\quad \frac{\partial y}{\partial x} = I + \frac{\partial F}{\partial x}
+$$
 
 There is always an **identity path** $I$ in the gradient, so even when $\partial F/\partial x$ is small the gradient is not completely killed. Residuals also ease **degradation**: deeper plain networks can have higher training error, which is not overfitting but an optimization problem.
 
@@ -96,7 +114,9 @@ There is always an **identity path** $I$ in the gradient, so even when $\partial
 
 For a linear layer $d_{in} \to d_{out}$:
 
-$$\text{params} = d_{in}d_{out} + d_{out}, \qquad \text{forward FLOPs} \approx 2\,d_{in}d_{out}\ \text{(per sample)}$$
+$$
+\text{params} = d_{in}d_{out} + d_{out}, \qquad \text{forward FLOPs} \approx 2\,d_{in}d_{out}\ \text{(per sample)}
+$$
 
 **Example**: a $784 \to 512 \to 256 \to 10$ MLP has $784\times512 + 512\times256 + 256\times10 + (512+256+10) \approx 5.36\times10^5$ parameters.
 

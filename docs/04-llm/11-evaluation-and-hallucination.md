@@ -49,7 +49,9 @@ flowchart LR
 
 **Unbiased estimate of pass@k** (a must for coding questions):
 
-$$\text{pass@}k = 1 - \frac{\binom{n-c}{k}}{\binom{n}{k}}$$
+$$
+\text{pass@}k = 1 - \frac{\binom{n-c}{k}}{\binom{n}{k}}
+$$
 
 With $n$ generated samples and $c$ of them passing, the formula gives an unbiased estimate of "at least one passes". $n$ must be much larger than $k$ (e.g. $n=200, k=1$), otherwise the variance explodes; this is also why pass@1 numbers from different papers are not directly comparable - sample count, temperature, and prompt may all differ.
 
@@ -120,7 +122,7 @@ Mitigation must be layered; do not expect a single fix:
 - **Data/knowledge layer**: RAG (put the evidence into context), knowledge editing (ROME/MEMIT for a small number of fact updates), data cleaning and deduplication;
 - **Training layer**: high-quality SFT data, teaching the model to say "I don't know" (R-Tuning-style methods), RLHF calibration of confidence, de-sycophantic preference data;
 - **Decoding layer**: lower temperature, factual-nucleus, DoLa (contrast shallow vs deep logits to reinforce factual knowledge), CAD (context-aware decoding, suppressing internal knowledge that conflicts with context), contrastive decoding;
-- **Product layer**: mandatory citations, traceable answers, human handoff in high-risk cases, refusal and disclaimer wording, post-launch spot checks. But note that **RAG is not a panacea**: retrieval noise, retrieval failure, and the model ignoring context (faithfulness hallucination) all turn "grounded" into "grounded nonsense", so RAG must be evaluated too (see [11 RAG](11-rag.md)).
+- **Product layer**: mandatory citations, traceable answers, human handoff in high-risk cases, refusal and disclaimer wording, post-launch spot checks. But note that **RAG is not a panacea**: retrieval noise, retrieval failure, and the model ignoring context (faithfulness hallucination) all turn "grounded" into "grounded nonsense", so RAG must be evaluated too (see [12 RAG](12-rag.md)).
 
 ### 2.6 How to build a production evaluation system
 

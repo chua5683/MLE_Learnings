@@ -67,7 +67,9 @@ Treat the context window as a **compiled artifact** rebuilt cleanly every turn:
 
 An agent's reliability jumps nonlinearly when every action meets fast, objective **backpressure**:
 
-$$P(\text{verified success within } k \text{ tries}) = 1 - (1 - p)^k \quad \text{provided } \mathrm{FPR}_{\text{verifier}} \approx 0$$
+$$
+P(\text{verified success within } k \text{ tries}) = 1 - (1 - p)^k \quad \text{provided } \mathrm{FPR}_{\text{verifier}} \approx 0
+$$
 
 | Domain | High-leverage deterministic backpressure |
 | --- | --- |

@@ -76,7 +76,7 @@ Estimated total: **2–3 days**.
 
 - [01 ML fundamentals](../01-ml-fundamentals/README.md): evaluation metrics (AUC/PR/NDCG), class imbalance, and calibration are the "parts" used in design rounds — go back for the formulas when a metrics question comes up.
 - [02 Deep learning fundamentals](../02-dl-fundamentals/README.md): DNNs, Transformers, and sequence modeling determine what a ranking model can look like.
-- [04 Large language models](../04-llm/README.md) and [11 RAG](../04-llm/11-rag.md): the design questions in 05 reuse RAG, KV cache, and inference optimization heavily.
+- [04 Large language models](../04-llm/README.md) and [12 RAG](../04-llm/12-rag.md): the design questions in 05 reuse RAG, KV cache, and inference optimization heavily.
 - [05 AI Agents](../05-agents/README.md): control flow, tools, memory, and evaluation for agent system design.
 - [07 ML Infra](../07-ml-infra/README.md): this chapter only says which components to use; internals, consistency, scheduling, and cost models are covered in Chapter 7.
 - [08 Interview bank](../08-interview-bank/README.md): last-minute cheat sheets and cross-topic Q&A.

@@ -21,15 +21,21 @@ Binary confusion matrix:
 
 ### 2.1 Classification metrics
 
-$$\text{Precision}=\frac{TP}{TP+FP}, \qquad \text{Recall}=\frac{TP}{TP+FN}, \qquad F_1=\frac{2PR}{P+R}$$
+$$
+\text{Precision}=\frac{TP}{TP+FP}, \qquad \text{Recall}=\frac{TP}{TP+FN}, \qquad F_1=\frac{2PR}{P+R}
+$$
 
 More generally, with a weight:
 
-$$F_\beta=\frac{(1+\beta^2)PR}{\beta^2P+R}$$
+$$
+F_\beta=\frac{(1+\beta^2)PR}{\beta^2P+R}
+$$
 
 $\beta>1$ favors recall, while $\beta<1$ favors precision. Also:
 
-$$\text{Specificity}=\frac{TN}{TN+FP}, \qquad \text{BalancedAcc}=\frac{\text{Recall}+\text{Specificity}}{2}$$
+$$
+\text{Specificity}=\frac{TN}{TN+FP}, \qquad \text{BalancedAcc}=\frac{\text{Recall}+\text{Specificity}}{2}
+$$
 
 **Why accuracy can lie**: when only 1% of samples are positive, predicting all negative gives 99% accuracy but zero recall. Under imbalance, look at PR-AUC, F1, Recall at a fixed Precision, or cost-weighted metrics.
 
@@ -37,15 +43,21 @@ $$\text{Specificity}=\frac{TN}{TN+FP}, \qquad \text{BalancedAcc}=\frac{\text{Rec
 
 The ROC curve plots TPR (i.e., Recall) against FPR while sweeping all thresholds:
 
-$$\text{TPR}=\frac{TP}{TP+FN}, \qquad \text{FPR}=\frac{FP}{FP+TN}$$
+$$
+\text{TPR}=\frac{TP}{TP+FN}, \qquad \text{FPR}=\frac{FP}{FP+TN}
+$$
 
 **Probabilistic interpretation of AUC**: the probability that a randomly drawn positive sample scores higher than a randomly drawn negative sample:
 
-$$\text{AUC}=P(s^+>s^-)+\frac12P(s^+=s^-) =\frac{1}{mn}\sum_{i:y_i=1}\sum_{j:y_j=0}\left[\mathbb{1}(s_i>s_j)+\frac12\mathbb{1}(s_i=s_j)\right]$$
+$$
+\text{AUC}=P(s^+>s^-)+\frac12P(s^+=s^-) =\frac{1}{mn}\sum_{i:y_i=1}\sum_{j:y_j=0}\left[\mathbb{1}(s_i>s_j)+\frac12\mathbb{1}(s_i=s_j)\right]
+$$
 
 Using ranks: sort all samples by score and let $R_+$ be the sum of positive-sample ranks; then
 
-$$\text{AUC}=\frac{R_+ - m(m+1)/2}{mn}$$
+$$
+\text{AUC}=\frac{R_+ - m(m+1)/2}{mn}
+$$
 
 Sorting costs $O(N\log N)$ and a linear scan follows, which is more efficient than computing TPR/FPR point by point at every threshold.
 
@@ -55,7 +67,9 @@ Sorting costs $O(N\log N)$ and a linear scan follows, which is more efficient th
 
 The PR curve plots Precision against Recall. Average precision (AP) approximates the area under the PR curve:
 
-$$\text{AP}=\sum_{n}(R_n-R_{n-1})P_n$$
+$$
+\text{AP}=\sum_{n}(R_n-R_{n-1})P_n
+$$
 
 ($P_n$ is usually the precision in that recall interval; sklearn's average_precision uses a step-wise integral, while the interpolated version uses the maximum precision to the right.)
 
@@ -63,12 +77,16 @@ $$\text{AP}=\sum_{n}(R_n-R_{n-1})P_n$$
 
 ### 2.4 Regression metrics
 
-$$\text{MSE}=\frac1m\sum_i(y_i-\hat y_i)^2, \qquad \text{RMSE}=\sqrt{\text{MSE}}, \qquad \text{MAE}=\frac1m\sum_i|y_i-\hat y_i|$$
+$$
+\text{MSE}=\frac1m\sum_i(y_i-\hat y_i)^2, \qquad \text{RMSE}=\sqrt{\text{MSE}}, \qquad \text{MAE}=\frac1m\sum_i|y_i-\hat y_i|
+$$
 
-$$R^2=1-\frac{\sum_i(y_i-\hat y_i)^2}{\sum_i(y_i-\bar y)^2}$$
+$$
+R^2=1-\frac{\sum_i(y_i-\hat y_i)^2}{\sum_i(y_i-\bar y)^2}
+$$
 
 - **RMSE** penalizes large errors more heavily and has the same unit as $y$; **MAE** is robust to outliers, but its optimum is the least-absolute-deviation fit (the median).
-- **MAPE** $=\frac{100\%}{m}\sum_i|y_i-\hat y_i|/|y_i|$: dimensionless and comparable across scales, but it explodes as $y_i\to0$ and is asymmetric between under- and over-prediction.
+- **MAPE** $=\frac{100}{m}\sum_i|y_i-\hat y_i|/|y_i|$ (expressed in %): dimensionless and comparable across scales, but it explodes as $y_i\to0$ and is asymmetric between under- and over-prediction.
 - **R²**: the improvement relative to "always predict the mean"; it is negative when the model is worse than the mean, which is entirely possible on a test set.
 - **Huber / quantile loss**: Huber behaves like MSE for small residuals and like MAE for large ones; quantile loss $\rho_\tau(e)=e(\tau-\mathbb{1}(e<0))$ is used for prediction intervals or the median.
 
@@ -76,7 +94,9 @@ $$R^2=1-\frac{\sum_i(y_i-\hat y_i)^2}{\sum_i(y_i-\bar y)^2}$$
 
 Let $rel_i$ be the relevance at position $i$:
 
-$$\text{DCG@K}=\sum_{i=1}^{K}\frac{2^{rel_i}-1}{\log_2(i+1)}, \qquad \text{NDCG@K}=\frac{\text{DCG@K}}{\text{IDCG@K}}$$
+$$
+\text{DCG@K}=\sum_{i=1}^{K}\frac{2^{rel_i}-1}{\log_2(i+1)}, \qquad \text{NDCG@K}=\frac{\text{DCG@K}}{\text{IDCG@K}}
+$$
 
 - **NDCG**: position discounting (later positions get less weight) plus graded relevance; IDCG is the DCG of the ideal ranking, so the value lies in [0,1]. Suitable for search and recommendation.
 - **MAP**: computes AP per user and averages; it only distinguishes relevant from irrelevant and ignores position discounting.
@@ -89,7 +109,9 @@ $$\text{DCG@K}=\sum_{i=1}^{K}\frac{2^{rel_i}-1}{\log_2(i+1)}, \qquad \text{NDCG@
 - **CTR** = clicks/impressions; **CVR** = conversions/clicks; **CTCVR** = conversions/impressions = CTR × CVR.
 - A/B test: random assignment → observe metric differences → statistical significance. The confidence interval for the difference of two proportions is
 
-$$\hat\Delta=\hat p_T-\hat p_C, \qquad SE=\sqrt{\frac{\hat p_T(1-\hat p_T)}{n_T}+\frac{\hat p_C(1-\hat p_C)}{n_C}}$$
+$$
+\hat\Delta=\hat p_T-\hat p_C, \qquad SE=\sqrt{\frac{\hat p_T(1-\hat p_T)}{n_T}+\frac{\hat p_C(1-\hat p_C)}{n_C}}
+$$
 
 $\hat\Delta\pm1.96\,SE$ is the 95% confidence interval. The sample size is determined by the baseline rate, the minimum detectable effect (MDE), the significance level, and statistical power; compute power before the experiment and do not peek repeatedly afterward.
 
@@ -102,8 +124,8 @@ Point predictions rarely tell downstream systems *how confident* the model is. D
 - **Calibration error (ECE & Brier)**: Expected Calibration Error partitions predictions into $M$ probability bins and measures $\mathrm{ECE} = \sum_{m=1}^{M}\frac{|B_m|}{n}|\mathrm{acc}(B_m) - \mathrm{conf}(B_m)|$; Brier score $\frac{1}{n}\sum(\hat{p}_i - y_i)^2$ decomposes into calibration + refinement.
 - **Split Conformal Prediction**: wraps *any* black-box model with a held-out calibration set of size $n_{\mathrm{cal}}$ to produce a prediction set $C(x)$ or interval guaranteed to cover the true label with probability $\ge 1-\alpha$ under exchangeability (distribution-free, no Gaussian assumption):
   1. Compute nonconformity scores on calibration data (e.g., $s_i = |y_i - \hat{f}(x_i)|$ for regression, or $s_i = 1 - \hat{p}_{y_i}(x_i)$ for classification).
-  2. Set $\hat{q}$ to the $\lceil (n_{\mathrm{cal}}+1)(1-\alpha)\rceil / n_{\mathrm{cal}}$ quantile of $\{s_i\}$.
-  3. Output interval $[\hat{f}(x)-\hat{q},\; \hat{f}(x)+\hat{q}]$ (or set $\{y : 1-\hat{p}_y(x) \le \hat{q}\}$).
+  2. Set $\hat{q}$ to the $\lceil (n_{\mathrm{cal}}+1)(1-\alpha)\rceil / n_{\mathrm{cal}}$ quantile of $\lbrace s_i\rbrace$.
+  3. Output interval $[\hat{f}(x)-\hat{q},\; \hat{f}(x)+\hat{q}]$ (or set $\lbrace y : 1-\hat{p}_y(x) \le \hat{q}\rbrace$).
   Useful for ETA P90 guarantees, medical/fraud abstention, and selective routing.
 
 ### 2.8 Metric selection quick reference

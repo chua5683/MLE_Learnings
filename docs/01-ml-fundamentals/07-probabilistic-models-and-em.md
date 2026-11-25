@@ -23,7 +23,9 @@
 
 By Bayes' rule:
 
-$$p(y|x)=\frac{p(y)p(x|y)}{p(x)} \quad\propto\quad p(y)\prod_{j=1}^{d}p(x_j|y)$$
+$$
+p(y|x)=\frac{p(y)p(x|y)}{p(x)} \quad\propto\quad p(y)\prod_{j=1}^{d}p(x_j|y)
+$$
 
 "Naive" means **assuming features are conditionally independent given the class**. For classification we only compare numerators; the denominator $p(x)$ does not depend on the class.
 
@@ -33,7 +35,9 @@ $$p(y|x)=\frac{p(y)p(x|y)}{p(x)} \quad\propto\quad p(y)\prod_{j=1}^{d}p(x_j|y)$$
 
 **Laplace smoothing**: if a feature value never appears in a class, its MLE probability is 0, and after multiplying everything the posterior becomes 0. After smoothing,
 
-$$p(x_j=v|y=c)=\frac{N_{jvc}+\alpha}{N_c+\alpha|V_j|}$$
+$$
+p(x_j=v|y=c)=\frac{N_{jvc}+\alpha}{N_c+\alpha|V_j|}
+$$
 
 $\alpha=1$ is Laplace smoothing, and $|V_j|$ is the number of possible values of feature $j$.
 
@@ -45,7 +49,9 @@ $\alpha=1$ is Laplace smoothing, and $|V_j|$ is the number of possible values of
 - **MAP**: $\hat\theta=\arg\max_\theta[\log p(D|\theta)+\log p(\theta)]$; the prior acts as regularization. For example, a Gaussian prior with a Gaussian likelihood gives Ridge, and a Laplace prior gives Lasso.
 - **Fully Bayesian**: keep the posterior $p(\theta|D)\propto p(D|\theta)p(\theta)$ and integrate at prediction time:
 
-$$p(x_{new}|D)=\int p(x_{new}|\theta)p(\theta|D)\,d\theta$$
+$$
+p(x_{new}|D)=\int p(x_{new}|\theta)p(\theta|D)\,d\theta
+$$
 
 **Conjugate priors** keep the posterior in the same family as the prior, so updates are analytic: Beta-Bernoulli, Dirichlet-Multinomial, Normal-Normal (known variance), Gamma-Poisson. The benefit is simple computation and online updates; the cost is a restricted prior family.
 
@@ -53,42 +59,58 @@ $$p(x_{new}|D)=\int p(x_{new}|\theta)p(\theta|D)\,d\theta$$
 
 Let $X$ be observed data, $Z$ latent variables, and $\theta$ parameters. The goal is the log marginal likelihood:
 
-$$\log p(X|\theta)=\log\sum_Z p(X,Z|\theta)$$
+$$
+\log p(X|\theta)=\log\sum_Z p(X,Z|\theta)
+$$
 
 Direct optimization requires summing (or integrating) over $Z$, which is usually hard. Introduce an arbitrary distribution $q(Z)$ and use Jensen's inequality or a direct decomposition:
 
-$$\log p(X|\theta) =\underbrace{\sum_Z q(Z)\log\frac{p(X,Z|\theta)}{q(Z)}}_{\text{ELBO }\mathcal{L}(q,\theta)} +\underbrace{\sum_Z q(Z)\log\frac{q(Z)}{p(Z|X,\theta)}}_{KL(q\|p(Z|X,\theta))}$$
+$$
+\log p(X|\theta) =\underbrace{\sum_Z q(Z)\log\frac{p(X,Z|\theta)}{q(Z)}}_{\text{ELBO }\mathcal{L}(q,\theta)} +\underbrace{\sum_Z q(Z)\log\frac{q(Z)}{p(Z|X,\theta)}}_{KL(q\|p(Z|X,\theta))}
+$$
 
 The KL divergence is non-negative, so the ELBO is a lower bound on the log-likelihood.
 
 - **E-step**: fix $\theta=\theta_{old}$ and set $q(Z)=p(Z|X,\theta_{old})$. Then KL is 0 and the ELBO equals the current log-likelihood.
 - **M-step**: fix $q$ and maximize the ELBO:
 
-$$\theta_{new}=\arg\max_\theta\sum_Z q(Z)\log p(X,Z|\theta)$$
+$$
+\theta_{new}=\arg\max_\theta\sum_Z q(Z)\log p(X,Z|\theta)
+$$
 
 This maximizes the **expected complete-data log-likelihood**.
 
 **Monotonicity**:
 
-$$\log p(X|\theta_{new})\ge\mathcal{L}(q,\theta_{new})\ge\mathcal{L}(q,\theta_{old})=\log p(X|\theta_{old})$$
+$$
+\log p(X|\theta_{new})\ge\mathcal{L}(q,\theta_{new})\ge\mathcal{L}(q,\theta_{old})=\log p(X|\theta_{old})
+$$
 
 The first inequality follows from KL being non-negative, and the second from the M-step maximization. Hence EM never decreases the likelihood and converges to a local optimum or saddle point; initialization matters (GMM often uses KMeans initialization or multiple restarts).
 
 ### 2.4 Gaussian mixture model (GMM)
 
-$$p(x)=\sum_{k=1}^{K}\pi_k\mathcal{N}(x|\mu_k,\Sigma_k), \qquad \sum_k\pi_k=1$$
+$$
+p(x)=\sum_{k=1}^{K}\pi_k\mathcal{N}(x|\mu_k,\Sigma_k), \qquad \sum_k\pi_k=1
+$$
 
 **E-step**: compute the posterior (responsibility) that each sample belongs to each cluster:
 
-$$\gamma_{ik}=\frac{\pi_k\mathcal{N}(x_i|\mu_k,\Sigma_k)}{\sum_{j}\pi_j\mathcal{N}(x_i|\mu_j,\Sigma_j)}$$
+$$
+\gamma_{ik}=\frac{\pi_k\mathcal{N}(x_i|\mu_k,\Sigma_k)}{\sum_{j}\pi_j\mathcal{N}(x_i|\mu_j,\Sigma_j)}
+$$
 
 **M-step**:
 
-$$N_k=\sum_i\gamma_{ik}, \quad \pi_k=\frac{N_k}{m}, \quad \mu_k=\frac{1}{N_k}\sum_i\gamma_{ik}x_i$$
+$$
+N_k=\sum_i\gamma_{ik}, \quad \pi_k=\frac{N_k}{m}, \quad \mu_k=\frac{1}{N_k}\sum_i\gamma_{ik}x_i
+$$
 
-$$\Sigma_k=\frac{1}{N_k}\sum_i\gamma_{ik}(x_i-\mu_k)(x_i-\mu_k)^\top$$
+$$
+\Sigma_k=\frac{1}{N_k}\sum_i\gamma_{ik}(x_i-\mu_k)(x_i-\mu_k)^\top
+$$
 
-**GMM vs KMeans**: KMeans makes hard assignments ($\gamma_{ik}\in\{0,1\}$), assumes isotropic clusters with equal variance, and updates only centers; GMM makes soft assignments and learns covariances and mixture weights, so it can represent elliptical clusters. KMeans can be seen as the limit of GMM when variances are fixed and driven to 0. GMM is sensitive to initialization, and covariances can become singular (a cluster left with a single point), so regularize with $\Sigma_k+\epsilon I$.
+**GMM vs KMeans**: KMeans makes hard assignments ($\gamma_{ik}\in\lbrace0,1\rbrace$), assumes isotropic clusters with equal variance, and updates only centers; GMM makes soft assignments and learns covariances and mixture weights, so it can represent elliptical clusters. KMeans can be seen as the limit of GMM when variances are fixed and driven to 0. GMM is sensitive to initialization, and covariances can become singular (a cluster left with a single point), so regularize with $\Sigma_k+\epsilon I$.
 
 ### 2.5 Hidden Markov model (HMM)
 
@@ -96,23 +118,31 @@ HMM describes a hidden-state sequence $z_{1:T}$ and an observation sequence $x_{
 
 **Forward algorithm** computes the likelihood:
 
-$$\alpha_t(j)=B_j(x_t)\sum_i\alpha_{t-1}(i)A_{ij}, \qquad p(x_{1:T})=\sum_j\alpha_T(j)$$
+$$
+\alpha_t(j)=B_j(x_t)\sum_i\alpha_{t-1}(i)A_{ij}, \qquad p(x_{1:T})=\sum_j\alpha_T(j)
+$$
 
 **Backward algorithm** multiplies backward from the future in a similar way; combining the two gives the state posterior $\gamma_t(i)=\alpha_t(i)\beta_t(i)/p(x)$ and the transition posterior $\xi_t(i,j)$.
 
 **Viterbi decoding** (the most likely state sequence):
 
-$$\delta_t(j)=\max_i[\delta_{t-1}(i)A_{ij}]\cdot B_j(x_t)$$
+$$
+\delta_t(j)=\max_i[\delta_{t-1}(i)A_{ij}]\cdot B_j(x_t)
+$$
 
 Backtracking through the stored argmax yields the optimal path; complexity is $O(TK^2)$.
 
 **Baum-Welch = EM**: the E-step uses forward-backward to compute $\gamma,\xi$; the M-step updates $\pi,A,B$:
 
-$$\hat A_{ij}=\frac{\sum_t\xi_t(i,j)}{\sum_t\gamma_t(i)}, \qquad \hat B_j(v)=\frac{\sum_{t:x_t=v}\gamma_t(j)}{\sum_t\gamma_t(j)}$$
+$$
+\hat A_{ij}=\frac{\sum_t\xi_t(i,j)}{\sum_t\gamma_t(i)}, \qquad \hat B_j(v)=\frac{\sum_{t:x_t=v}\gamma_t(j)}{\sum_t\gamma_t(j)}
+$$
 
 **HMM vs CRF**: HMM is generative and assumes observations are conditionally independent given the state and depend only on the current state; CRF is discriminative and directly models $p(y|x)$, allowing arbitrary global features:
 
-$$p(y|x)=\frac{1}{Z(x)}\exp\left(\sum_t\sum_k\lambda_k f_k(y_t,y_{t-1},x,t)\right)$$
+$$
+p(y|x)=\frac{1}{Z(x)}\exp\left(\sum_t\sum_k\lambda_k f_k(y_t,y_{t-1},x,t)\right)
+$$
 
 CRF does not need the observation-independence assumption and is usually stronger for sequence labeling, but training is more expensive.
 

@@ -182,7 +182,7 @@ Two easy-to-miss points: 1) LoRA's `lora_alpha` and `r` must be read together - 
 **Follow-up**: Can A also be initialized to zero? No - then both gradients degenerate to zero and it never learns.
 
 ### Q6. What is LoRA's α/r? How do you choose the rank?
-**Answer**: $\alpha/r$ is the increment scaling factor that decouples "rank" from "update magnitude": changing $r$ keeps the effective learning rate stable via $\alpha$. Ranks are commonly 8-64: harder tasks and more data call for larger rank; simple style/format adaptation is fine at 8-16, general instruction tuning at 32-64. A more robust recipe is to sweep $r\in\{8,16,32,64\}$ with $\alpha=2r$ fixed.
+**Answer**: $\alpha/r$ is the increment scaling factor that decouples "rank" from "update magnitude": changing $r$ keeps the effective learning rate stable via $\alpha$. Ranks are commonly 8-64: harder tasks and more data call for larger rank; simple style/format adaptation is fine at 8-16, general instruction tuning at 32-64. A more robust recipe is to sweep $r\in\lbrace8,16,32,64\rbrace$ with $\alpha=2r$ fixed.
 **Follow-up**: Is a larger rank always better? Beyond a point returns saturate and overfitting/memory grow; for large ranks use rsLoRA's $\alpha/\sqrt{r}$.
 
 ### Q7. Can LoRA be merged? Is there extra inference latency?
@@ -246,3 +246,4 @@ Two easy-to-miss points: 1) LoRA's `lora_alpha` and `r` must be read together - 
 - [The Power of Scale for Parameter-Efficient Prompt Tuning](https://arxiv.org/abs/2104.08691)
 - [LIMA: Less Is More for Alignment](https://arxiv.org/abs/2305.11206)
 - [llm_interview_note · supervised fine-tuning](https://github.com/wdndev/llm_interview_note)
+- **Next step after SFT**: [07 · Post-training and alignment pipeline](07-post-training-pipeline.md) (end-to-end post-training stages, synthetic data, judges, and distillation) and [Chapter 3 · RL and Alignment](../03-reinforcement-learning/README.md) (PPO, RLHF, DPO, and GRPO derivations).

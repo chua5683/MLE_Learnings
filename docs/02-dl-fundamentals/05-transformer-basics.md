@@ -26,9 +26,13 @@ Three key design choices: **self-attention** (each position sees all positions d
 
 For an input sequence $X\in\mathbb{R}^{n\times d}$, three learnable projections produce query/key/value:
 
-$$Q=XW_Q, \qquad K=XW_K, \qquad V=XW_V, \qquad W_Q,W_K,W_V\in\mathbb{R}^{d\times d_k}$$
+$$
+Q=XW_Q, \qquad K=XW_K, \qquad V=XW_V, \qquad W_Q,W_K,W_V\in\mathbb{R}^{d\times d_k}
+$$
 
-$$\mathrm{Attention}(Q,K,V)=\mathrm{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$
+$$
+\mathrm{Attention}(Q,K,V)=\mathrm{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V
+$$
 
 Step by step:
 
@@ -54,7 +58,9 @@ Doubling the sequence length roughly quadruples compute and memory - the root ca
 
 Split the $d$ dimensions into $h$ heads of size $d_k=d/h$, run attention in each, concatenate, and apply an output projection:
 
-$$\mathrm{head}_i=\mathrm{Attention}(XW_Q^i,XW_K^i,XW_V^i), \qquad \mathrm{MHA}(X)=\mathrm{Concat}(\mathrm{head}_1,\dots,\mathrm{head}_h)W_O$$
+$$
+\mathrm{head}_i=\mathrm{Attention}(XW_Q^i,XW_K^i,XW_V^i), \qquad \mathrm{MHA}(X)=\mathrm{Concat}(\mathrm{head}_1,\dots,\mathrm{head}_h)W_O
+$$
 
 - **Purpose**: different heads attend to different patterns in different subspaces (syntax, coreference, position, etc.), analogous to multiple kernels in a CNN.
 - **Parameter count**: $W_Q,W_K,W_V$ are each $d\times d$ and $W_O$ is $d\times d$, for $4d^2$ total - the same as a single head with $d_k=d$. Multi-head does not buy expressiveness with extra parameters; it **changes the subspace partition at the same budget**.
@@ -66,7 +72,9 @@ Attention is **permutation-equivariant** over the input: shuffle the tokens and 
 
 **Sinusoidal positional encoding (original paper)**:
 
-$$PE_{(pos,2i)}=\sin\left(\frac{pos}{10000^{2i/d}}\right), \qquad PE_{(pos,2i+1)}=\cos\left(\frac{pos}{10000^{2i/d}}\right)$$
+$$
+PE_{(pos,2i)}=\sin\left(\frac{pos}{10000^{2i/d}}\right), \qquad PE_{(pos,2i+1)}=\cos\left(\frac{pos}{10000^{2i/d}}\right)
+$$
 
 It has an important property: the encoding of position $pos+k$ can be written as a **linear transform** (rotation matrix) of the encoding at $pos$, so the model can learn the notion of a relative offset $k$ through a linear projection and gains some extrapolation ability.
 
@@ -85,7 +93,9 @@ The core of RoPE is to apply rotation matrices to $q,k$ so that $\langle R_m q, 
 
 Each position independently passes through a two-layer MLP:
 
-$$\mathrm{FFN}(x)=W_2\,\sigma(W_1x+b_1)+b_2, \qquad d\to 4d\to d$$
+$$
+\mathrm{FFN}(x)=W_2\,\sigma(W_1x+b_1)+b_2, \qquad d\to 4d\to d
+$$
 
 - **Parameter count**: $d\cdot4d+4d\cdot d=8d^2$, the bulk of each layer's parameters (attention has only $4d^2$).
 - **Role**: attention mixes information between positions, while the FFN performs a nonlinear transform within each position, similar to a key-value memory.
@@ -95,7 +105,9 @@ $$\mathrm{FFN}(x)=W_2\,\sigma(W_1x+b_1)+b_2, \qquad d\to 4d\to d$$
 
 Each sublayer:
 
-$$x\leftarrow x+\mathrm{Sublayer}\big(\mathrm{LN}(x)\big) \quad\text{(Pre-LN)}, \qquad x\leftarrow\mathrm{LN}\big(x+\mathrm{Sublayer}(x)\big)\quad\text{(Post-LN)}$$
+$$
+x\leftarrow x+\mathrm{Sublayer}\big(\mathrm{LN}(x)\big) \quad\text{(Pre-LN)}, \qquad x\leftarrow\mathrm{LN}\big(x+\mathrm{Sublayer}(x)\big)\quad\text{(Post-LN)}
+$$
 
 The original paper used Post-LN, while modern large models almost all use Pre-LN: the residual stream is a pure identity path, gradients flow straight through, and training is stable (details in [03 Normalization techniques](03-normalization-techniques.md)). Pre-LN architectures usually add one final LN at the end.
 
@@ -106,7 +118,9 @@ The original paper used Post-LN, while modern large models almost all use Pre-LN
 
 **Implementing a mask**: before softmax, fill disallowed positions with $-\infty$ (in practice $-10^9$ or `torch.finfo(dtype).min`):
 
-$$\mathrm{scores}_{ij}=\begin{cases}q_i\cdot k_j/\sqrt{d_k}, & \text{allowed}\\-\infty, & \text{masked}\end{cases}\quad\Rightarrow\quad \mathrm{softmax}\Rightarrow A_{ij}=0$$
+$$
+\mathrm{scores}_{ij}=\begin{cases}q_i\cdot k_j/\sqrt{d_k}, & \text{allowed}\\-\infty, & \text{masked}\end{cases}\quad\Rightarrow\quad \mathrm{softmax}\Rightarrow A_{ij}=0
+$$
 
 - **Padding mask**: positions where $\text{token}=[PAD]$ do not participate in attention.
 - **Causal mask**: lower triangle 1, upper triangle 0, so position $i$ sees only positions $\le i$; this is what makes parallel training possible without leaking the future.
@@ -122,11 +136,15 @@ $$\mathrm{scores}_{ij}=\begin{cases}q_i\cdot k_j/\sqrt{d_k}, & \text{allowed}\\-
 
 Per layer, approximately:
 
-$$\underbrace{4d^2}_{\text{attention}}+\underbrace{8d^2}_{\text{FFN}}+\underbrace{4d}_{\text{two LNs}}\approx12d^2$$
+$$
+\underbrace{4d^2}_{\text{attention}}+\underbrace{8d^2}_{\text{FFN}}+\underbrace{4d}_{\text{two LNs}}\approx12d^2
+$$
 
 **BERT-base**: $d=768$, 12 layers, vocabulary about 30.5k, tied embeddings:
 
-$$12\times12\times768^2+30522\times768\approx84.9\text{M}+23.4\text{M}\approx110\text{M}$$
+$$
+12\times12\times768^2+30522\times768\approx84.9\text{M}+23.4\text{M}\approx110\text{M}
+$$
 
 which matches the official numbers. Inference FLOPs are about $2\times$ the parameter count per token, plus $O(n^2d)$ for the attention part.
 

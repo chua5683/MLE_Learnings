@@ -53,13 +53,14 @@
   - [Pretraining and data engineering](04-llm/04-pretraining-and-data.md)
   - [Scaling laws](04-llm/05-scaling-laws.md)
   - [Fine-tuning and PEFT](04-llm/06-fine-tuning-and-peft.md)
-  - [Distributed training](04-llm/07-distributed-training.md)
-  - [Inference optimization and deployment](04-llm/08-inference-optimization-and-serving.md)
-  - [Quantization and compression](04-llm/09-quantization-and-compression.md)
-  - [Evaluation and hallucination](04-llm/10-evaluation-and-hallucination.md)
-  - [RAG](04-llm/11-rag.md)
-  - [Prompt engineering](04-llm/12-prompt-engineering.md)
-  - [Multimodal LLMs (VLMs & Omni)](04-llm/13-multimodal-llms.md)
+  - [Post-training and alignment pipeline](04-llm/07-post-training-pipeline.md)
+  - [Distributed training](04-llm/08-distributed-training.md)
+  - [Inference optimization and deployment](04-llm/09-inference-optimization-and-serving.md)
+  - [Quantization and compression](04-llm/10-quantization-and-compression.md)
+  - [Evaluation and hallucination](04-llm/11-evaluation-and-hallucination.md)
+  - [RAG](04-llm/12-rag.md)
+  - [Prompt engineering](04-llm/13-prompt-engineering.md)
+  - [Multimodal LLMs (VLMs & Omni)](04-llm/14-multimodal-llms.md)
 
 ## Chapter 5 · AI Agents
 

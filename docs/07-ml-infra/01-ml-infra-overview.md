@@ -80,7 +80,7 @@ flowchart TB
 1. Events land in Kafka (replayable), then get written periodically into lakehouse tables (partitioned by day/hour).
 2. Stream jobs compute near-real-time features; batch jobs recompute hourly/daily and repair what the stream job missed or got wrong.
 3. **Sample join**: left-join the impression log with the feature values at that time. Two sources: **forward logging** (record the scoring-time features directly, most consistent) and **backfill** (join from historical feature tables by impression time; fast, but must guard against leakage).
-4. Training (DDP or hybrid parallelism, see [Chapter 4](../04-llm/07-distributed-training.md)) → checkpoint → offline evaluation → registry → canary → full rollout.
+4. Training (DDP or hybrid parallelism, see [Chapter 4](../04-llm/08-distributed-training.md)) → checkpoint → offline evaluation → registry → canary → full rollout.
 5. Watch online metrics; roll back if they degrade.
 
 ### 2.4 The hub: the impression log

@@ -19,7 +19,7 @@ Here $Q\in\mathbb{R}^{T\times d_h}$ and $M$ is the causal mask (upper triangle s
 - **Prefill**: process the whole prompt at once; $T$ is large and the work is matrix-multiply heavy, so it is **compute-bound**.
 - **Decode**: generate one token per step but attend to the historical K/V, so it is **memory-bound** (most time goes into moving the KV cache).
 
-That is why half of inference optimization focuses on the KV cache: PagedAttention, continuous batching, KV quantization, and the attention variants in this note. Deployment details are in [08 Inference optimization and deployment](08-inference-optimization-and-serving.md).
+That is why half of inference optimization focuses on the KV cache: PagedAttention, continuous batching, KV quantization, and the attention variants in this note. Deployment details are in [09 Inference optimization and deployment](09-inference-optimization-and-serving.md).
 
 ### 1.3 Four attention variants
 
@@ -37,7 +37,7 @@ Let $L$ be the number of layers, $n_h$ the number of query heads, $n_{kv}$ the n
 ### 2.1 The KV cache memory formula (worth memorizing)
 
 $$
-\text{KV bytes}=2\times L\times n_{kv}\times d_h\times T\times B\times \text{bytes\_per\_elem}
+\text{KV bytes}=2\times L\times n_{kv}\times d_h\times T\times B\times \text{bytes per elem}
 $$
 
 The leading 2 is one copy each for K and V. **Example: Llama-3-8B** ($L=32$, $n_{kv}=8$, $d_h=128$), $T=8192$, bf16 (2 bytes), batch=1:
@@ -70,7 +70,7 @@ At **training** time GQA is equivalent to setting the number of KV heads to $G$,
 
 Standard attention writes the $T\times T$ score matrix back to HBM, costing $O(T^2)$ memory and heavy IO. FlashAttention tiles Q/K/V into SRAM, computes block by block, and uses **online softmax** to update incrementally, avoiding materializing a whole row:
 
-For each row, maintain a running maximum $m$, a running sum $\ell$, and a running output $O$. When processing a new block $\{x_j\}$:
+For each row, maintain a running maximum $m$, a running sum $\ell$, and a running output $O$. When processing a new block $\lbrace x_j\rbrace$:
 
 $$
 m'=\max(m,\max_j x_j),\qquad
@@ -189,7 +189,7 @@ A model is trained only on length $L$ but you want $L'>L$:
 **Follow-up**: Can sliding windows be combined with positional extension? Yes, but the window limits the effective visible distance, so the benefit is limited.
 
 ### Q12. Why is prefill compute-bound and decode memory-bound?
-**Answer**: Prefill processes $T$ tokens at once with large matrix multiplies, giving high arithmetic intensity and making it compute-limited; decode handles one token per step but must read all weights and the KV cache, giving low arithmetic intensity and making it memory-bandwidth-limited. So prefill optimization looks at FLOPs utilization, while decode optimization looks at batching and bandwidth (see [08](08-inference-optimization-and-serving.md)).
+**Answer**: Prefill processes $T$ tokens at once with large matrix multiplies, giving high arithmetic intensity and making it compute-limited; decode handles one token per step but must read all weights and the KV cache, giving low arithmetic intensity and making it memory-bandwidth-limited. So prefill optimization looks at FLOPs utilization, while decode optimization looks at batching and bandwidth (see [09](09-inference-optimization-and-serving.md)).
 **Follow-up**: Which techniques does this explain? Continuous batching improves decode batch utilization; PD disaggregation splits the two workloads onto different machines.
 
 ## 5. Pitfalls and follow-ups

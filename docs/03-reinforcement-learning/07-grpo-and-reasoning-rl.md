@@ -24,10 +24,10 @@ GRPO therefore uses **group-relative rewards** as advantages, drops the critic, 
 
 ### 2.1 Group sampling and advantage estimation
 
-For each question $x$, sample $G$ answers $\{y_1,\dots,y_G\}$ from the old policy and score them with a reward function (RM or rules) to get $\{r_1,\dots,r_G\}$. Define the group-normalized advantage:
+For each question $x$, sample $G$ answers $\lbrace y_1,\dots,y_G\rbrace$ from the old policy and score them with a reward function (RM or rules) to get $\lbrace r_1,\dots,r_G\rbrace$. Define the group-normalized advantage:
 
 $$
-\hat A_i=\frac{r_i-\mathrm{mean}\left(\{r_1,\dots,r_G\}\right)}{\mathrm{std}\left(\{r_1,\dots,r_G\}\right)} \qquad (1)
+\hat A_i=\frac{r_i-\mathrm{mean}\left(\lbrace r_1,\dots,r_G\rbrace\right)}{\mathrm{std}\left(\lbrace r_1,\dots,r_G\rbrace\right)} \qquad (1)
 $$
 
 All tokens in one answer share this $\hat A_i$ (a sequence-level advantage, with no token-level GAE).
@@ -37,7 +37,7 @@ All tokens in one answer share this $\hat A_i$ (a sequence-level advantage, with
 ### 2.2 The GRPO objective
 
 $$
-\mathcal{J}_{\mathrm{GRPO}}(\theta)=\mathbb{E}_{x\sim\mathcal{D},\{y_i\}\sim\pi_{\theta_{\mathrm{old}}}}\left[\frac{1}{G}\sum_{i=1}^{G}\frac{1}{|y_i|}\sum_{t=1}^{|y_i|}\min\left(r_{i,t}\hat A_i,\ \mathrm{clip}\left(r_{i,t},1-\epsilon,1+\epsilon\right)\hat A_i\right)-\beta\,\mathrm{KL}\right] \qquad (2)
+\mathcal{J}_{\mathrm{GRPO}}(\theta)=\mathbb{E}_{x\sim\mathcal{D},\lbrace y_i\rbrace\sim\pi_{\theta_{\mathrm{old}}}}\left[\frac{1}{G}\sum_{i=1}^{G}\frac{1}{|y_i|}\sum_{t=1}^{|y_i|}\min\left(r_{i,t}\hat A_i,\ \mathrm{clip}\left(r_{i,t},1-\epsilon,1+\epsilon\right)\hat A_i\right)-\beta\,\mathrm{KL}\right] \qquad (2)
 $$
 
 where $r_{i,t}=\frac{\pi_\theta(y_{i,t}\mid x,y_{i,<t})}{\pi_{\theta_{\mathrm{old}}}(y_{i,t}\mid x,y_{i,<t})}$ is the token-level importance ratio, and the KL term keeps the policy from drifting too far from the reference. **The structure is identical to PPO-clip; the only difference is that $\hat A_i$ is not computed by GAE but comes from group-relative rewards.**

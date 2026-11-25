@@ -33,7 +33,7 @@ $$
 
 | Aspect | L1 / Lasso | L2 / Ridge |
 | --- | --- | --- |
-| Penalty | $\sum\vert w_j\vert $ | $\sum w_j^2$ |
+| Penalty | $\sum\vert w_j\vert$ | $\sum w_j^2$ |
 | Solution | Sparse (some exactly 0) | Dense, globally shrunk |
 | Prior | Laplace | Gaussian |
 | Correlated features | Picks one at random | Keeps them together, shares weight |

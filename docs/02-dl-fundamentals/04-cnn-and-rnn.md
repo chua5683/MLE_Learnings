@@ -20,17 +20,23 @@
 
 What deep learning calls "convolution" is really **cross-correlation** (the kernel is not flipped):
 
-$$y_{i,j}=\sum_{c=1}^{C_{in}}\sum_{u=0}^{K-1}\sum_{v=0}^{K-1}W_{c,u,v}\,x_{c,\,i\cdot S+u,\,j\cdot S+v}+b$$
+$$
+y_{i,j}=\sum_{c=1}^{C_{in}}\sum_{u=0}^{K-1}\sum_{v=0}^{K-1}W_{c,u,v}\,x_{c,\,i\cdot S+u,\,j\cdot S+v}+b
+$$
 
 Output spatial size:
 
-$$O=\left\lfloor\frac{I+2P-K}{S}\right\rfloor+1$$
+$$
+O=\left\lfloor\frac{I+2P-K}{S}\right\rfloor+1
+$$
 
 **Example**: $I=224,K=3,P=1,S=1\Rightarrow O=224$ (same padding); $S=2\Rightarrow O=112$.
 
 **Parameter count** (one convolution layer):
 
-$$\text{params}=K^2\,C_{in}\,C_{out}+C_{out}$$
+$$
+\text{params}=K^2\,C_{in}\,C_{out}+C_{out}
+$$
 
 **Forward FLOPs** (per sample): $2\cdot O^2\cdot K^2\cdot C_{in}\cdot C_{out}$ (a multiply and an add each count once).
 
@@ -38,7 +44,9 @@ $$\text{params}=K^2\,C_{in}\,C_{out}+C_{out}$$
 
 The receptive field of layer $l$ satisfies:
 
-$$RF_l=RF_{l-1}+(K_l-1)\prod_{i<l}S_i$$
+$$
+RF_l=RF_{l-1}+(K_l-1)\prod_{i<l}S_i
+$$
 
 **Example**: three $3\times3$ convolutions with stride 1 give $RF=1+2+2+2=7$. In other words, stacking three $3\times3$ layers matches the receptive field of one $7\times7$ layer but uses only $3\times9=27$ parameters versus $49$, with more nonlinearity - the core motivation for VGG's small-kernel stacking.
 
@@ -59,7 +67,9 @@ Split a standard convolution into two steps:
 
 The total drops from $K^2CC_{out}$ to $K^2C+CC_{out}$. For $K=3$ the compression ratio is roughly
 
-$$\frac{K^2C+CC_{out}}{K^2CC_{out}}=\frac{1}{C_{out}}+\frac{1}{K^2}\approx\frac{1}{9}+\frac{1}{C_{out}}$$
+$$
+\frac{K^2C+CC_{out}}{K^2CC_{out}}=\frac{1}{C_{out}}+\frac{1}{K^2}\approx\frac{1}{9}+\frac{1}{C_{out}}
+$$
 
 For large $C_{out}$ this is about $1/8$ to $1/9$ of a standard convolution, the key to running MobileNet on phones.
 
@@ -84,30 +94,49 @@ For large $C_{out}$ this is about $1/8$ to $1/9$ of a standard convolution, the 
 
 **Vanilla RNN**:
 
-$$h_t=\tanh\big(W_h h_{t-1}+W_x x_t+b\big), \qquad y_t=W_y h_t$$
+$$
+h_t=\tanh\big(W_h h_{t-1}+W_x x_t+b\big), \qquad y_t=W_y h_t
+$$
 
 **BPTT and vanishing gradients**: backpropagating through time gives
 
-$$\frac{\partial h_t}{\partial h_{t-1}}=\mathrm{diag}\big(\tanh'(\cdot)\big)W_h$$
+$$
+\frac{\partial h_t}{\partial h_{t-1}}=\mathrm{diag}\big(\tanh'(\cdot)\big)W_h
+$$
 
 The gradient is a product of $T$ such matrices. If the spectral radius of $W_h$ is $<1$ the gradient vanishes exponentially, and if $>1$ it explodes; the tanh derivative $\le1$ makes vanishing worse. This is why vanilla RNNs cannot learn long-range dependencies.
 
 **LSTM** (three gates plus a cell state):
 
-$$f_t=\sigma(W_f[h_{t-1},x_t]+b_f), \quad i_t=\sigma(W_i[h_{t-1},x_t]+b_i)$$
-$$o_t=\sigma(W_o[h_{t-1},x_t]+b_o), \quad g_t=\tanh(W_g[h_{t-1},x_t]+b_g)$$
-$$c_t=f_t\odot c_{t-1}+i_t\odot g_t, \qquad h_t=o_t\odot\tanh(c_t)$$
+$$
+f_t=\sigma(W_f[h_{t-1},x_t]+b_f), \quad i_t=\sigma(W_i[h_{t-1},x_t]+b_i)
+$$
+
+$$
+o_t=\sigma(W_o[h_{t-1},x_t]+b_o), \quad g_t=\tanh(W_g[h_{t-1},x_t]+b_g)
+$$
+
+$$
+c_t=f_t\odot c_{t-1}+i_t\odot g_t, \qquad h_t=o_t\odot\tanh(c_t)
+$$
 
 **The key point**: the cell-state update is **additive**, and $\partial c_t/\partial c_{t-1}=f_t$ is diagonal. When the forget gate $f_t\approx1$, gradients can travel a long way along $c$ almost losslessly - the mathematical reason LSTM mitigates vanishing gradients (it does not fully solve it).
 
 **GRU** (two gates, one fewer state):
 
-$$z_t=\sigma(W_z[h_{t-1},x_t]), \quad r_t=\sigma(W_r[h_{t-1},x_t])$$
-$$\tilde{h}_t=\tanh\big(W_h[r_t\odot h_{t-1},x_t]\big), \qquad h_t=(1-z_t)\odot h_{t-1}+z_t\odot\tilde{h}_t$$
+$$
+z_t=\sigma(W_z[h_{t-1},x_t]), \quad r_t=\sigma(W_r[h_{t-1},x_t])
+$$
+
+$$
+\tilde{h}_t=\tanh\big(W_h[r_t\odot h_{t-1},x_t]\big), \qquad h_t=(1-z_t)\odot h_{t-1}+z_t\odot\tilde{h}_t
+$$
 
 **Parameter count** (input dim $d$, hidden size $h$, ignoring biases): each gate has one $(d+h)\times h$ matrix, LSTM has 4 gates and GRU has 3:
 
-$$\text{LSTM}=4\big((d+h)h+h\big), \qquad \text{GRU}=3\big((d+h)h+h\big)$$
+$$
+\text{LSTM}=4\big((d+h)h+h\big), \qquad \text{GRU}=3\big((d+h)h+h\big)
+$$
 
 ```mermaid
 flowchart LR
@@ -128,7 +157,9 @@ flowchart LR
 
 **seq2seq** uses an encoder to compress the input sequence into a fixed-length vector $c$, from which the decoder generates the output. For long inputs the fixed-length vector becomes an **information bottleneck**. Bahdanau attention lets the decoder, at every step, take a weighted sum over all encoder hidden states:
 
-$$e_{tj}=a(s_{t-1},h_j), \qquad \alpha_{tj}=\frac{\exp(e_{tj})}{\sum_k\exp(e_{tk})}, \qquad c_t=\sum_j\alpha_{tj}h_j$$
+$$
+e_{tj}=a(s_{t-1},h_j), \qquad \alpha_{tj}=\frac{\exp(e_{tj})}{\sum_k\exp(e_{tk})}, \qquad c_t=\sum_j\alpha_{tj}h_j
+$$
 
 This is the direct predecessor of self-attention (see [05 Transformer basics](05-transformer-basics.md)).
 

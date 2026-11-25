@@ -74,10 +74,10 @@ One idea runs through all eleven notes: **the freedom that comes from "the model
 
 ## How it connects to other chapters
 
-- **Prerequisites**: [LLM architecture evolution](../04-llm/02-llm-architecture-evolution.md), [Fine-tuning and PEFT](../04-llm/06-fine-tuning-and-peft.md), [Prompt engineering](../04-llm/12-prompt-engineering.md). Agents add control flow on top of prompts; structured output, JSON schema, and CoT all come from prompt engineering.
-- **Strongly related**: [RAG](../04-llm/11-rag.md). Note 05 covers "RAG orchestrated as an agent"; retrieval itself (chunking, embeddings, ANN, rerank) lives in 04-11 and is not repeated here.
+- **Prerequisites**: [LLM architecture evolution](../04-llm/02-llm-architecture-evolution.md), [Fine-tuning and PEFT](../04-llm/06-fine-tuning-and-peft.md), [Prompt engineering](../04-llm/13-prompt-engineering.md). Agents add control flow on top of prompts; structured output, JSON schema, and CoT all come from prompt engineering.
+- **Strongly related**: [RAG](../04-llm/12-rag.md). Note 05 covers "RAG orchestrated as an agent"; retrieval itself (chunking, embeddings, ANN, rerank) lives in 04-12 and is not repeated here.
 - **Downstream**: [LLM application system design](../06-ml-system-design/05-llm-application-design.md). Assemble the components of this chapter into a shippable support Copilot, enterprise knowledge base, or coding assistant.
-- **Safety and evaluation**: [Evaluation and hallucination](../04-llm/10-evaluation-and-hallucination.md) covers model-level evaluation; notes 09 and 10 cover **trajectory-level** evaluation, enterprise governance, and agent-specific risks (overreach, injection, side effects).
+- **Safety and evaluation**: [Evaluation and hallucination](../04-llm/11-evaluation-and-hallucination.md) covers model-level evaluation; notes 09 and 10 cover **trajectory-level** evaluation, enterprise governance, and agent-specific risks (overreach, injection, side effects).
 - **RL perspective**: [GRPO and reasoning RL](../03-reinforcement-learning/07-grpo-and-reasoning-rl.md). An agent's "thinking" can be viewed as policy sampling; test-time compute in reasoning models shares its roots with agent search and reflection.
 
 ## Using this chapter in interviews

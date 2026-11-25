@@ -38,9 +38,11 @@ Split an image $X\in\mathbb{R}^{H\times W\times C}$ into $N = (H/P)(W/P)$ non-ov
 
 ### 2.2 Contrastive Learning (CLIP / InfoNCE) and Self-Supervised Learning
 
-Given a batch of $B$ matched image-text pairs $\{(I_i, T_i)\}_{i=1}^{B}$, encode them into L2-normalized vectors $u_i, v_i$, and optimize symmetric **InfoNCE** with learnable temperature $\tau$:
+Given a batch of $B$ matched image-text pairs $\lbrace(I_i, T_i)\rbrace_{i=1}^{B}$, encode them into L2-normalized vectors $u_i, v_i$, and optimize symmetric **InfoNCE** with learnable temperature $\tau$:
 
-$$\mathcal{L}_{I\to T} = -\frac{1}{B}\sum_{i=1}^{B}\log\frac{\exp(u_i^\top v_i / \tau)}{\sum_{j=1}^{B}\exp(u_i^\top v_j / \tau)}, \qquad \mathcal{L}_{\mathrm{CLIP}} = \frac{1}{2}(\mathcal{L}_{I\to T} + \mathcal{L}_{T\to I})$$
+$$
+\mathcal{L}_{I\to T} = -\frac{1}{B}\sum_{i=1}^{B}\log\frac{\exp(u_i^\top v_i / \tau)}{\sum_{j=1}^{B}\exp(u_i^\top v_j / \tau)}, \qquad \mathcal{L}_{\mathrm{CLIP}} = \frac{1}{2}(\mathcal{L}_{I\to T} + \mathcal{L}_{T\to I})
+$$
 
 - **Why temperature $\tau$ matters**: small $\tau$ sharpens softmax and focuses gradients on **hard negatives**; too small destabilizes training (CLIP clips $1/\tau \le 100$).
 - **Why large batches matter**: in-batch negatives come from the other $B-1$ items; larger $B$ supplies harder negatives. **SigLIP** replaces softmax InfoNCE with pairwise sigmoid binary cross-entropy, removing the global batch-wide normalization dependency and working well at smaller batches.
@@ -50,15 +52,21 @@ $$\mathcal{L}_{I\to T} = -\frac{1}{B}\sum_{i=1}^{B}\log\frac{\exp(u_i^\top v_i /
 
 **DDPM (Denoising Diffusion)** defines a fixed forward noising process:
 
-$$x_t = \sqrt{\bar{\alpha}_t}\,x_0 + \sqrt{1-\bar{\alpha}_t}\,\epsilon, \qquad \epsilon \sim \mathcal{N}(0, I)$$
+$$
+x_t = \sqrt{\bar{\alpha}_t}\,x_0 + \sqrt{1-\bar{\alpha}_t}\,\epsilon, \qquad \epsilon \sim \mathcal{N}(0, I)
+$$
 
 and trains a network $\epsilon_\theta(x_t, t)$ to predict the injected noise via simple MSE: $\mathcal{L} = \mathbb{E}\|\epsilon - \epsilon_\theta(x_t, t)\|^2$ (a weighted ELBO; mathematically linked to score matching $\nabla_x \log p_t(x)$).
 
 **Flow Matching / Rectified Flow** (used in SD3, Flux, modern video models) replaces curved SDE trajectories with **straight linear interpolation** between data $x_0$ and noise $x_1 \sim \mathcal{N}(0, I)$:
 
-$$x_t = (1-t)x_0 + t x_1, \qquad u_t = \frac{dx_t}{dt} = x_1 - x_0$$
+$$
+x_t = (1-t)x_0 + t x_1, \qquad u_t = \frac{dx_t}{dt} = x_1 - x_0
+$$
 
-$$\mathcal{L}_{\mathrm{FM}} = \mathbb{E}_{t, x_0, x_1}\left\|v_\theta(x_t, t) - (x_1 - x_0)\right\|^2$$
+$$
+\mathcal{L}_{\mathrm{FM}} = \mathbb{E}_{t, x_0, x_1}\left\|v_\theta(x_t, t) - (x_1 - x_0)\right\|^2
+$$
 
 Because straighter paths have lower curvature, ODE solvers generate high-fidelity samples in **10–30 steps** instead of 50–1000.
 
@@ -71,11 +79,13 @@ Because straighter paths have lower curvature, ODE solvers generate high-fidelit
 
 Every GNN layer updates node $v$'s representation by aggregating messages from neighbors $\mathcal{N}(v)$:
 
-$$h_v^{(l+1)} = \mathrm{Update}\left(h_v^{(l)},\; \mathrm{Aggregate}_{u\in\mathcal{N}(v)}\big(m(h_v^{(l)}, h_u^{(l)}, e_{uv})\big)\right)$$
+$$
+h_v^{(l+1)} = \mathrm{Update}\left(h_v^{(l)},\; \mathrm{Aggregate}_{u\in\mathcal{N}(v)}\big(m(h_v^{(l)}, h_u^{(l)}, e_{uv})\big)\right)
+$$
 
 | Architecture | Aggregation | Key property |
 | --- | --- | --- |
-| **GCN** | Degree-normalized mean $\sum_{u\in\mathcal{N}(v)\cup\{v\}} \frac{1}{\sqrt{d_v d_u}} W h_u$ | Transductive spectral/spatial smoothing |
+| **GCN** | Degree-normalized mean $\sum_{u\in\mathcal{N}(v)\cup\lbrace v\rbrace} \frac{1}{\sqrt{d_v d_u}} W h_u$ | Transductive spectral/spatial smoothing |
 | **GraphSAGE** | Fixed-size neighbor sampling + mean/max/LSTM + concat with self | Inductive (generalizes to unseen nodes); scalable |
 | **GAT** | Learned attention weights $\alpha_{vu} = \mathrm{softmax}_u(\mathrm{LeakyReLU}(a^\top [Wh_v \| Wh_u]))$ | Assigns different importance to noisy vs. informative neighbors |
 

@@ -41,7 +41,9 @@ My one-liner: **TTFT is set by prefill + queueing, TPOT by decode bandwidth, thr
 
 One decode step reads two things: all model weights and the KV cache of every request. Its arithmetic intensity is about 1 FLOP/Byte, while the A100/H100 ridge point is roughly 150-300 FLOP/Byte, so decode sits firmly in the bandwidth-bound regime. The per-step time is approximately:
 
-$$t_{decode} \approx \frac{N_{params}\cdot p + B\cdot S\cdot 2L n_{kv} d_{head} p}{\text{HBM bandwidth}}$$
+$$
+t_{decode} \approx \frac{N_{params}\cdot p + B\cdot S\cdot 2L n_{kv} d_{head} p}{\text{HBM bandwidth}}
+$$
 
 where $p$ is bytes per element (FP16=2), $B$ is the number of concurrent sequences, and $S$ is the current average length. A 7B FP16 model has 14 GB of weights and an A100 80G delivers about 2 TB/s of HBM, so the theoretical single-request limit is about $14/2000 \approx 7$ ms/token, i.e. ~140 tok/s; in practice kernel efficiency, KV reads, and scheduling cap you at roughly half of that.
 
@@ -51,11 +53,15 @@ where $p$ is bytes per element (FP16=2), $B$ is the number of concurrent sequenc
 
 KV cache per token:
 
-$$\text{KV per token} = 2 \times L \times n_{kv} \times d_{head} \times p \;(\text{bytes})$$
+$$
+\text{KV per token} = 2 \times L \times n_{kv} \times d_{head} \times p \;(\text{bytes})
+$$
 
 Total footprint multiplies by batch and sequence length:
 
-$$\text{KV total} = 2 \cdot L \cdot n_{kv} \cdot d_{head} \cdot S \cdot B \cdot p$$
+$$
+\text{KV total} = 2 \cdot L \cdot n_{kv} \cdot d_{head} \cdot S \cdot B \cdot p
+$$
 
 - The factor 2: one copy for K and one for V;
 - $n_{kv}$ is the **number of KV heads** (equal to the head count for MHA, smaller for GQA/MQA - see [03 Attention and positional encoding](03-attention-and-position-encoding.md));
@@ -73,7 +79,9 @@ Note that KV grows linearly with the **token count**, so for long contexts it ov
 
 ### 2.3 Back out the maximum concurrency from the memory budget
 
-$$B_{max} \approx \frac{\text{GPU memory}\times\text{utilization} - \text{weights} - \text{activation/framework overhead}}{\text{KV per token}\times\text{average sequence length}}$$
+$$
+B_{max} \approx \frac{\text{GPU memory}\times\text{utilization} - \text{weights} - \text{activation/framework overhead}}{\text{KV per token}\times\text{average sequence length}}
+$$
 
 In practice, use 0.85-0.9 utilization on an 80 GB card and reserve 2-4 GB beyond the weights for activations and the CUDA context. This formula is also the starting point for the interview question "how many QPS can one 8xA100 node serve": compute $B_{max}$, multiply by single-request decode speed, then divide by the average output length.
 
@@ -104,11 +112,15 @@ The idea: a cheap draft model guesses $\gamma$ tokens first; the large target mo
 
 With acceptance rate $\alpha$, the expected number of tokens produced per target forward pass is:
 
-$$E[\#\text{tokens}] = \frac{1-\alpha^{\gamma+1}}{1-\alpha}$$
+$$
+\mathbb{E}[\text{tokens}] = \frac{1-\alpha^{\gamma+1}}{1-\alpha}
+$$
 
 If one draft forward costs $c$ times a target forward, the speedup is:
 
-$$\text{speedup} = \frac{1-\alpha^{\gamma+1}}{(1-\alpha)\,(\gamma c + 1)}$$
+$$
+\text{speedup} = \frac{1-\alpha^{\gamma+1}}{(1-\alpha)\,(\gamma c + 1)}
+$$
 
 Key points: you only win when $\alpha$ is high, $\gamma$ is moderate, and the draft is cheap enough; with low $\alpha$, a larger $\gamma$ loses more. Variants include Medusa (multiple decoding heads guessing in parallel), **EAGLE / EAGLE-2 / EAGLE-3** (extrapolating fused multi-layer hidden features + dynamic context-aware draft trees, achieving 3–5× lossless speedup), and lookahead/n-gram (using repeated prompt fragments as a zero-cost draft). Verification is simpler under greedy decoding; sampling requires rejection sampling to keep the distribution identical.
 
@@ -118,7 +130,7 @@ Key points: you only win when $\alpha$ is high, $\gamma$ is moderate, and the dr
 - **Wide-EP MoE serving (DeepEP)**: for huge sparse MoE models (e.g., DeepSeek-V3 with 256 experts), decoding with **Data Parallel Attention + Wide Expert Parallelism** (spreading experts across 32–144 GPUs) keeps per-GPU active weights small and raises per-expert batch size, overlapping All-to-All dispatch/combine with computation using low-latency RDMA kernels (DeepEP).
 - **Kernel fusion**: RMSNorm+residual, fusing the three QKV projections, fused MoE, FlashAttention/FlashInfer/FlashDecoding. Decode kernels are tiny, so launch overhead and memory traffic dominate; fusion pays off clearly.
 - **CUDA graph**: record a chain of kernel launches and replay it as a graph, eliminating CPU-side launch overhead; only works for decode with fixed shapes (vLLM uses piecewise CUDA graphs to cover a few common batch buckets).
-- **Parallelism**: TP within a node (split every layer, frequent all-reduce), PP across nodes (split by layer, point-to-point), EP for MoE (all-to-all). See [07 Distributed training](07-distributed-training.md) and [ML Infra · Inference serving and GPU optimization](../07-ml-infra/04-inference-serving-and-gpu-optimization.md).
+- **Parallelism**: TP within a node (split every layer, frequent all-reduce), PP across nodes (split by layer, point-to-point), EP for MoE (all-to-all). See [08 Distributed training](08-distributed-training.md) and [ML Infra · Inference serving and GPU optimization](../07-ml-infra/04-inference-serving-and-gpu-optimization.md).
 
 ## 3. Implementation notes
 

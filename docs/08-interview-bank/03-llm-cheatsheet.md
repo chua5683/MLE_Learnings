@@ -21,7 +21,9 @@
 
 ## 2. Inference: formulas + three numbers to memorize
 
-$$\text{KV per token}=2\times L\times n_{kv}\times d_{head}\times p\ \text{(bytes)},\qquad \text{KV total}=\text{above}\times S\times B$$
+$$
+\text{KV per token}=2\times L\times n_{kv}\times d_{head}\times p\ \text{(bytes)},\qquad \text{KV total}=\text{above}\times S\times B
+$$
 
 | Model | KV per token (FP16) | One 4K sequence |
 | --- | --- | --- |
@@ -114,7 +116,7 @@ Prompt quick list: $T$=0 for extraction/classification/JSON; CoT buys serial com
 
 ## 8. Further reading
 
-- Architecture and training: [01 Language modeling and tokenization](../04-llm/01-language-models-and-tokenization.md), [02 LLM architecture evolution](../04-llm/02-llm-architecture-evolution.md), [03 Attention and positional encoding](../04-llm/03-attention-and-position-encoding.md), [05 Scaling Law](../04-llm/05-scaling-laws.md), [07 Distributed training](../04-llm/07-distributed-training.md)
-- Fine-tuning and alignment: [06 Fine-tuning and PEFT](../04-llm/06-fine-tuning-and-peft.md), [03 The full RLHF pipeline](../03-reinforcement-learning/05-rlhf-pipeline.md), [03 GRPO and reasoning RL](../03-reinforcement-learning/07-grpo-and-reasoning-rl.md)
-- Applications and evaluation: [08 Inference optimization and deployment](../04-llm/08-inference-optimization-and-serving.md), [09 Quantization and compression](../04-llm/09-quantization-and-compression.md), [10 Evaluation and hallucination](../04-llm/10-evaluation-and-hallucination.md), [11 RAG](../04-llm/11-rag.md), [12 Prompt engineering](../04-llm/12-prompt-engineering.md)
+- Architecture and training: [01 Language modeling and tokenization](../04-llm/01-language-models-and-tokenization.md), [02 LLM architecture evolution](../04-llm/02-llm-architecture-evolution.md), [03 Attention and positional encoding](../04-llm/03-attention-and-position-encoding.md), [05 Scaling Law](../04-llm/05-scaling-laws.md), [08 Distributed training](../04-llm/08-distributed-training.md)
+- Fine-tuning and alignment: [06 Fine-tuning and PEFT](../04-llm/06-fine-tuning-and-peft.md), [07 Post-training pipeline](../04-llm/07-post-training-pipeline.md), [03 The full RLHF pipeline](../03-reinforcement-learning/05-rlhf-pipeline.md), [03 GRPO and reasoning RL](../03-reinforcement-learning/07-grpo-and-reasoning-rl.md)
+- Applications and evaluation: [09 Inference optimization and deployment](../04-llm/09-inference-optimization-and-serving.md), [10 Quantization and compression](../04-llm/10-quantization-and-compression.md), [11 Evaluation and hallucination](../04-llm/11-evaluation-and-hallucination.md), [12 RAG](../04-llm/12-rag.md), [13 Prompt engineering](../04-llm/13-prompt-engineering.md), [14 Multimodal LLMs](../04-llm/14-multimodal-llms.md)
 - Agents: [05 Agent basics and architecture](../05-agents/01-agent-fundamentals-and-architecture.md), [05 Production evaluation and safety](../05-agents/09-evaluation-and-safety.md)

@@ -15,7 +15,7 @@ flowchart TB
 
     subgraph M["Models"]
         RL["03 Reinforcement learning<br/>MDP · PG · PPO · RLHF · DPO · GRPO"]
-        LLM["04 Large language models<br/>architecture · pretraining · scaling · fine-tuning · distributed · inference · quantization · evaluation · RAG · prompting · multimodal"]
+        LLM["04 Large language models<br/>architecture · pretraining · scaling · fine-tuning · post-training · distributed · inference · quantization · evaluation · RAG · prompting · multimodal"]
         AG["05 AI agents<br/>agent loop · tools · planning · memory · RAG · multi-agent · proactive · harness · eval · governance"]
     end
 
@@ -45,15 +45,16 @@ flowchart TB
 | Transformer | Attention, residual, LayerNorm | 02-05 / 04-02 |
 | Scaling laws | Pretraining, loss functions | 04-05 |
 | LoRA | Low-rank decomposition, fine-tuning | 04-06 |
-| KV cache | Autoregressive decoding, attention | 04-08 |
+| Post-training pipeline | SFT, rejection sampling, online DPO, RLVR, distillation | 04-07 / 03-05 to 03-07 |
+| KV cache | Autoregressive decoding, attention | 04-09 |
 | RLHF | Policy gradients, PPO | 03-05 |
 | DPO | Preference modeling, KL regularization | 03-06 |
-| RAG | Retrieval, embeddings, generation | 04-11 |
+| RAG | Retrieval, embeddings, generation | 04-12 |
 | Agents | LLMs, tool calling, planning | 05-01 |
 | Proactive, Harness & Governance Agents | Agent loop, MCP, event streams, auth/RBAC | 05-07 / 05-08 / 05-10 |
 | Feature store | Offline/online consistency | 07-02 |
 | Causal / Uplift & Bandits | Potential outcomes, propensities | 01-08 |
-| VLMs / Diffusion / GNNs | ViT, contrastive loss, message passing | 02-07 / 04-13 |
+| VLMs / Diffusion / GNNs | ViT, contrastive loss, message passing | 02-07 / 04-14 |
 | RL Post-Training Infra | Distributed training + vLLM/SGLang serving | 07-05 |
 
 ## 3. One-page index
@@ -73,8 +74,8 @@ flowchart TB
 | PPO-clip objective | [03-04](../03-reinforcement-learning/04-ppo-and-trpo.md) |
 | DPO loss | [03-06](../03-reinforcement-learning/06-dpo-and-preference-optimization.md) |
 | GRPO group-relative advantage | [03-07](../03-reinforcement-learning/07-grpo-and-reasoning-rl.md) |
-| KV cache memory | [04-08](../04-llm/08-inference-optimization-and-serving.md) |
-| ZeRO memory breakdown | [04-07](../04-llm/07-distributed-training.md) |
+| KV cache memory | [04-09](../04-llm/09-inference-optimization-and-serving.md) |
+| ZeRO memory breakdown | [04-08](../04-llm/08-distributed-training.md) |
 
 ### Design questions (often asked in interviews)
 
